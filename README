@@ -1,7 +1,9 @@
-GFinder is GNUstep's Workspace Manager and offers a File Manager and an optional Desktop with associated services and tools.
-Inspired by the NeXT workspace manager, it incorporates modern features and offers many conveniencies.
+GFinder is a fork of GNUstep's Workspace Manager aiming to implement a more modern Mac-Like experience and offers a File Manager and an optional Desktop with associated services and tools.
+Inspired by the OSX Finder, it incorporates modern features and offers many conveniencies.
 
 File Manager:
+     * Icons view set by default
+     * Horizontal shortcuts modelled after Apple's Finder.
      * Classical column browser view
      * List view
      * Icons view with possibility of Thumbnails
