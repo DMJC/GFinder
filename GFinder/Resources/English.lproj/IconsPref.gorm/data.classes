@@ -1,0 +1,22 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    FirstResponder = {
+	Actions = (
+	    "orderFrontFontPanel:",
+	    "setUnsetThumbnails:"
+	);
+	Super = NSObject;
+    };
+    IconsPref = {
+	Actions = (
+	    "setUnsetThumbnails:"
+	);
+	Outlets = (
+	    win,
+	    prefbox,
+	    thumbbox,
+	    thumbCheck
+	);
+	Super = NSObject;
+    };
+}

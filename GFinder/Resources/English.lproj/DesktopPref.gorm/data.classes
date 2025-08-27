@@ -1,0 +1,72 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    ArrResizer = {
+	Actions = (
+	    "initForController:"
+	);
+	Outlets = (
+	);
+	Super = NSView;
+    };
+    ColorView = {
+	Actions = (
+	);
+	Outlets = (
+	);
+	Super = NSView;
+    };
+    DesktopPref = {
+	Actions = (
+	    "setColor:",
+	    "chooseImage:",
+	    "setImage:",
+	    "setImageStyle:",
+	    "setUseImage:",
+	    "setOmnipresent:",
+	    "setUsesDock:",
+	    "setDockPosition:",
+	    "setDockStyle:",
+	    "setTShelfAutohide:",
+	    "setSingleClickLaunch:"
+	);
+	Outlets = (
+	    win,
+	    prefbox,
+	    tabView,
+	    colorLabel,
+	    colorWell,
+	    imageView,
+	    imagePosMatrix,
+	    chooseImageButt,
+	    useImageSwitch,
+	    omnipresentCheck,
+	    hideTShelfCheck,
+	    launchSingleClick,
+	    dockBox,
+	    useDockCheck,
+	    dockPosLabel,
+	    dockPosMatrix,
+	    dockStyleLabel,
+	    dockStyleMatrix,
+	    gfinder
+	);
+	Super = NSObject;
+    };
+    FirstResponder = {
+	Actions = (
+	    "chooseImage:",
+	    "orderFrontFontPanel:",
+	    "setColor:",
+	    "setDockPosition:",
+	    "setDockStyle:",
+	    "setImage:",
+	    "setImageStyle:",
+	    "setOmnipresent:",
+	    "setSingleClickLaunch:",
+	    "setTShelfAutohide:",
+	    "setUseImage:",
+	    "setUsesDock:"
+	);
+	Super = NSObject;
+    };
+}

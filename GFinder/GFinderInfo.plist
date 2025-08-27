@@ -1,0 +1,47 @@
+ {
+    ApplicationName = "GFinder";
+    ApplicationDescription = "GNUstep Finder Manager";
+    ApplicationIcon = "FileManager.tiff";
+    ApplicationRelease = "1.1.0";
+    NSBuildVersion = "02 2025";
+    CFBundleIdentifier = "org.gnustep.GFinder";
+    Authors = (
+      "Riccardo Mottola",
+      "Enrico Sersale",
+      "Documentation and Help contents by:",
+      "Dennis Leeuw <dleeuw@made-it.com>"
+    );
+    URL = "http://www.gnustep.org/experience/GFinder.html";
+    Copyright = "Copyright (C) 2003-2025 Free Software Foundation, Inc.";
+    CopyrightDescription = "Released under the GNU General Public License 2.0 or later";
+    NSIcon = "FileManager.tiff";
+    NSRole = "Viewer";
+    NSServices = (
+      {
+        NSMenuItem = {
+          English = "Open in GFinder";
+          German = "In GFinder \U00F6ffnen";
+	  French = "Ouvrir dans GFinder";
+	  Italian = "Aprire in GFinder";
+          default = "Open in GFinder";
+        };
+        NSMessage = openInWorkspace;
+        NSPortName = GFinder;
+        NSSendTypes = ( NSStringPboardType );
+      }
+    );
+    NSTypes = (
+    {
+      NSUnixExtensions = ( "inspector" );
+      NSIcon = "MagnifyGlas.tiff";
+    },
+      {
+        NSUnixExtensions = ( "lsf" );
+        NSIcon = "LiveSearchFolder.tiff";
+      },
+      {
+	NSUnixExtensions = ( "webloc" );
+	NSIcon = "FileIcon_WebLink.tiff";
+      }
+  );
+}

@@ -1,0 +1,44 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    FirstResponder = {
+	Actions = (
+	    "orderFrontFontPanel:",
+	    "closeMainWin:",
+	    "showInfo:",
+	    "okLoginAction:",
+	    "setDefaultApplication:"
+	);
+	Super = NSObject;
+    };
+    IconView = {
+	Actions = (
+	);
+	Outlets = (
+	    inspector
+	);
+	Super = NSImageView;
+    };
+    Tools = {
+	Actions = (
+	    "setDefaultApplication:"
+	);
+	Outlets = (
+	    win,
+	    mainBox,
+	    topBox,
+	    iconView,
+	    titleField,
+	    toolsBox,
+	    explLabel1,
+	    scrollView,
+	    defAppLabel,
+	    defAppField,
+	    defPathLabel,
+	    defPathField,
+	    explLabel2,
+	    explLabel3,
+	    okButt
+	);
+	Super = NSObject;
+    };
+}

@@ -1,0 +1,23 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    FirstResponder = {
+	Actions = (
+	    "orderFrontFontPanel:",
+	    "buttonAction:",
+	    "initForInspector:",
+	    "csizesAction:"
+	);
+	Super = NSObject;
+    };
+    RecyclerPrefs = {
+	Actions = (
+	    "setDockable:"
+	);
+	Outlets = (
+	    win,
+	    dockButt,
+	    explLabel
+	);
+	Super = NSObject;
+    };
+}

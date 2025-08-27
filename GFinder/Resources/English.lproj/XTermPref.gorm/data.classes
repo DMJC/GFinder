@@ -1,0 +1,29 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    FirstResponder = {
+	Actions = (
+	    "orderFrontFontPanel:",
+	    "setUseService:"
+	);
+	Super = NSObject;
+    };
+    XTermPref = {
+	Actions = (
+	    "setXTerm:",
+	    "setUseService:"
+	);
+	Outlets = (
+	    win,
+	    prefbox,
+	    fieldsBox,
+	    xtermLabel,
+	    argsLabel,
+	    setButt,
+	    serviceBox,
+	    serviceCheck,
+	    xtermField,
+	    argsField
+	);
+	Super = NSObject;
+    };
+}

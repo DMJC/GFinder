@@ -1,0 +1,66 @@
+
+PACKAGE_NEEDS_CONFIGURE = YES
+
+ADDITIONAL_INCLUDE_DIRS += @SQLITE_INCLUDE_DIRS@
+ADDITIONAL_LIB_DIRS += @SQLITE_LIB_DIRS@
+
+PACKAGE_NAME = gfinder
+include $(GNUSTEP_MAKEFILES)/common.make
+
+FRAMEWORK_NAME = MDKit
+include Version
+
+MDKit_PRINCIPAL_CLASS = MDKQuery
+MDKit_HAS_RESOURCE_BUNDLE = yes
+
+LIBRARIES_DEPEND_UPON += -lFSNode
+LIBRARIES_DEPEND_UPON += -lDBKit
+LIBRARIES_DEPEND_UPON += $(GUI_LIBS) $(FND_LIBS) $(OBJC_LIBS) $(SYSTEM_LIBS)
+
+MDKit_RESOURCE_FILES = \
+    Resources/attributes.plist \
+    Resources/Images/* \
+    Resources/English.lproj
+
+MDKit_LANGUAGES = Resources/English
+
+MDKit_OBJC_FILES = \
+SQLite.m \
+MDKQuery.m \
+MDKQueryManager.m \
+MDKWindow.m \
+MDKResultsCategory.m \
+MDKTableView.m \
+MDKResultCell.m \
+MDKAttributeChooser.m \
+MDKAttribute.m \
+MDKAttributeView.m \
+MDKAttributeEditor.m \
+MDKFSFilter.m
+
+MDKit_HEADER_FILES = \
+MDKit.h \
+SQLite.h \
+MDKQuery.h \
+MDKQueryManager.h \
+MDKWindow.h \
+MDKAttributeChooser.h \
+MDKAttribute.h \
+MDKAttributeView.h \
+MDKAttributeEditor.h
+
+ifeq ($(findstring darwin, $(GNUSTEP_TARGET_OS)), darwin)
+  ifeq ($(OBJC_RUNTIME_LIB), gnu)
+    SHARED_LD_POSTFLAGS += -lgnustep-base -lgnustep-gui -lFSNode -lDBKit
+  endif
+endif
+
+-include GNUmakefile.preamble
+
+-include GNUmakefile.local
+
+include $(GNUSTEP_MAKEFILES)/framework.make
+
+include $(GNUSTEP_MAKEFILES)/aggregate.make
+
+-include GNUmakefile.postamble

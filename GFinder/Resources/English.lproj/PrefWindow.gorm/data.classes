@@ -1,0 +1,21 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    FirstResponder = {
+	Actions = (
+	    "orderFrontFontPanel:"
+	);
+	Super = NSObject;
+    };
+    PrefController = {
+	Actions = (
+	    "activatePrefView:"
+	);
+	Outlets = (
+	    win,
+	    topBox,
+	    popUp,
+	    viewsBox
+	);
+	Super = NSObject;
+    };
+}

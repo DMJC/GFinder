@@ -1,0 +1,39 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    FileOpExecutor = {
+	Actions = (
+	);
+	Outlets = (
+	    fileOp
+	);
+	Super = NSObject;
+    };
+    FileOpInfo = {
+	Actions = (
+	    "pause:",
+	    "stop:",
+	    "registerExecutor:"
+	);
+	Outlets = (
+	    executor,
+	    controller,
+	    win,
+	    fromLabel,
+	    fromField,
+	    toLabel,
+	    toField,
+	    progInd,
+	    pauseButt,
+	    stopButt
+	);
+	Super = NSObject;
+    };
+    FirstResponder = {
+	Actions = (
+	    "orderFrontFontPanel:",
+	    "pause:",
+	    "registerExecutor:"
+	);
+	Super = NSObject;
+    };
+}

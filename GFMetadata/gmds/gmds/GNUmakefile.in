@@ -1,0 +1,24 @@
+
+PACKAGE_NAME = gfinder
+include $(GNUSTEP_MAKEFILES)/common.make
+
+ADDITIONAL_INCLUDE_DIRS += @SQLITE_INCLUDE_DIRS@
+ADDITIONAL_LIB_DIRS += @SQLITE_LIB_DIRS@
+        
+TOOL_NAME = gmds
+
+gmds_OBJC_FILES = gmds.m \
+                  sqlite.m 
+
+gmds_TOOL_LIBS += -lgnustep-gui
+
+-include GNUmakefile.preamble
+
+-include GNUmakefile.local
+
+include $(GNUSTEP_MAKEFILES)/tool.make
+
+include $(GNUSTEP_MAKEFILES)/aggregate.make
+
+-include GNUmakefile.postamble
+

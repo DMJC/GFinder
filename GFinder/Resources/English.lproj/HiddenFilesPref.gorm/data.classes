@@ -1,0 +1,50 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    FirstResponder = {
+	Actions = (
+	    "orderFrontFontPanel:",
+	    "loadContents:",
+	    "moveToHidden:",
+	    "moveToShown:",
+	    "activateChanges:",
+	    "addDir:",
+	    "removeDir:",
+	    "activateDirChanges:"
+	);
+	Super = NSObject;
+    };
+    HiddenFilesPref = {
+	Actions = (
+	    "loadContents:",
+	    "moveToHidden:",
+	    "moveToShown:",
+	    "activateChanges:",
+	    "addDir:",
+	    "removeDir:",
+	    "activateDirChanges:"
+	);
+	Outlets = (
+	    win,
+	    prefbox,
+	    tabView,
+	    iconView,
+	    pathField,
+	    hiddenlabel,
+	    leftScroll,
+	    shownlabel,
+	    rightScroll,
+	    addButt,
+	    removeButt,
+	    loadButt,
+	    labelinfo,
+	    setButt,
+	    cellPrototipe,
+	    hiddenDirslabel,
+	    hiddenDirsScroll,
+	    addDirButt,
+	    removeDirButt,
+	    setDirButt
+	);
+	Super = NSObject;
+    };
+}

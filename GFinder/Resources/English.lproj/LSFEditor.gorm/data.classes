@@ -1,0 +1,37 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    FirstResponder = {
+	Actions = (
+	    "addSearchPlaceFromDialog:",
+	    "buttonsAction:",
+	    "chooseSearchPlacesType:",
+	    "orderFrontFontPanel:",
+	    "removeSearchPlaceButtAction:",
+	    "startFind:"
+	);
+	Super = NSObject;
+    };
+    LSFEditor = {
+	Actions = (
+	    "buttonsAction:"
+	);
+	Outlets = (
+	    win,
+	    modulesBox,
+	    cancelButt,
+	    saveButt,
+	    modulesLabel,
+	    placesScroll,
+	    searchLabel,
+	    recursiveSwitch
+	);
+	Super = NSObject;
+    };
+    SearchPlacesBox = {
+	Actions = (
+	);
+	Outlets = (
+	);
+	Super = NSBox;
+    };
+}

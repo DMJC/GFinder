@@ -1,0 +1,28 @@
+
+# Additional flags to pass to the preprocessor
+ADDITIONAL_CPPFLAGS += 
+
+# Additional flags to pass to the Objective-C compiler
+ADDITIONAL_OBJCFLAGS += -Wall 
+
+# Additional flags to pass to the C compiler
+ADDITIONAL_CFLAGS += -Wall 
+
+# Additional include directories the compiler should search
+ADDITIONAL_INCLUDE_DIRS += -I../../FSNode 
+ADDITIONAL_INCLUDE_DIRS += -I../../DBKit 
+
+# Additional LDFLAGS to pass to the linker
+ADDITIONAL_LDFLAGS +=  
+
+# Additional library directories the linker should search
+ADDITIONAL_LIB_DIRS += -L../../FSNode/FSNode.framework/Versions/Current/$(GNUSTEP_TARGET_LDIR)
+ADDITIONAL_LIB_DIRS += -L../../DBKit/$(GNUSTEP_OBJ_DIR)   
+                      
+#
+# Flags dealing with installing and uninstalling
+#
+
+# Additional directories to be created during installation
+ADDITIONAL_INSTALL_DIRS +=
+

@@ -1,0 +1,33 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    ArrResizer = {
+	Actions = (
+	    "initForController:"
+	);
+	Outlets = (
+	);
+	Super = NSView;
+    };
+    FirstResponder = {
+	Actions = (
+	    "orderFrontFontPanel:"
+	);
+	Super = NSObject;
+    };
+    ShelfPref = {
+	Actions = (
+	    "setDefaultWidth:"
+	);
+	Outlets = (
+	    win,
+	    prefbox,
+	    iconbox,
+	    imView,
+	    leftResBox,
+	    rightResBox,
+	    nameField,
+	    setButt
+	);
+	Super = NSObject;
+    };
+}

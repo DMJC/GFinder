@@ -1,0 +1,30 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    FirstResponder = {
+	Actions = (
+	    "orderFrontFontPanel:"
+	);
+	Super = NSObject;
+    };
+    OperationPrefs = {
+	Actions = (
+	    "setUnsetStatWin:",
+	    "setUnsetFileOp:"
+	);
+	Outlets = (
+	    win,
+	    prefbox,
+	    tabView,
+	    statusBox,
+	    statChooseButt,
+	    confirmBox,
+	    confMatrix,
+	    labelinfo1,
+	    labelinfo2,
+	    statusinfo1,
+	    statusinfo2,
+	    statuslabel
+	);
+	Super = NSObject;
+    };
+}

@@ -1,0 +1,33 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    FirstResponder = {
+	Actions = (
+	    "openEditor:",
+	    "orderFrontFontPanel:",
+	    "restartSearch:",
+	    "setAutoupdateCycle:",
+	    "stopSearch:",
+	    "updateIfNeeded:"
+	);
+	Super = NSObject;
+    };
+    LSFolder = {
+	Actions = (
+	    "setAutoupdateCycle:",
+	    "updateIfNeeded:",
+	    "openEditor:"
+	);
+	Outlets = (
+	    win,
+	    topBox,
+	    progBox,
+	    elementsLabel,
+	    autoupdatePopUp,
+	    updateButt,
+	    resultsScroll,
+	    editButt,
+	    pathBox
+	);
+	Super = NSObject;
+    };
+}

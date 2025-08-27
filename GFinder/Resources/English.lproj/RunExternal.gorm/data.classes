@@ -1,0 +1,42 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    CompletionField = {
+	Actions = (
+	    "initForController:"
+	);
+	Outlets = (
+	    fm,
+	    controller
+	);
+	Super = NSTextView;
+    };
+    FirstResponder = {
+	Actions = (
+	    "cancelButtAction:",
+	    "completionFieldDidEndLine:",
+	    "initForController:",
+	    "okButtAction:"
+	);
+	Super = NSObject;
+    };
+    NSObject = {
+	Actions = (
+	    "completionFieldDidEndLine:"
+	);
+    };
+    RunExternalController = {
+	Actions = (
+	    "cancelButtAction:",
+	    "okButtAction:"
+	);
+	Outlets = (
+	    win,
+	    titleLabel,
+	    secondLabel,
+	    cancelButt,
+	    okButt,
+	    cfield
+	);
+	Super = NSObject;
+    };
+}

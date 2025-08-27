@@ -1,0 +1,2442 @@
+2024-03-20  Riccardo Mottola <rm@gnu.org>
+	* Inspector/ContentViewers/ImageViewer/Resizer.m:
+	use getPixel/setPixel to handle also 16bpp and non-planar images.
+	A bit slower, but more portable code since it relies on
+	NSBitmapImageRep.
+
+2022-12-22  Riccardo Mottola <rm@gnu.org>
+	* Inspector/ContentViewers/ImageViewer/ImageViewer.h
+	* Inspector/ContentViewers/ImageViewer/ImageViewer.m:
+	Cleanup checking of image consistency, remove lastPath.
+	If the image isn't the current one, don't show it invalid:
+	we suppose another resizer task is running in the background.
+
+2022-12-21  Riccardo Mottola <rm@gnu.org>
+	* Inspector/ContentViewers/ImageViewer/ImageViewer.m
+	Try to handle failure of resized image better.
+
+2022-10-06  Riccardo Mottola <rm@gnu.org>
+	* Inspector/ContentViewers/ImageViewer/ImageViewer.m
+	* Inspector/ContentViewers/ImageViewer/Resizer.m
+	store Image Path and get it back from the resizer and compare if it is current
+
+2022-10-06  Riccardo Mottola <rm@gnu.org>
+	* Inspector/ContentViewers/AppViewer/AppViewer.m
+	* Inspector/ContentViewers/FolderViewer/FolderViewer.m
+	* Inspector/ContentViewers/IBViewViewer/IBViewViewer.m
+	* Inspector/ContentViewers/ImageViewer/ImageViewer.m
+	* Inspector/ContentViewers/NSColorViewer/NSColorViewer.m
+	* Inspector/ContentViewers/NSRTFViewer/NSRTFViewer.m
+	* Inspector/ContentViewers/NSTIFFViewer/NSTIFFViewer.m
+	* Inspector/ContentViewers/PdfViewer/PdfViewer.m
+	* Inspector/ContentViewers/RtfViewer/RtfViewer.m
+	* Inspector/ContentViewers/SoundViewer/SoundViewer.m
+	* Inspector/ContentViewersProtocol.h
+	* Inspector/Contents.m
+	remove displayLastPath and simplify, it was forced to NO anyway.
+
+2022-07-12  Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNIcon.h
+	* FSNode/FSNIcon.m
+	* FSNode/FSNIconsView.m
+	* GFinder/FileViewer/GWViewerIconsPath.m
+	remove index from FSNIconNameEditor, unused.
+
+2022-07-11  Riccardo Mottola <rm@gnu.org>
+	* FSNode/FSNBrowserMatrix.[h,m]:
+	mouseFlags has to be NSUInteger coming from NSEvent modifierFlags.
+
+2022-06-29  Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNBrowserColumn.m
+	* FSNode/FSNBrowserColumn.h
+	Switch index to NSInteger
+
+2022-06-29  Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNBrowserColumn.m
+	Cleanup of selection code, use proper NSInteger for Matrix access
+
+2021-10-12  Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNIcon.h
+	* FSNode/FSNIcon.m
+	If modern style is selected, draw the frame with a subtle alpha
+	channel.
+
+2021-09-10  Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Preferences/DesktopPref.m
+	* GFinder/TShelf/TShelfIcon.h
+	* GFinder/TShelf/TShelfIcon.m
+	* GFinder/TShelf/TShelfIconsView.h
+	* GFinder/TShelf/TShelfIconsView.m
+	* GFinder/TShelf/TShelfView.h
+	* GFinder/TShelf/TShelfView.m
+	* GFinder/TShelf/TShelfWin.h
+	* GFinder/TShelf/TShelfWin.m:
+	Also Tabbed Shelf shall respect single-click launch.
+
+2021-09-09  Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Desktop/Dock/Dock.h
+	* GFinder/Desktop/Dock/Dock.m
+	* GFinder/Desktop/Dock/DockIcon.h
+	* GFinder/Desktop/Dock/DockIcon.m
+	* GFinder/Desktop/GWDesktopManager.h
+	* GFinder/Desktop/GWDesktopManager.m
+	* GFinder/Preferences/DesktopPref.h
+	* GFinder/Preferences/DesktopPref.m
+	* GFinder/Resources/English.lproj/DesktopPref.gorm
+	* GFinder/Resources/English.lproj/Localizable.strings
+	* GFinder/Resources/French.lproj/Localizable.strings
+	* GFinder/Resources/German.lproj/Localizable.strings
+	* GFinder/Resources/Italian.lproj/Localizable.strings:
+	Add single-click launch preference and apply it to the Dock.
+
+2021-09-09  Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNIcon.h
+	* FSNode/FSNIcon.m
+	* FSNode/FSNTextCell.m
+	* GFinder/Desktop/GWDesktopIcon.m
+	Allow the background od an Icon Label to be drawn and have Desktop Icons use this.
+
+2021-05-21  Riccardo Mottola <rm@gnu.org>
+
+	* configure
+	* configure.ac
+	substitute CC, CPP, CXX variables so subprojects pick them up
+
+2021-05-08  Riccardo Mottola <rm@gnu.org>
+
+	* Inspector/Tools.h
+	* Inspector/Tools.h
+	In findApplicationsForPaths return now early and a BOOL for success or failure finding applications. Use this return in activateForPaths to cleanup tool list if none were found and use this to enable tool display for directories.
+
+2021-01-31  Riccardo Mottola <rm@gnu.org>
+
+	* Inspector/ContentViewers/AppViewer/AppViewer.m
+	Cleanup code and fix display of extensions without a valid icons.
+
+2020-10-29  Riccardo Mottola <rm@gnu.org>
+
+	* Inspector/ContentViewers/ImageViewer/ImageViewer.h
+        * Inspector/ContentViewers/ImageViewer/ImageViewer.m
+        * Inspector/ContentViewers/ImageViewer/Resizer.h
+        * Inspector/ContentViewers/ImageViewer/Resizer.m
+        * Inspector/ContentViewersProtocol.h
+	Extract ImageViewerProtocol, make ImageViewer adopt it, set the Proxy in the resizer explicitely and avoid using a serverConnection variable.
+
+2020-03-11  Riccardo Mottola <rm@gnu.org>
+	* GFinder/Thumbnailer/ImageThumbnailer/ImageThumbnailer.m
+	Update Scaling code to Bilinear from PRICE.
+
+2020-01-31  Riccardo Mottola <rm@gnu.org>
+	* Inspector/ContentViewers/ImageViewer/Resizer.m
+	Update Scaling code to Bilinear from PRICE.
+
+2018-12-08  Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNode.m
+	Do not set mount type because of file system type, just rely now on mounting/unmounting of volumes
+
+2018-11-19  Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Desktop/GWDesktopView.m (showMountedVolumes)
+	Improve handling of added and removed volumes.
+
+2018-08-01  Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNodeRepIcons.m
+	Fix inconsistent condition for  [volumes containsObject: nodepath]
+
+	* GFinder/Desktop/GWDesktopManager.h
+	* GFinder/Desktop/GWDesktopManager.m
+	Track mounted volumes by checking additions/removals instead of modification of mount points.
+
+
+2018-07-06  Riccardo Mottola <rm@gnu.org>
+
+	* Inspector/ContentViewers/AppViewer/AppViewer.m
+	Do not lookup the icon for empty names, reset icon if none is found.
+
+2018-03-13  Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Resources/Japanese.lproj/Localizable.strings
+	Add Japanese locale by Chubei Nakagawa
+
+2018-01-25  Riccardo Mottola <rm@gnu.org>
+
+	* GWMetadata/gmds/mdextractor/mdextractor.m
+	* Tools/fswatcher/fswatcher-inotify.m
+	* Tools/fswatcher/fswatcher.m
+	Clean up unused is_daemon static var.
+
+2018-01-24  Riccardo Mottola <rm@gnu.org>
+
+	* GWMetadata/MDFinder/MDFinder.h
+	* GWMetadata/MDFinder/MDFinder.m
+	Fix warnings: make NSMenuItem follow protocol.
+
+	* Operation/FileOpInfo.m
+	Fix string format warning.
+
+	* GWMetadata/gmds/mdextractor/mdextractor.m
+	Return correct object in case of exception!
+
+	* GFinder/TShelf/TShelfView.m
+	Minor cleanup and compare pointer against nil and not NO.
+
+2018-01-17  Riccardo Mottola <rm@gnu.org>
+
+	* Tools/ddbd/ddbd.m
+	Fix allocated class type.
+
+2018-01-17  Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Finder/Finder.m
+	Fix allocated class type.
+
+2018-01-11 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/configure
+	* FSNode/configure.ac
+	Remove sub-folder configures and merge into top-level
+
+	* GFinder/configure.ac
+	* GFinder/configure
+	Remove sub-folder configures and merge into top-level
+
+2016-06-07 Riccardo Mottola <rm@gnu.org>
+
+	* Inspector/ContentViewers/ImageViewer/ImageViewer.h
+	* Inspector/ContentViewers/ImageViewer/ImageViewer.m
+	Do not watch for the connection dieing, we suppose it stable being local now.
+
+2016-06-01 Riccardo Mottola <rm@gnu.org>
+
+	* Inspector/ContentViewers/ImageViewer/ImageViewer.m
+	* Inspector/ContentViewers/ImageViewer/Resizer.m
+	Pass data directly without Archiving/Unarchiving.
+
+2016-06-01 Riccardo Mottola <rm@gnu.org>
+
+	* Inspector/ContentViewers/ImageViewer/ImageViewer.h
+	* Inspector/ContentViewers/ImageViewer/ImageViewer.m
+	* Inspector/ContentViewers/ImageViewer/Resizer.h
+	* Inspector/ContentViewers/ImageViewer/Resizer.m
+	Use DO and connections to communicate to thread.
+
+2016-06-01 Riccardo Mottola <rm@gnu.org>
+
+	* Inspector/ContentViewers/ImageViewer/ImageViewer.h
+	* Inspector/ContentViewers/ImageViewer/ImageViewer.m
+	* Inspector/ContentViewers/ImageViewer/Resizer.m
+	Partially revert, but fix and complete using a class instead of a separate Task, Rename Resizer to ImageResizer to avid class name clash.
+
+2016-04-28 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/GFinder.m
+	Make disk mount available also without an active desktop.
+
+2016-04-21 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Thumbnailer/ImageThumbnailer/ImageThumbnailer.m
+	* Inspector/ContentViewers/ImageViewer/resizer/Resizer.m
+	Generate thumbnail and preview only from the first available Bitmap representation: this means for multipage tiffs that the first page is used. Works around unidentified issues in certain setups where images failed to display. A better solution might be needed in the future in GUI itself.
+
+2016-04-13 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNodeRepIcons.m
+	Use different cache keys for icons and icons with link badge. Remove fail-over case which should not happen and Log a warning instead.
+
+2016-04-12 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Desktop/Dock/Dock.m
+	Use numeric search to sort icons index array.
+
+	* FSNode/Resources/Images/HardDisk.tiff
+	New icon by Bertrand
+
+2016-04-07 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNodeRep.m
+	Cleanup and use NSUInteger
+
+	* FSNode/FSNBrowser.m
+	* FSNode/FSNBrowserCell.m
+	* FSNode/FSNBrowserColumn.m
+	* FSNode/FSNIcon.m
+	* FSNode/FSNIconsView.m
+	* FSNode/FSNListView.m
+	* FSNode/FSNPathComponentsViewer.m
+	* FSNode/FSNodeRep.h
+	* FSNode/FSNodeRep.m
+	* GFinder/Desktop/GWDesktopView.m
+	* GFinder/FileViewer/GWViewerIconsPath.m
+	* GFinder/FileViewer/GWViewerShelf.m
+	* GFinder/History/History.
+	Refactor heighOfFont to heightOfFont
+
+2016-04-06 17:41-EDT Gregory John Casamento <greg.casamento@gmail.com>
+
+	* GFinder/GFinder.m: Add exception handler when loading
+	help file.  Still print out issue, but do not crash and end
+	up in an inconsistent state.
+
+2016-03-24 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Finder/Modules/FModuleAnnotations/FModuleAnnotations.m
+	* GFinder/Finder/Modules/FModuleContents/FModuleContents.m
+	* GFinder/Finder/Modules/FModuleCrDate/FModuleCrDate.m
+	* GFinder/Finder/Modules/FModuleKind/FModuleKind.m
+	* GFinder/Finder/Modules/FModuleModDate/FModuleModDate.m
+	* GFinder/Finder/Modules/FModuleName/FModuleName.m
+	* GFinder/Finder/Modules/FModuleOwner/FModuleOwner.m
+	* GFinder/Finder/Modules/FModuleSize/FModuleSize.m
+	* GFinder/Finder/Modules/FinderModulesProtocol.h
+	use NSInteger and NSComparisonResult instead of int.
+
+	* Tools/searchtool/searchtool.m
+	Clean up code and make it more robust.
+
+2016-03-23 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Desktop/GWDesktopManager.m
+	Enable thumbnail generation also for the desktop
+
+2016-03-22 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/GFinder.h
+	* GFinder/GFinder.m
+	Fix NSInteger vs. int
+
+2016-03-15 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Preferences/DesktopPref.m
+	Fix column vs. row selection.
+
+2016-03-10 Riccardo Mottola <rm@gnu.org>
+
+	* Inspector/aclocal.m4 (AC_CHECK_PDFKIT)
+	Fix redundant []
+
+	* Inspector/configure.ac
+	Inherit CC and CXX compiler settings.
+
+2016-03-10 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNodeRepIcons.m (iconOfSize: forNode:)
+	Traverse links to get thumbnails inside linked folders, mark direct symlinked folders and images with a link icon.
+
+2016-03-10  Wolfgang Lux  <wolfgang.lux@gmail.com>
+
+	* Inspector/aclocal.m4 (AC_CHECK_PDFKIT):
+	Fix linking argument order in configure test.
+
+2016-03-07 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNode.m
+	Localize the node name only if it is a directory.
+
+2016-03-02 Riccardo Mottola <rm@gnu.org>
+
+	* Inspector/Attributes.m
+	Use FSNode's name, not just the last path component.
+
+	* FSNode/FSNode.m
+	Localize the name of the node (perhaps this should be done selectively?).
+
+2016-03-02 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNFunctions.m
+	Do not retain a string constant.
+
+2016-02-26 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Desktop/Dock/DockIcon.m
+	* GFinder/Desktop/GWDesktopManager.h
+	* GFinder/Desktop/GWDesktopManager.m
+	* GFinder/Desktop/GWDesktopView.h
+	* GFinder/Desktop/GWDesktopView.m
+	Implement unlock methods and use them when unmounting fails.
+
+2016-02-23  Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/GFinder.m
+	Quit Recycler.app when activating desktop.
+
+2016-02-22  Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/GFinder.m
+	Allow disk checking also without desktop.
+
+2016-02-22  Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Fiend/FiendLeaf.m
+	* GFinder/GFinder.m
+	* GFinder/WorkspaceApplication.m
+	* Recycler/Recycler.m
+	Update tag of performFileOperation from int to NSInteger as per current API.
+
+2016-02-17  Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/FileViewer/GWViewersManager.m
+	Listen to NSWorkspaceDidMountNotification and NSWorkspaceDidUnmountNotification and update FSNodeRep accordingly.
+
+2016-02-17  Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNodeRep.m
+	* GFinder/GFinder.m
+	Self initialize FSNodeRep with removable medias and don't go through GFinder which used a non-API method.
+
+2016-02-16  Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNodeRep.h
+	* FSNode/FSNodeRep.m
+	Delete custom mountNewRemovableMedia implementation.
+
+2016-02-15  Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNodeRep.h
+	* FSNode/FSNodeRep.m
+	Delete mountedRemovableMedia custom implementation.
+
+2016-02-13  Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNodeRep.m
+	Delete unmountAndEjectDeviceAtPath custom implementation and use AppKit's one.
+
+2016-02-12  Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNodeRep.h
+	* FSNode/FSNodeRep.m
+	Remove mountedLocalVolumePaths already implemented in NSWorkspace.
+
+	* GFinder/Dialogs/RunExternalController.h
+	* GFinder/Dialogs/RunExternalController.m
+	Localize panel labels and titles.
+
+	* GFinder/Resources/English.lproj/RunExternal.gorm
+	Make labels larger.
+
+2016-02-12  Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNodeRep.h
+	* FSNode/FSNodeRep.m
+	Remove getFileSystemInfoForPath of category already implemented in class.
+
+2016-02-10  Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Preferences/HiddenFilesPref.m
+	Localize panel title.
+
+2016-02-10  Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Preferences/HiddenFilesPref.m
+	Clean up types as well as certain key localizations.
+
+2016-02-02  Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Finder/Modules/FModuleSize/FModuleSize.m
+	Fix spelling error.
+
+2016-01-27  Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Resources/English.lproj/Finder.gorm
+	* Workspace/Finder/Finder.m
+	Fix "recursive" button translation.
+
+2016-01-26 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Preferences/BrowserViewerPref.m
+	Fix key to match correct spelling.
+
+2016-01-20 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNBrowser.m
+	* FSNode/FSNFunctions.h
+	* FSNode/FSNFunctions.m
+	* FSNode/FSNIconsView.m
+	* FSNode/FSNListView.m
+	* GFinder/FileViewer/GWViewerIconsPath.m
+	Group controlTextDidEndEditing in FSFunctions in utility functions and use bundle-localized strings, use these functions in all places.
+
+2016-01-18 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNListView.m
+	* GWMetadata/MDKit/MDKWindow.m
+	* GFinder/Desktop/Dock/Dock.m
+	* GFinder/Finder/Finder.m
+	* GFinder/Finder/LiveSearch/LSFEditor.m
+	indexOfObjectIdenticalTo returns a NSUInteger
+
+2016-01-18 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNBrowser.m
+	* FSNode/FSNIconsView.m
+	* FSNode/FSNListView.m
+	* FSNode/FSNode.m
+	Localizations inside the Framework
+
+2016-01-18 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Desktop/GWDesktopView.m
+	Fix reading of defaults.
+
+2016-01-18 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/ExtendedInfo/Role/ExtInfoRole.m
+	* FSNode/ExtendedInfo/Role/GNUmakefile.in
+	Localizations inside the Bundle.
+
+	* FSNode/FSNListView.m
+	* FSNode/FSNodeRep.m
+	* FSNode/GNUmakefile.in
+	Localizations inside the Framework
+
+2016-01-16 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNodeRep.m
+	Listen to GSThemeDidActivateNotification to detect a theme change and refetch all cached icons.
+
+2016-01-14 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Preferences/DesktopPref.h
+	* GFinder/Preferences/DesktopPref.m
+	* GFinder/Resources/English.lproj/DesktopPref.gorm
+	* GFinder/Resources/English.lproj/Localizable.strings
+	* GFinder/Resources/French.lproj/Localizable.strings
+	* GFinder/Resources/German.lproj/Localizable.strings
+	* GFinder/Resources/Italian.lproj/Localizable.strings
+	Improve translation of Desktop Preference, move items, add strings.
+
+2016-01-11 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Thumbnailer/GWThumbnailer.m (makeThumbnailForPath)
+	Use actual pixel dimensions and not size, or resolutions different than 72dpi will make wrong thumbnails.
+
+2016-01-07 Riccardo Mottola <rm@gnu.org>
+
+	* Inspector/Attributes.m
+	* GFinder/Resources/English.lproj/Localizable.strings
+	* GFinder/Resources/French.lproj/Localizable.strings
+	* GFinder/Resources/German.lproj/Localizable.string
+	Localize Owner strong to Owner_short
+
+2016-01-05 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/FileViewer/GWViewersManager.m
+	count loops to NSUInteger
+
+2016-01-01 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNodeRep.h
+	* FSNode/FSNodeRep.m
+	Make nc ivar local instead.
+
+2015-12-04 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Thumbnailer/GWThumbnailer.h
+	* GFinder/Thumbnailer/GWThumbnailer.m
+	removeThumbnails, makeThumbnails: execute work in separate thread. Add pathsInProcessing to keep track of which paths are in process and do not allow to make/remove thumbnails on them.
+
+2015-12-04 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Thumbnailer/GWThumbnailer.h
+	* GFinder/Thumbnailer/GWThumbnailer.m (writeDictToFile)
+	Lock critical section.
+
+2015-12-03 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNodeRep.h
+	* FSNode/FSNodeRep.m
+	* FSNode/FSNodeRepIcons.m
+	Remove unused workspace icon.
+
+2015-12-03 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNIcon.m
+	* FSNode/FSNPathComponentsViewer.m
+	Use NSBrowserCell image for branch image, so that it uses the current theme.
+
+	* GFinder/GFinder.m
+	* GFinder/Thumbnailer/GWThumbnailer.m
+	In the icon changed notification, pass in side the info object only the actually created/deleted icons: do not put an empty object with the missing ones. Saves space in the info object.
+
+2015-12-02 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Thumbnailer/GWThumbnailer.h
+	* GFinder/Thumbnailer/GWThumbnailer.m
+	Factor out writing thumbnail dictionary in a common method.
+
+2015-12-02 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Thumbnailer/GWThumbnailer.h
+	* GFinder/Thumbnailer/GWThumbnailer.m
+	* GFinder/FileViewer/GWViewer.m
+	Make the thumbnailer a (releasable) singleton and instantiate it through sharedThumbnailer. It may be released, but if it exists, it is a singleton.
+
+2015-11-19  Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNodeRep.m
+	Use constants for common images from GNUstep, do not provide those icons.
+
+2015-11-18  Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNodeRep.m
+	Use pathForImageResource: instead of pathForResource
+
+2015-11-07 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Thumbnailer/GWThumbnailer.h
+	* GFinder/Thumbnailer/GWThumbnailer.m
+	Define maximum icon size to 64.
+
+	* GFinder/Thumbnailer/ImageThumbnailer/GNUmakefile.preamble
+	* GFinder/Thumbnailer/ImageThumbnailer/ImageThumbnailer.h
+	* GFinder/Thumbnailer/ImageThumbnailer/ImageThumbnailer.m
+	Cleanup header import and protocol redefinition.
+
+2015-11-06 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/FileViewer/GWViewer.m
+	* GFinder/Thumbnailer/GWThumbnailer.h
+	* GFinder/Thumbnailer/GWThumbnailer.m
+	Simplify parameters for direct call.
+
+2015-11-06 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/FileViewer/GWViewer.h
+	* GFinder/FileViewer/GWViewer.m
+	* GFinder/Thumbnailer/GWThumbnailer.h
+	* GFinder/Thumbnailer/GWThumbnailer.m
+	Call makre and remove thumbnails directly and not in a service,
+	remove the corresponding service and just instantiate the class.
+
+2015-11-05 Riccardo Mottola <rm@gnu.org>
+
+	* Tools/thumbnailer
+	* GFinder/Thumbnailer
+	Moved thumbnailer from Tools to GFinder.
+
+2015-11-02 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/GFinder.m
+	Add 64px icons, remove 44
+
+015-10-22 Riccardo Mottola <rm@gnu.org>
+
+	* Tools/thumbnailer/ImageThumbnailer/ImageThumbnailer.m
+	Fix resize nearest neigbour algorithm by adapting PRICE's scale one. The code had problems with different bytes per samples and alpha, which are now preserved.
+
+2015-10-16 Riccardo Mottola <rm@gnu.org>
+
+	* Inspector/ContentViewers/ImageViewer/resizer/Resizer.m
+	Fix resize nearest neigbour algorithm by adapting PRICE's scale one. The code had problems with different bytes per samples and alpha, which are now preserved.
+
+2015-10-15 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNIconsView.m
+	Use fabsf() with float argument
+
+2015-10-12 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/FileViewer/GWViewersManager.m (viewerForNode)
+	* GFinder/GFinder.m
+	Remove unnused parameter closeOldViewer (was always nil)
+
+2015-10-12 Riccardo Mottola <rm@gnu.org>
+
+	* Operation/Operation.m
+	Remove unused variable.
+
+	* GFinder/FileViewer/GWViewersManager.m
+	Fix warnings of NO vs. nil
+
+2015-09-16 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/GFinder.m
+	* GFinder/config.h.in
+	* GFinder/configure
+	* GFinder/configure.ac
+	Add check for sys/resource.h
+
+2015-05-26 Riccardo Mottola <rm@gnu.org>
+
+	* Operation/Operation.m
+	* Operation/Resources/English.lproj/Localizable.strings
+	Verify and protect certain directories from file operations.
+
+2015-05-26 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/FileViewer/GWViewer.m
+	Regenerate and propagate selection on windows key change, even if it did not change inside the viewer.
+
+2015-05-26 Riccardo Mottola <rm@gnu.org>
+
+	* Tools/fswatcher/fswatcher-inotify.h
+	* Tools/fswatcher/fswatcher-inotify.m
+	Cleanup and implement --auto and --daemon like fswatcher.m
+
+2015-05-26 Riccardo Mottola <rm@gnu.org>
+
+	* Tools/fswatcher/fswatcher-inotify.h
+	Use linux inotify, as suggested by Adrian Bunk
+
+	* Tools/fswatcher/local_inotify.h
+	* Tools/fswatcher/local_inotify_syscalls.h
+	Deleted local copy
+
+2015-05-12 Riccardo Mottola <rm@gnu.org>
+
+	* configure.ac
+	pick up gnustep make configured CC, CPP, CXX and check they are consistent with how make was configured
+	* configure
+	regenerated
+
+2014-12-30 Riccardo Mottola <rm@gnu.org>
+
+	* Recycler/main.m
+	* GFinder/GFinder.m
+	Fix warnings: update code to use id<NSMenuItem> and not NSMenuItem*
+
+2014-12-29 Riccardo Mottola <rm@gnu.org>
+
+	* Operation/Operation.m (rectForFileOpWindow)
+	Fix off-by-one array access, return NSZeroRect immediately if no other operations are running.
+
+2014-11-16 Riccardo Mottola <rm@gnu.org>
+
+	* Operation/FileOpInfo.m
+	Set root object to nil, fixes memory leak of FileOpInfo itself.
+
+2014-09-22 Riccardo Mottola <rm@gnu.org>
+
+	* Operation/FileOpInfo.h
+	* Operation/FileOpInfo.m
+	Cleanup.
+
+2014-09-22 Riccardo Mottola <rm@gnu.org>
+
+	* Operation/FileOpInfo.h
+	* Operation/FileOpInfo.m
+	Fix memory leak on pause, allow stopping of operation also when paused.
+
+2014-10-21 Riccardo Mottola <rm@gnu.org>
+
+	* Operation/FileOpInfo.h
+	Match protocol to actual class, making endOperation synchronous.
+
+	* Operation/FileOpInfo.m
+	Cleanup NSConnectionDidDieNotification when thread exits, other clean ups.
+
+2014-10-13 18:58-EDT Gregory John Casamento <greg.casamento@gmail.com>
+
+	* Operation/FileOpInfo.m: Set executor to nil when thread
+	exits.
+
+2014-09-10 Riccardo Mottola <rm@gnu.org>
+
+	* Operation/FileOpInfo.m
+	Extend thread fix to Trash, move, link, duplicate.
+
+2014-09-10 Riccardo Mottola <rm@gnu.org>
+
+	* Operation/FileOpInfo.h
+	* Operation/FileOpInfo.m
+	Store information about operation and processed file in the caller, re-detach the operation executor thread when resuming from pause. Fix doCopy pause/resume this way.
+
+2014-07-01 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNBrowser.m
+	* FSNode/FSNIconsView.m
+	* FSNode/FSNListView.m
+	* FSNode/FSNode.m
+	* GFinder/Desktop/Dock/DockIcon.m
+	* GFinder/Desktop/GWDesktopView.m
+	* GFinder/FileViewer/GWViewer.m
+	* GFinder/FileViewer/GWViewerShelf.m
+	* GFinder/Finder/Finder.m
+	* GFinder/Finder/LiveSearch/LSFolder.m
+	* GFinder/Finder/SearchResults/SearchResults.m
+	* GFinder/GFinder.m
+	* GFinder/Preferences/OperationPrefs.m
+	* GFinder/WorkspaceApplication.m
+	* Operation/FileOpInfo.m
+	* Operation/Operation.m
+	* Recycler/RecyclerIcon.m
+	* Tools/ddbd/ddbd.m
+	Replaced operation constant values with their true NSWorkspace*Operation constants
+
+2014-04-30 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNIcon.m
+	Try to guess the best of [NSHost names] and not just name.
+
+2013-12-18 Riccardo Mottola <rm@gnu.org>
+
+	* Recycler/RecyclerIcon.m
+	Uniform with code from DockIcon so that also the standard Recycler may finally unmount volumes!
+
+2013-12-12 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/GFinder.h
+	* GFinder/GFinder.m
+	* GFinder/FileViewer/GWViewer.m
+	* GFinder/FileViewer/GWViewersManager.m
+	* GWMetadata/MDKit/MDKWindow.m
+	Use specific MAX_FILES_TO_OPEN_DIALOG instead of OPEN_MAX, which is the maximum number of open files
+
+2013-12-12 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNodeRep.m (mountedVolumes)
+	use setmntent() and _PATH_MOUNTED to retrieve mounted volumes
+
+2013-12-01 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNBrowserCell.m
+	Optimize drawing code, calculate dot clipping there and not inside the
+	clipping methods.
+
+2013-11-26 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNBrowserCell.h
+	* FSNode/FSNBrowserCell.m
+	Reinstantiate special infoFont, but only as local variable and not ivar.
+
+2013-11-25 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNBrowserCell.h
+	* FSNode/FSNBrowserCell.m
+	* FSNode/FSNTextCell.h
+	* FSNode/FSNTextCell.m
+	Clean up IMP caching, cleaner names and instance variables instead of statics.
+
+2013-11-25 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNBrowserCell.m
+	use fontAttr only inside (cutTitle:toFitWidth:) and remove it as a static-initialized variable.
+
+	* FSNode/FSNTextCell.h
+	* FSNode/FSNTextCell.m
+	Remove unused dtslenght.
+
+2013-11-25 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNBrowserCell.h
+	* FSNode/FSNBrowserCell.m
+	Do not use a separate infoFont, but just NSCell's font.
+
+2013-11-24 Sebastian Reitenbach <sebastia@l00-bugdead-prods.de>
+	* Apps_wrapper, add wrapper for opennx
+
+2013-11-20 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNBrowserCell.m
+	Remove unused dtslenght.
+
+2013-11-09 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNBrowser.h
+	* FSNode/FSNBrowser.m
+	* FSNode/FSNIconsView.h
+	* FSNode/FSNIconsView.m
+	* FSNode/FSNListView.h
+	* FSNode/FSNListView.m
+	* FSNode/FSNodeRep.h
+	* GFinder/Desktop/GWDesktopView.m
+	* GFinder/GFinder.h
+	* GFinder/GFinder.m
+	* Operation/Operation.h
+	* Operation/Operation.m
+	* Recycler/Recycler.h
+	* Recycler/Recycler.m
+	* Recycler/RecyclerView.h
+	* Recycler/RecyclerView.m
+	Rename Cutted to Cut.
+
+2013-11-08 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNBrowser.m
+	* FSNode/FSNIconsView.m
+	* FSNode/FSNListView.m
+	* GFinder/FileViewer/GWViewerIconsPath.m
+	controlTextDidEndEditing: do not check for write permission: you can change a filename without!
+
+2013-11-08 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/FileViewer/GWViewerIconsPath.m (controlTextDidEndEditing)
+	Call updateNameEditor instead of just stopRepNameEditing to make control editable again after the error alert.
+
+2013-11-01 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNBrowserCell.m
+	* GWMetadata/MDKit/MDKResultsCategory.m
+	* GWMetadata/MDKit/MDKWindow.m
+	* GFinder/FileViewer/GWViewer.m
+	* GFinder/Finder/Finder.m
+	* GFinder/Finder/LiveSearch/LSFolder.m
+	* GFinder/Finder/SearchResults/SearchResults.m
+	* GFinder/TShelf/TShelfIcon.m
+	* Inspector/Annotations.m
+	* Inspector/Attributes.m
+	* Inspector/ContentViewers/ImageViewer/ImageViewer.m
+	* Inspector/Contents.m
+	* Operation/FileOpInfo.m
+	Revert horrible PRIuPTR and change to unsinged long cast style.
+
+2013-10-30 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/FileViewer/GWViewer.h
+	* GFinder/FileViewer/GWViewer.m
+	* GFinder/FileViewer/GWViewersManager.h
+	* GFinder/FileViewer/GWViewersManager.m
+	* GFinder/GFinder.m
+	Change browser type to an enumerated type from String and update menus accordingly.
+
+2013-10-27 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/FileViewer/GWViewer.m
+	Optimize by changing the selection only if it really changed.
+
+2013-10-25 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/FileViewer/GWViewer.m
+	No not set first responder explicitely, let GUI handle that.
+	(fixes infinite loop in panels while renaming files)
+
+2013-10-20: Sebastian Reitenbach <sebastia@l00-bugdead-prods.de>
+	* GWMetadata/MDFinder/MDFinder.[h|m]
+	* GWMetadata/Preferences/StartAppWin.[h|m]
+	* GFinder/Dialogs/StartAppWin.[h|m]
+	* Inspector/ContentViewers/SoundViewer/SoundViewer.m
+	* Recycler/Dialogs/StartAppWin.[h|m]
+	NSProgressIndicator uses doubles, so GFinder
+	should use doubles too
+
+	* FSNode/FSNBrowserCell.m
+	* FSNode/FSNIcon.m
+	* GWMetadata/MDKit/MDKQuery.m
+	* GWMetadata/MDKit/MDKResultsCategory.m
+	* GWMetadata/MDKit/MDKWindow.m
+	* GWMetadata/gmds/mdextractor/Extractors/HtmlExtractor/HtmlExtractor.m
+	* GFinder/FileViewer/GWViewer.m
+	* GFinder/FileViewer/GWViewersManager.m
+	* GFinder/Finder/Finder.m
+	* GFinder/Finder/LiveSearch/LSFolder.m
+	* GFinder/Finder/SearchResults/SearchResults.m
+	* GFinder/GWFunctions.m
+	* GFinder/TShelf/TShelfIcon.m
+	* Inspector/Annotations.m
+	* Inspector/Attributes.m
+	* Inspector/ContentViewers/ImageViewer/ImageViewer.m
+	* Inspector/Contents.m
+	* Inspector/Functions.m
+	* Inspector/TimeDateView.m
+	* Operation/FileOpInfo.m
+	* Tools/ddbd/DDBMDStorage.m
+	fix warnings emitted by clang, mostly format strings
+
+2013-10-18 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Finder/SearchResults/SearchResults.h
+	* GFinder/Finder/SearchResults/SearchResults.m
+	* Inspector/ContentViewers/ImageViewer/ImageViewer.h
+	* Inspector/ContentViewers/ImageViewer/ImageViewer.m
+	Update types to NSUInteger and NSTimeInterval
+
+2013-09-25 Riccardo Mottola <rm@gnu.org>
+
+	* Tools/thumbnailer/main.m
+	* Tools/lsfupdater/lsfupdater.m
+	* Tools/fswatcher/fswatcher.m
+	* Inspector/Functions.m
+	Warning fixes.
+
+2013-09-17 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/GFinder.m
+	Change [isa class] to [self class]
+
+2013-09-12 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Desktop/GWDesktopManager.m
+	Do not propagate file change notification to desktop or dock if they are not active.
+
+2013-09-11 Riccardo Mottola <rm@gnu.org>
+
+	* Operation/Operation.h
+	* Operation/Operation.m
+	operation reference updated to NSUInteger and others.
+
+2013-08-27 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNFunctions.m
+	* FSNode/FSNode.m
+	Fix warning and call from sizeDescription sizeDescription() avoiding code duplication. Remove sign info useless with an unsigned parameter.
+
+2013-08-24 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/FileViewer/GWViewer.h
+	* GFinder/FileViewer/GWViewer.m
+	* GFinder/FileViewer/GWViewersManager.h
+	* GFinder/FileViewer/GWViewersManager.m
+	* GFinder/GFinder.m
+	Change key assignment and management for Viewers, set it on creation of a new viewer and store it inside the viewer-array and not separately.
+
+2013-04-22 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Preferences/BrowserViewerPref.h
+	* GFinder/Preferences/BrowserViewerPref.m
+	* GFinder/Resources/English.lproj/BrowserViewerPref.gorm
+	Clean up Browser preferences code and allow a max. width of 362.
+
+2013-04-14 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Resources/English.lproj/Help/SViewer.rtfd
+	* GFinder/FileViewer/GWSpatialViewer.h
+	* GFinder/FileViewer/GWSpatialViewer.m
+	Deleted
+
+	* FSNode/FSNBrowser.m
+	* FSNode/FSNodeRep.m
+	* GFinder/Desktop/GWDesktopManager.h
+	* GFinder/Desktop/GWDesktopManager.m
+	* GFinder/Desktop/GWDesktopView.m
+	* GFinder/FileViewer/GWViewer.h
+	* GFinder/FileViewer/GWViewer.m
+	* GFinder/FileViewer/GWViewerBrowser.m
+	* GFinder/FileViewer/GWViewerIconsView.m
+	* GFinder/FileViewer/GWViewerListView.m
+	* GFinder/FileViewer/GWViewerScrollView.m
+	* GFinder/FileViewer/GWViewerWindow.h
+	* GFinder/FileViewer/GWViewerWindow.m
+	* GFinder/FileViewer/GWViewersManager.h
+	* GFinder/FileViewer/GWViewersManager.m
+	* GFinder/GNUmakefile.in
+	* GFinder/GFinder.m
+	Removed spatial viewer support.
+
+2013-04-03 Riccardo Mottola <rm@gnu.org>
+
+	* Operation/FileOpInfo.m
+	* Operation/FileOpInfo.h
+	NSInteger fix.
+
+2013-04-03 Riccardo Mottola <rm@gnu.org>
+
+	* Operation/FileOpInfo.m (fileManager shouldProceedAfterError)
+	Decode path from error correctly (Thanks Sebastian)
+
+2013-03-26 Riccardo Mottola <rm@gnu.org>
+
+	* GWMetadata/MDFinder/GNUmakefile.preamble
+	Fix so that DBKit and MDKit are resolved from the build tree and not
+	the installed versions.
+
+2013-03-21 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNListView.m
+	NSInteger fixes.
+
+2013-03-20 Riccardo Mottola <rm@gnu.org>
+
+	* GWMetadata/MDKit/MDKAttributeEditor.h
+	Fix protocol warning.
+
+2013-03-20 Riccardo Mottola <rm@gnu.org>
+
+	* Inspector/Annotations.m
+	* Inspector/Contents.m
+	* Inspector/Functions.h
+	Remove MAKE_LOCALIZED_LABEL and use MAKE_LABEL
+
+2013-03-18 Riccardo Mottola <rm@gnu.org>
+
+	* GWMetadata/MDKit/MDKAttributeEditor.h
+	Fix protocol warning.
+
+2013-03-13 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/GWFunctions.[h,m]
+	Remove addItemToMenu and MAKE_LOCALIZED_LABEL since they make using
+	make_strings impossible.
+
+2013-03-13 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/GFinder.m
+	Replace addItemToMenu() with standard addItemWithTitle
+
+2013-03-12 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/FileViewer/GWViewerIconsPath.h
+	Fix warning about missing protocol
+
+2013-03-12 Riccardo Mottola <rm@gnu.org>
+
+	* Tools/fswatcher/fswatcher.m
+	NSUInteger transition and indentation.
+
+2013-03-12 Riccardo Mottola <rm@gnu.org>
+
+	* Tools/fswatcher/fswatcher.h
+	* Tools/fswatcher/fswatcher.m
+	Fix typo.
+
+2013-03-12 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNBrowser.h
+	Fix warning about missing protocol
+
+2013-03-12 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/WorkspaceApplication.m
+	NSUInteger transition and cleanups.
+
+2013-03-12 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/WorkspaceApplication.m (startLogout)
+	Add logout timer to the Modal loop.
+
+2013-03-10 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/GFinder.m
+	Change Yes/No in quit panel to make it consistent with logout.
+
+2013-03-10 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Finder/LiveSearch/LSFolder.h
+	* GFinder/Finder/LiveSearch/LSFolder.m
+	* GFinder/Finder/SearchResults/SearchResults.h
+	* GFinder/Finder/SearchResults/SearchResults.m
+	NSTimeInterval transition
+
+	* GFinder/Finder/SearchResults/SearchResults.h
+	* GFinder/Finder/SearchResults/SearchResults.m
+	NSDragOperation
+
+2013-03-10 Sebastian Reitenbach <sebastia@l00-bugdead-prods.de>
+	* Tools/searchtool/searchtool.m
+	  Indentation
+
+2013-03-09 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Finder/Finder.m
+	NSUInteger transition.
+
+2013-03-08 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/GFinder.m (setSelectedPaths)
+	Set the Finder to selection only to directories and not files.
+
+2013-03-08 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/GFinder.m
+	Trap exception.
+
+2013-03-08 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/GFinder.m
+	Shut down the recycler after removign the connection observer.
+
+2013-03-06 Riccardo Mottola <rm@gnu.org>
+
+	* Tools/fswatcher/fswatcher.m (isDotFile)
+	Replace with version of MDIndexing
+
+2013-03-06 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/GFinder.m
+	Always shut down the Recycler on exit.
+
+2013-03-06 Riccardo Mottola <rm@gnu.org>
+
+	* Tools/fswatcher/fswatcher.m
+	Handle is_auto and is_daemon like gdnc.
+
+2013-03-04 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNListView.h
+	NSUInteger and NSInteger transition.
+
+2013-03-04 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNIconsView.h
+	* FSNode/FSNListView.h
+	Fix warnings about not implemented protocols.
+2013-02-28 Riccardo Mottola <rm@gnu.org>
+
+	* GWMetadata/gmds/gmds/gmds.m
+	Clean up subtask creating and passed arguments, remove special
+	"--from-gmds" parameter and rely only on --daemon.
+
+2013-02-28 Riccardo Mottola <rm@gnu.org>
+
+	* GWMetadata/MDKit/MDKResultCell.m
+	Remove unused variable.
+
+2013-02-22 Sebastian Reitenbach <sebastia@l00-bugdead-prods.de>
+	* Tools/ddbd/ddbd.m
+	reuse values already saved in args
+
+2013-02-21 Riccardo Mottola <rm@gnu.org>
+
+	* Tools/ddbd/ddbd.m
+	NSUInteger transition
+
+2013-02-21 Riccardo Mottola <rm@gnu.org>
+
+	* Tools/ddbd/DDBPathsManager.m
+	* Tools/ddbd/ddbd.m
+	Remove unneeded creation of autorelease pools or in case move them to the respective manager only.
+
+2013-02-20 Riccardo Mottola <rm@gnu.org>
+
+	* GWMetadata/MDKit/MDKWindow.m (isDotFile)
+	* GWMetadata/gmds/mdextractor/mdextractor.m (isDotFile)
+	Total rewrite taken from MDIndexing
+
+2013-02-20 Riccardo Mottola <rm@gnu.org>
+
+	* GWMetadata/Preferences/MDIndexing.m (isDotFile)
+	Fix exit condition.
+
+2013-02-20 Riccardo Mottola <rm@gnu.org>
+
+	* GWMetadata/MDKit/MDKWindow.h
+	* GWMetadata/MDKit/MDKWindow.m
+	NSInteger, NSUInteger and CGFloat transition
+
+2013-02-17 Riccardo Mottola <rm@gnu.org>
+
+	* Tools/ddbd/ddbd.m
+	Do not release the connection obtained with defaultConnection
+
+2013-02-14 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNodeRep.m
+	Make sure the user Library dir exists
+
+2013-02-14 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/TShelf/TShelfIcon.m
+	* GFinder/TShelf/TShelfIconsView.m
+	* GFinder/TShelf/TShelfPBIcon.m
+	Change NSDragOperationAll to NSDragOperationEvery
+
+2013-02-14 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/FileViewer/GWViewer.m
+	CGFloat and NSUInteger transition.
+
+2013-02-14 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNBrowserCell.h
+	* FSNode/FSNBrowserCell.m
+	* FSNode/FSNIcon.h
+	* FSNode/FSNIcon.m
+	* FSNode/FSNListView.m
+	* FSNode/FSNodeRep.h
+	NSUInteger transition.
+
+2013-02-14 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/TShelf/TShelfIconsView.m
+	CGFloat and NSUInteger transition.
+
+2013-02-14 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/FileViewer/GWViewer.m
+	CGFloat and NSUInteger transition.
+
+2013-02-13 Riccardo Mottola <rm@gnu.org>
+
+	* GWMetadata/Preferences/MDIndexing.m (isDotFile)
+	Total rewrite.
+
+2013-02-13 Riccardo Mottola <rm@gnu.org>
+
+	* GWMetadata/MDKit/MDKQuery.[h,m]
+	* GWMetadata/MDKit/MDKAttributeEditor.m
+	* GWMetadata/MDKit/MKDAttributeChooser.m
+	* GWMetadata/gmds/gmds/gmds.m
+	Rename DATE to DATE_TYPE to avoid conflict on windows with wtypes.h
+
+2013-02-12 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/TShelf/TShelfPBIcon.[h,m]:
+	NSUInteger transition.
+
+	* GFinder/TShelf/TShelfIconsView.m (iconCompare, pbiconCompare)
+	New compare methods to take in account NSNotFound
+
+2013-02-12 Riccardo Mottola <rm@gnu.org>
+
+	* GWMetadata/Preferences/MDIndexing.m
+	Transition to CGFloat and NSUInteger.
+
+2013-02-08 Sebastian Reitenbach <sebastia@l00-bugdead-prods.de>
+	* GWMetadata/MDFinder/MDFinder.m
+	* Recycler/Recycler.m
+	  move to newer API for applicationShouldTerminate
+
+2013-02-08 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/TShelf/TShelfIcon.m
+	Fix -1 to be NSNotFound to complete transition to unsigned.
+
+2013-02-08 Riccardo Mottola
+
+	* GFinder/Fiend/Fiend.m (renameCurrentLayer, addLayer)
+	Release dialog later and don't autorelease it too early.
+
+2013-02-08 Riccardo Mottola
+
+	* GWMetadata/Preferences/Resources/English.lproj/MDIndexing.gorm/
+	Slight cleanup
+
+	* DBKit/DBKBTree.m
+	Fix ARP leak
+
+2013-02-07 Riccardo Mottola <rm@gnu.org>
+
+	* GWMetadata/MDKit/SQLite.h (finalize)
+	* GWMetadata/MDKit/SQLite.m (finalize)
+	Rename finalize to finalizeStatement to avoid clash with GC [NSObejct finalize+ method.
+
+2013-02-07 Sebastian Reitenbach <sebastia@l00-bugdead-prods.de>
+	* GWMetadata/gmds/gmds/gmds.m
+	* GWMetadata/gmds/mdextractor/mdextractor.m
+	  shutup clang warning about constant strings in NSLog
+	* Tools/ddbd/DDBDirsManager.m
+	* Tools/ddbd/MDModules/MDModuleAnnotations/MDModuleAnnotations.m
+	* Tools/ddbd/DDBPathsManager.m
+	  even more shutup to clang
+	* GFinder/TShelf/TShelfIconsView.m
+	* Inspector/Attributes.h
+	  even more shutup to clang
+	* FSNode/FSNBrowserColumn.m
+	* FSNode/FSNBrowserMatrix.m
+	* (unsigned) int to NS(U)Integer conversion
+	* GWMetadata/Preferences/MDIndexing.m
+	  more (unsigned) int to NS(U)Integer conversion
+	* GFinder/Desktop/Dock/DockIcon.m
+	* Inspector/Attributes.m
+	* remove unused variables
+	* GFinder/Desktop/GWDesktopWindow.m
+	* GFinder/Desktop/XBundles/XDesktopWindow/XDesktopWindow.m
+	  more (unsigned) int to NS(U)Integer conversion
+	* GFinder/FileViewer/GWViewerBrowser.m
+	* GFinder/FileViewer/GWViewerSplit.m
+	  more (unsigned) int to NS(U)Integer conversion
+	* GFinder/Finder/LiveSearch/LSFolder.m
+	* GFinder/Finder/Finder.m
+	* GFinder/Finder/SearchResults/SearchResults.m
+	  more (unsigned) int to NS(U)Integer conversion
+	* GFinder/History/History.m
+	* GFinder/Preferences/DesktopPref.m
+	* GFinder/Preferences/HiddenFilesPref.m
+	  more (unsigned) int to NS(U)Integer conversion
+
+2013-01-27 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNIcon.m
+	* GFinder/TShelf/TShelfIcon.m
+	Simplify code and fix crash due to previous autorelease fix.
+
+2013-01-25 Riccardo Mottola <rm@gnu.org>
+
+	* Tools/ddbd/ddbd.m
+	Fix memory leak by removing unnecessary retain to self.
+
+2013-01-25 Riccardo Mottola <rm@gnu.org>
+
+	* DBKit/DBKitFixLenRecordsFile.m
+	Do not use deallocated instance ivars.
+
+2013-01-25 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNIcon.m
+	* GFinder/TShelf/TShelfIcon.m
+	Fix ARP memory leak.
+
+2013-01-21 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/TShelf/TShelfIconsView.m
+	Fix warning and rewrite cycle cuinting upwards due to unsigned.
+
+2013-01-21 Riccardo Mottola <rm@gnu.org>
+
+	* GWMetadata/MDKit/MDKQuery.m
+	Initialize value.
+
+2013-01-20 Riccardo Mottola <rm@gnu.org>
+
+	* Desktop/GWDesktopManager.m (loadXWinBundle)
+	Do not return a retained object.
+
+2013-01-20 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/FileViewer/GWViewersManager.h
+	* GFinder/FileViewer/GWViewersManager.m
+	Rename newViewerOfType to viewerOfType since it does not return a new retained object.
+
+	* GFinder/FileViewer/GWSpatialViewer.m
+	* GFinder/GFinder.m
+	Update accordingly.
+
+2013-01-20 Riccardo Mottola <rm@gnu.org>
+
+	* Tools/ddbd/ddbd.m (userMetadataForPath:, annotationsForPath:)
+	Do not retain returned value.
+
+2013-01-17 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Finder/SearchResults/SearchResults.m
+        * Inspector/Attributes.m
+	* Operation/FileOpInfo.m
+	* Tools/ddbd/ddbd.m
+	Fix warnings and leaks.
+
+2013-01-17 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNBrowserColumn.m
+	Clean up and use NSUinteger for array indexes
+
+	* Inspector/Inspector.m
+	Fix memory leak.
+
+	* FSNode/FSNIconsView.m
+	Fix pool leak.
+
+2013-01-17 Riccardo Mottola <rm@gnu.org>
+
+	* Inspector/Attributes.m (activateForPaths:)
+	Cleanup and fix warning.
+
+	* Operation/FileOpInfo.m (calculateNumFiles:)
+	Cleanup, fix missing release of arp2 on break and transition index to NSUInteger.
+
+	* FSNode/FSNBrowserColumn.m
+	Release Autorelease pools correctly.
+
+2013-01-16 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/TShelf/TShelfIcon.m
+	Initialize by returning self correctly.
+
+2013-01-15 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/TShelf/TShelfWin.m (addTab, renameTab)
+	Release dialog laterinstead of autoreleasing immediately.
+
+2013-01-15 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/GFinder.m
+	* GFinder/Desktop/Dock/DockIcon.m
+	Change count variable from int to NSUInteger
+
+2013-01-15  Wolfgang Lux  <wolfgang.lux@gmail.com>
+
+	* GFinder/GFinder.m (-applicationWillFinishLaunching:,
+	(-fileSystemDidChange:, -watchedPathDidChange:, -_updateTrashContents):
+	Initialize trashContents attribute from actual trash contents and
+	avoid code duplication.
+
+2012-10-17 Riccardo Mottola <rm@gnu.org>
+
+	* Tools/ddbd/DDBMDStorage.m
+	Fix destroy before data access.
+
+2012-10-16 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNode.m
+	Fix size calculation bug.
+
+2012-10-14 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/TShelf/TShelfWin.m
+	* GFinder/TShelf/TShelfIcon.h
+	* GFinder/TShelf/TShelfIcon.m
+	* GFinder/TShelf/TShelfIconsView.h
+	* GFinder/TShelf/TShelfIconsView.m
+	NSUInteger transition.
+
+2012-10-13 Riccardo Mottola <rm@gnu.org>
+
+	* DBKit/DBKBTree.m
+	* DBKit/DBKVarLenRecordsFile.m
+	* Tools/ddbd/DDBDirsManager.m
+	* Tools/ddbd/DDBPathsManager.m
+	More unisgned index fixes.
+
+2012-10-10 Riccardo Mottola <rm@gnu.org>
+
+	* DBKit/DBKBTreeNode.m
+	Fix unsigned integer loop.
+
+2012-06-20 Sebastian Reitenbach <sebastia@l00-bugdead-prods.de>
+
+	* GFinder/Desktop/Dock/DockIcon.m
+	Fix unmounting of CD-Rom on OpenBSD that was mounted
+	using kern.usermount facilities. The mount point changes
+	ownership to root:wheel, and the removed check prevented
+	trying to unmount the device.
+
+2012-06-21 Riccardo Mottola <rm@gnu.org>
+
+	* DBKit/DBKVarLenRecordsFile.m
+	* Tools/ddbd/DDBPathsManager.m
+	Warning fix (NSUInteger).
+
+2012-06-20 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/FileViewer/GWViewerShelf.m
+	Add missing include and fix warning.
+
+2012-06-13 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNTextCell.m
+	Use literal string directly
+
+2012-05-25 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Resources/English.lproj/DesktopPref.gorm
+	Resaved with base 1.24 version
+
+2012-04-16 Riccardo Mottola <rm@gnu.org>
+
+	* DBKit/DBKBTree.h
+	* DBKit/DBKBTree.m
+	* DBKit/DBKBTreeNode.h
+	* DBKit/DBKBTreeNode.m
+	* FSNode/FSNode.h
+	* FSNode/FSNode.m
+	* GFinder/Finder/LiveSearch/LSFolder.h
+	* GFinder/Finder/LiveSearch/LSFolder.m
+	* GWMetadata/MDKit/MDKQuery.m
+	Change indexes to NSUInteger and other minor cleanups.
+
+	* GFinder/TShelf/TShelfView.m
+	* GFinder/TShelf/TShelfView.h
+	NSUInteger for indexes.
+
+	* GFinder/Finder/LiveSearch/LSFolder.h
+	Declare types to fix warnings.
+
+2012-04-11 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Preferences/DesktopPref.m
+	* GFinder/Desktop/GWDesktopView.h
+	* GFinder/Desktop/GWDesktopView.m
+	* GFinder/Resources/English.lproj/DesktopPref.gorm
+	New desktop background style, uniform scale
+
+2012-03-28 Riccardo Mottola
+
+	* GFinder/FileViewer/GWViewerIconsView.m
+	* GFinder/FileViewer/GWViewerListView.m
+	* GFinder/FileViewer/GWViewer.h
+	* GFinder/FileViewer/GWViewerBrowser.h
+	* GFinder/FileViewer/GWViewerBrowser.m
+	* GFinder/FileViewer/GWViewerIconsPath.h
+	* GFinder/FileViewer/GWViewerScrollView.h
+	* GFinder/FileViewer/GWViewerSplit.h
+	* GFinder/FileViewer/GWViewersManager.h
+	* GFinder/FileViewer/GWSpatialViewer.h
+	* GFinder/FileViewer/GWViewerIconsPath.m
+	* GFinder/FileViewer/GWViewerScrollView.m
+	* GFinder/FileViewer/GWViewerSplit.m
+	* GFinder/FileViewer/GWViewerShelf.h
+	* Workspace/FileViewer/GWViewerPathsPopUp.h
+	* GFinder/FileViewer/GWViewerListView.h
+	* GFinder/FileViewer/GWViewerIconsView.h
+	* GFinder/FileViewer/GWViewerShelf.m
+	* GFinder/FileViewer/GWViewerPathsPopUp.m
+	* GFinder/Desktop/Dock/DockIcon.h
+	* GFinder/Desktop/Dock/DockIcon.m
+	* Inspector/ContentViewers/RtfViewer/RtfViewer.h
+	* GFinder/Desktop/GWDesktopManager.m
+	Fixed includes.
+
+2012-03-27 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/FileViewer/GWViewer.m
+	* GFinder/FileViewer/GWSpatialViewer.m
+	* GFinder/FileViewer/GWViewersManager.m
+	Save key in the viewer's list and format it as unsigned
+
+2012-03-26  Eric Wasylishen <ewasylishen@gmail.com>
+
+	* GFinder/FileViewer/GWViewerShelf.m: Use FSNTextCell for
+	focusedIconLabel to correct alignment problem introduced in the
+	last change.
+
+2012-03-26  Eric Wasylishen <ewasylishen@gmail.com>
+
+	* FSNode/FSNTextCell.m: Adjust vertically centering to match
+	calculation in  -[FSNListViewDataSource(RepNameEditing)
+	setEditorAtRow:withMouseDownEvent:]
+
+2012-03-22  Eric Wasylishen <ewasylishen@gmail.com>
+
+	* FSNode/FSNTextCell.m: Vertically center labels including those
+	with no icon.
+
+2012-03-22  Eric Wasylishen <ewasylishen@gmail.com>
+
+	* FSNode/FSNListView.h:
+	* FSNode/FSNListView.m: Fix double-click and single-click on
+	list rows. Single-click on a selected row only starts editing
+	after a short interval (0.5s); double-clicking opens the
+	double-clicked item.
+
+2012-03-22  Eric Wasylishen <ewasylishen@gmail.com>
+
+	* FSNode/FSNIconsView.m:
+	* GFinder/Desktop/GWDesktopView.m: XOR selection rect:
+	Add fallback code path for running on versions of GUI older than
+	trunk.
+
+2012-03-22  Eric Wasylishen <ewasylishen@gmail.com>
+
+	* FSNode/FSNTextCell.h:
+	* FSNode/FSNTextCell.m: Vertically center labels. Fixes bug 35423
+
+2012-03-22  Eric Wasylishen <ewasylishen@gmail.com>
+
+	* FSNode/FSNIconsView.m: Fix XOR-stlye selection rectangle. Now
+	works when scrolling.
+
+2012-03-20 Riccardo Mottola <rm@gnu.org>
+
+	* Inspector/ContentViewers/PdfViewer/PdfViewer.m
+	Make next and previous buttons work.
+
+2012-03-20 Riccardo Mottola <rm@gnu.org>
+
+	* Inspector/ContentViewers/PdfViewer/PdfViewer.[h,m]
+	Guard against invalid page numbers.
+
+2012-03-06  Richard Stonehouse
+
+	* GWMetadata/gmds/mdextractor/GNUmakefile.preamble
+	add sqlite3 flag
+
+2012-03-02  Eric Wasylishen <ewasylishen@gmail.com>
+
+	* GFinder/Desktop/GWDesktopView.m: Don't cache scaled background.
+	Fixes background not drawing with xlib and background set to "fit",
+	and probably saves a fair bit of memory.
+
+2012-03-02  Eric Wasylishen <ewasylishen@gmail.com>
+
+	* GFinder/Desktop/GWDesktopView.m: Draw highlight rect using
+	NSFrameRectWithWidthUsingOperation(aRect, 1.0, GSCompositeHighlight);
+	instead of filling the rect twice, which was much slower
+
+2012-03-02 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Desktop/GWDesktopView.m
+	Highlight-rect without transparency for classic style selection.
+
+2012-02-21 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Preferences/DesktopPref.[h,m]
+	* GFinder/Desktop/Dock/Dock.[h,m]
+	* GFinder/Desktop/GWDesktopManager.h
+	* GFinder/Desktop/GWDesktopView.m
+	* FSNode/FSNIconsView.[h,m]
+	* GFinder/Resources/English.lproj/DesktopPref.gorm
+	New dock style preference and conditioinally enable transparency
+	in dock and selections based on it.
+
+2012-02-20 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Desktop/GWDesktopView.m:
+	Always convert to RGB color space before exctracting
+	RGB components (fixes crash/exception on close with grey backs)
+
+2012-02-16 Eric Wasylishen  <ewasylishen@gmail.com>
+
+	* GFinder/Desktop/GWDesktopView.m:
+	* GFinder/Desktop/Dock/Dock.m: Dont' set the dock background
+	colour based on the desktop background colour; leave it alone as
+	[[NSColor grayColor] colorWithAlphaComponent: 0.33].
+
+2012-01-16 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Desktop/Dock/Dock.h
+	* GFinder/Desktop/Dock/Dock.m
+	* GFinder/Desktop/GWDesktopView.m
+	Really transparent Dock
+
+2012-01-31  Eric Wasylishen  <ewasylishen@gmail.com>
+
+	* FSNode/FSNListView.m: Rewrite some code broken by NSNotFound
+	type change
+
+2012-01-15  Eric Wasylishen  <ewasylishen@gmail.com>
+
+	* GFinder/Preferences/DesktopPref.m:
+	* GFinder/Preferences/DesktopPref.h:
+	* GFinder/Resources/English.lproj/DesktopPref.gorm:
+	Redesign desktop background UI
+
+2012-01-14  Eric Wasylishen  <ewasylishen@gmail.com>
+
+	* GFinder/Desktop/GWDesktopView.m (-mouseDragged:):
+	Copy selection rect rewrite from FSNode/FSNIconsView.m
+
+2012-01-12  Eric Wasylishen  <ewasylishen@gmail.com>
+
+	* FSNode/FSNBrowserCell.m: Enable browser icons
+
+2012-01-10  Eric Wasylishen  <ewasylishen@gmail.com>
+
+	* FSNode/FSNIconsView.m (-mouseDragged:): Rewrite selection
+	rect drawing.
+
+2011-11-04  Eric Wasylishen  <ewasylishen@gmail.com>
+
+	* GFinder/Preferences/PrefController.h: specify type of
+	popUp outlet to fix this dangerous warning:
+	Preferences/PrefController.m:82:5: warning: multiple methods named ‘-removeItemAtIndex:’ found [enabled by default]
+	/usr/local/include/AppKit/NSMenu.h:569:1: note: using ‘-(void)removeItemAtIndex:(int)index’
+	/usr/local/include/AppKit/NSToolbar.h:102:1: note: also found ‘-(void)removeItemAtIndex:(NSInteger)index’
+	* GFinder/Desktop/GWDesktopView.m:
+	* Inspector/ContentViewers/NSColorViewer/NSColorViewer.m:
+	use CGFloat instead of float for -[NSColor getRed:...]
+
+2011-08-02 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Desktop/Dock/DockIcon.m
+	Fixed rounding of position.
+
+2011-06-27  Eric Wasylishen  <ewasylishen@gmail.com>
+
+	* GFinder/TShelf/TShelfIcon.m (-drawRect:):
+	Round the drawing coordinates for the shelf icon.
+	Don't use the dirty rect parameter to position the icon.
+
+2011-05-23 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNListView.m
+	Fix bug found by Sebastian: use string for key.
+
+2011-05-22 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/Desktop/Dock/Dock.m
+	Fix bug found by Sebastian: use string for key.
+
+2011-05-21 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNIcon.m
+	Fix drag into dock by using NSDragOperationEvery
+
+2011-05-20 Sebastian Reitenbach
+
+	* GWMetadata/MDKit/SQLite.h
+	* GWMetadata/gmds/gmds/sqlite.h
+	fix build with gcc-2.95
+
+2011-05-10 Riccardo Mottola for Sebastian Reitenbach
+
+	* GWMetadata/gmds/mdfind/GNUmakefile.in
+	* GWMetadata/gmds/mdextractor/GNUmakefile.in
+	Correct makefiles to use local version and not installed one.
+
+2011-05-10 Riccardo Mottola for Sebastian Reitenbach
+
+	* GWMetadata/gmds/mdextractor/updater.m
+	Fix warning.
+
+2011-05-07 Riccardo Mottola <rm@gnu.org>
+
+	* DBKit/DBKBTreeNode.m
+	* DBKit/DBKVarLenRecordsFile.m
+	* Tools/fswatcher/fswatcher.m
+	* Tools/wopen/wopen.m
+	* Tools/lsfupdater/lsfupdater.m
+	* Tools/ddbd/DDBPathsManager.m
+	* GFinder/GWFunctions.m
+	* GFinder/WorkspaceApplication.m
+	* Inspector/Attributes.m
+	* Inspector/Functions.m
+	* FSNode/FSNFunctions.m
+	* FSNode/FSNode.m
+	* GWMetadata/MDKit/MDKQueryManager.m
+	* GWMetadata/MDKit/MDKAttribute.m
+	* GWMetadata/gmds/mdextractor/mdextractor.m
+	* GWMetadata/gmds/mdextractor/Extractors/OpenOfficeExtractor/OpenOfficeExtractor.m
+	Warning fixes and code clean-up
+
+2011-03-21 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNBrowser.h
+	* FSNode/FSNBrowser.m
+
+	Patch by Philippe to use default font size instead of fixed 12.
+
+2011-03-15 Riccardo Mottola <rm@gnu.org>
+
+	* Inspector/ContentViewers/SoundViewer/SoundViewer.m:
+	Patch by Philippe to stop progress after playing ends.
+
+2011-03-11 Riccardo Mottola <rm@gnu.org>
+
+	* Inspector/ContentViewers/SoundViewer/SoundViewer.m
+	De-comment sound playing
+
+2011-02-28 Riccardo Mottola <rm@gnu.org>
+
+	* GFinder/GFinder.m
+	* GFinder/FileViewer/GWViewer.m
+	* GFinder/FileViewer/GWSpatialViewer.m
+	* GFinder/Desktop/GWDesktopManager.m
+	* GWMetadata/MDFinder/MDFinder.m
+	Replace sel_eq with sel_isEqual
+
+2011-02-27 Riccardo Mottola <rm@gnu.org>
+
+	* GWMetadata/gmds/mdextractor/updater.m:
+	Patch by Philippe Roussell: handle empty directories correctly
+	and invalidate associated timer.
+
+2011-02-21 Riccardo Mottola <rm@gnu.org>
+
+	* GWMetadata/gmds/mdextractor/GNUmakefile.preamble
+	* GWMetadata/gmds/mdfind/GNUmakefile.preamble
+	* GWMetadata/MDFinder/GNUmakefile.preamble
+	Build against build version of kits, patch by Sebastian Reitenbach
+
+	* GWMetadata/MDKit/MDKQuery.m
+	Warning fix through explicit cast.
+
+	* GWMetadata/MDKit/MDKQuery.m
+	* GWMetadata/MDKit/MDKWindow.m
+	Warning fixes.
+
+2011-02-02 Riccardo Mottola <rm@gnu.org>
+
+	*  FSNode/FSNodeRep.m
+	Use MNTAB constant.
+
+2011-01-28 Riccardo Mottola <rm@gnu.org>
+
+	*  FSNode/FSNodeRep.m
+	NetBSD compatibilty.
+
+2011-01-27 Riccardo Mottola <rm@gnu.org>
+
+	*  FSNode/FSNodeRep.m
+	Switch checking of volumes to getmntinfo() and keep only /etc/mtab asl fallback.
+
+2011-01-26 Riccardo Mottola <rm@gnu.org>
+
+	*  FSNode/FSNodeRep.m
+	Fix FreeBSD type parsing, cleanup.
+
+	* FSNode/FSNListView.m
+	* DBKit/DBKPathsTree.m
+	Warning fixes
+
+2011-01-25 Riccardo Mottola <rm@gnu.org>
+
+	*  FSNode/FSNodeRep.m
+	Mount parsing code rewrite for more portability. Still unfinished.
+
+2011-01-12 Riccardo Mottola <rm@gnu.org>
+
+	*  FSNode/FSNodeRep.m
+	Quick security fix.
+
+2010-12-24 Riccardo Mottola
+
+	* FSNode/FSNodeRepIcons.m
+	Do not read icons handled by NSWorkspace; some reformatting.
+
+2010-12-07 Riccardo Mottola
+
+	* GFinder/WorkspaceApplication.m:
+	Minor code cleanup.
+
+2010-11-11 Wolfgang Lux
+
+	* FSNode/FSNodeRepIcons.m
+	Quick hack to display different folder icons
+
+2010-10-25  Wolfgang Lux  <wolfgang.lux@gmail.com>
+
+	* GFinder/FileViewer/GWViewerShelf.h:
+	* GFinder/FileViewer/GWViewerShelf.m (-openSelectionInNewViewer):
+	Implement method so that double clicking an application or file
+	icon in the shelf opens the corresponding application.
+
+2010-10-21 Riccardo Mottola
+
+	* GFinder/GFinder.m
+	* GFinder/WorkspaceApplication.m
+	If there is no destination for the Recycle operation, get the
+	trash path.
+
+2010-10-20 Riccardo Mottola
+
+	* Operation/FileOpInfo.m
+	* GFinder/GFinder.m
+	* GFinder/Finder/Finder.m
+	* GFinder/WorkspaceApplication.m
+
+	Fix and guard all destination instances which were nil for
+	Destroy operation.
+
+2010-10-19  Wolfgang Lux  <wolfgang.lux@gmail.com>
+
+	* Operation/FileOpInfo.m (-dealloc): Remove incorrect release of
+	the progress indicator, which is not owned by the FileOpInfo
+	instance.
+
+2010-10-15 Riccardo Mottola
+
+	* Operation/FileOpInfo.m
+	* Operation/Operation.m
+	Destroy operation uses source and not destination.
+
+2010-10-13 Riccardo Mottola
+
+	* GFinder/GFinderInfo.plist,
+	* GFinder/GFinder.m;
+	Implement opening of webloc files.
+	* GFinder/Resources/Icons/FileIcon_WebLink.tiff
+	Added icon for WebLink, created under GPL
+
+2010-08-09  Wolfgang Lux  <wolfgang.lux@gmail.com>
+
+	* GFinder/GFinderInfo.plist:
+	* GFinder/GFinder.m (-applicationDidFinishLaunching:,
+	-openInWorkspace:userData:error:):
+	Implement an Open in Workspace service command.
+
+2010-07-31  Wolfgang Lux  <wolfgang.lux@gmail.com>
+
+	* GFinder/Fiend/FiendLeaf.m (-mouseDown:): Don't order fiend
+	icons back after a single mouse click. This behavior is outright
+	annoying (to say the least).
+
+2010-07-31  Wolfgang Lux  <wolfgang.lux@gmail.com>
+
+	* GFinder/Desktop/GWDesktopManager.m (-validateItem:):
+	* GFinder/FileViewer/GWSpatialViewer.m (-validateItem:):
+	* GFinder/FileViewer/GWViewer.m (-validateItem:): Enable the
+	Open As Folder... command also for non-package directories so that
+	users can quickly open a new file viewer for any directory.
+
+	* GFinder/FileViewer/GWSpatialViewer.m (-validateItem:):
+	* GFinder/FileViewer/GWViewer.m (-validateItem:): Validate
+	items with action makeKeyAndOrderFront:. This fixes the defunct
+	Windows menu.
+
+	* GFinder/GFinder.h:
+	* GFinder/GFinder.m (-createMenu): Use standard actions for
+	the Arrange in Front, Miniaturize Window, and Close Window items
+	in the Windows menu.
+
+2010-07-29 Riccardo Mottola <rmottola@users.sf.net>
+
+	* GWMetadata/MDKit/MDKQueryManager.m
+	* GWMetadata/gmds/mdextractor/mdextractor.m
+	Cleaned up headers.
+
+2010-07-14 Riccardo Mottola <rmottola@users.sf.net>
+
+	* GFinder/Fiend/Fiend.m
+	* GFinder/Preferences/DesktopPref.m
+	* GFinder/Preferences/IconsPref.m
+	* GFinder/Preferences/HiddenFilesPref.m
+	* GFinder/Preferences/OperationPrefs.m
+	* GFinder/Preferences/XTermPref.m
+	* GFinder/Preferences/DefEditorPref.m
+	* GFinder/Finder/Modules/FModuleSize/FModuleSize.m
+	* GFinder/Finder/Modules/FModuleKind/FModuleKind.m
+	* GFinder/Desktop/Dock/Dock.m
+	Cleaned up Imports amd release macros.
+
+2010-07-06 Riccardo Mottola
+
+	* GWMetadata/configure.ac
+	* GWMetadata/configure
+	Configure all subprojects
+
+	* GWMetadata/gmds/mdextractor/updater.m
+	* GWMetadata/gmds/mdextractor/mdextractor.m
+	* GWMetadata/Preferences/MDIndexing.m
+	* GWMetadata/Preferences/MDIndexing.h
+	Fix imports.
+	
+2010-07-05 Riccardo Mottola
+
+	* GFinder/GFinder.m
+	* Tools/ddbd/ddbd.m : attempt to shutdown automatically
+
+2010-06-28 Riccardo Mottola <rmottola@users.sf.net>
+
+	* FSNode/FSNBrowserColumn.m
+	Do not call size adjusting if the scroller is still nil.
+	Should also fix SPARC.
+
+2010-06-22  Richard Frith-Macdonald <rfm@gnu.org>
+
+	* Inspector/aclocal.m4:
+	* GWMetadata/gmds/mdextractor/Extractors/aclocal.m4:
+	* GWMetadata/gmds/aclocal.m4: Attempt to pass correct flags in to
+	build test by using 'gnustep-config'.
+
+2010-06-21 Riccardo Mottola
+
+	* Operation/Operation.m
+	Fix spelling error.
+
+	* GFinder/FileViewer/GWViewersManager.m
+	* GFinder/Finder/Finder.m
+	* GFinder/Finder/LiveSearch/LSFolder.m
+	* GFinder/Finder/Modules/FModuleModDate/FModuleModDate.m
+	* GFinder/Finder/Modules/FModuleName/FModuleName.m
+	* GFinder/Finder/Modules/FModuleAnnotations/FModuleAnnotations.m
+	* GFinder/Finder/Modules/FModuleContents/FModuleContents.m
+	* GFinder/Finder/Modules/FModuleCrDate/FModuleCrDate.m
+	* GFinder/Finder/FindModuleView.m
+	Header import clean up and TEST macro elimination.
+
+2010-06-18 Riccardo Mottola
+
+	* DBKit/DBKVarLenRecordsFile.m
+	* DBKit/DBKBTree.m
+	* FSNode/FSNBrowserCell.m
+	* FSNode/FSNPathComponentsViewer.m
+	* FSNode/FSNBrowserColumn.m
+	* FSNode/FSNListView.m
+	* FSNode/FSNIconsView.m
+	* FSNode/FSNodeRep.m
+	* FSNode/FSNBrowser.m
+	* FSNode/FSNTextCell.m
+	* FSNode/FSNIcon.m
+	* FSNode/FSNBrowserScroll.m
+	* FSNode/FSNode.m
+	* GFinder/GFinder.m
+	* Inspector/Attributes.m
+	Header import clean up and TEST macro elimination.
+
+2010-06-16 Riccardo Mottola <rmottola@users.sf.net>
+
+	* Operation\FileOpInfo.m
+	* Operation\Operation.h
+	* Operation\Functions.h
+	* Inspector\Attributes.m
+	* Inspector\Contents.h
+	* Inspector\Annotations.h
+	* Inspector\ContentViewersProtocol.h
+	* Inspector\Contents.m
+	* Inspector\Annotations.m
+	* Inspector\Functions.h
+	* Inspector\Functions.m
+	* Inspector\IconView.h
+	* Inspector\Attributes.h
+	* Recycler\RecyclerView.h
+	* Recycler\Recycler.h
+	* Recycler\RecyclerIcon.h
+	Header cleanup
+
+2010-06-15 Riccardo Mottola <rmottola@users.sf.net>
+
+	* Inspector/ContentViewers/NSRTFViewer/NSRTFViewer.m
+	Warning fix
+
+	* Operation/Resources/Images/progind.tiff
+	Deleted
+
+	* Operation/FileOpInfo.h
+	* Operation/FileOpInfo.m
+	* Operation/Resources/English.lproj/FileOperationWin.gorm
+	Changed to use the standard NSProgressIndicator
+
+	* Tools/fswatcher/fswatcher-inotify.m
+	* Tools/fswatcher/fswatcher.m
+	* GFinder/Dialogs/StartAppWin.m
+	* GFinder/Fiend/Fiend.m
+	* GFinder/Fiend/FiendLeaf.m
+	* GFinder/TShelf/TShelfIconsView.m
+	* GFinder/TShelf/TShelfIcon.m
+	* GFinder/TShelf/TShelfViewItem.m
+	* GFinder/GFinder.m
+	* GFinder/FileViewer/GWViewer.m
+	* GFinder/FileViewer/GWViewerIconsPath.m
+	* GFinder/FileViewer/GWSpatialViewer.m
+	* GFinder/FileViewer/GWViewerShelf.m
+	* GFinder/Finder/SearchResults/SearchResults.m
+	* GFinder/Finder/Modules/FModuleOwner/FModuleOwner.m
+	* GFinder/Desktop/Dock/DockIcon.m
+	* GFinder/Desktop/Dock/Dock.m
+	* GFinder/Desktop/GWDesktopManager.m
+	* GFinder/Desktop/GWDesktopView.m
+	* GFinder/WorkspaceApplication.m
+	* Tools/thumbnailer/main.m
+	* Tools/fswatcher/fswatcher-inotify.m
+	* Tools/fswatcher/fswatcher.m
+	* Tools/lsfupdater/lsfupdater.m
+	* Tools/thumbnailer/main.m
+	* Tools/ddbd/DDBPathsManager.m
+	* Tools/ddbd/ddbd.m
+	* Tools/ddbd/DDBDirsManager.m
+	* Operation/FileOpInfo.m
+	* Inspector/Contents.m
+	* Operation/FileOpInfo.m
+	* Inspector/TimeDateView.m
+	* Inspector/Contents.m
+	* Inspector/Tools.m
+	* Inspector/Inspector.m
+	* Recycler/Dialogs/StartAppWin.m
+	* Recycler/RecyclerView.m
+	* Recycler/Preferences/RecyclerPrefs.m
+	* Recycler/RecyclerIcon.m
+	Removed TEST_ macros for conventional ones, they just waste a test instruction
+	
+2010-06-14 Riccardo Mottola <rmottola@users.sf.net>
+
+	* DBKit/DBKBTreeNode.[h,m]: change unload signature to BOOL to avoid
+	conflicting with NSBundle
+
+	* Tools/fswatcher/fswatcher.h
+	* GFinder/FileViewer/GWViewerPathsPopUp.m
+	* GFinder/Fiend/FiendLeaf.m
+	* GFinder/WorkspaceApplication.m
+	* Inspector/ContentViewers/NSRTFViewer/NSRTFViewer.m
+	* GFinder/TShelf/TShelfView.m:
+	Warning fixes.
+
+	* Recycler/GNUstep.h
+	* Tools/thumbnailer/GNUstep.h
+	* Operation/GNUstep.h
+	* GFinder/GNUstep.h
+	* FSNode/GNUstep.h
+	Deleted duplicate copies.
+
+	* Operation/FileOpInfo.m
+	* Operation/Operation.m
+	* Operation/Functions.m
+	* GFinder/main.m
+	* GFinder/Dialogs/RunExternalController.m
+	* GFinder/Dialogs/StartAppWin.m
+	* GFinder/Dialogs/CompletionField.m
+	* GFinder/Dialogs/OpenWithController.m
+	* GFinder/Dialogs/Dialogs.m
+	* GFinder/TShelf/TShelfIconsView.m
+	* GFinder/TShelf/TShelfIcon.m
+	* GFinder/TShelf/TShelfViewItem.m
+	* GFinder/TShelf/TShelfPBIcon.m
+	* GFinder/TShelf/TShelfView.m
+	* GFinder/TShelf/TShelfWin.m
+	* GFinder/Fiend/Fiend.m
+	* GFinder/Fiend/FiendLeaf.m
+	* GFinder/GFinder.m
+	* GFinder/FileViewer/GWViewerWindow.m
+	* GFinder/History/History.m
+	* GFinder/Preferences/IconsPref.m
+	* GFinder/Preferences/HiddenFilesPref.m
+	* GFinder/Preferences/OperationPrefs.m
+	* GFinder/Preferences/PrefController.m
+	* GFinder/Preferences/XTermPref.m
+	* GFinder/Preferences/HistoryPref.m
+	* GFinder/Preferences/DefSortOrderPref.m
+	* GFinder/Preferences/DefEditorPref.m
+	* GFinder/Preferences/BrowserViewerPref.m
+	* GFinder/GWFunctions.m
+	* GFinder/WorkspaceApplication.m
+	* Recycler/main.m
+	* Recycler/Dialogs/StartAppWin.m
+	* Recycler/RecyclerView.m
+	* Recycler/Preferences/RecyclerPrefs.m
+	* Recycler/Recycler.m
+	* Recycler/RecyclerIcon.m
+	* FSNode/FSNPathComponentsViewer.m
+	* FSNode/FSNBrowserMatrix.m
+	* FSNode/FSNFunctions.m
+	* FSNode/ExtendedInfo/Role/ExtInfoRole.m
+	* FSNode/FSNBrowser.m
+	* FSNode/FSNIcon.m
+	* FSNode/FSNode.m:
+	Cleaned up imports to use system GNUstep.h
+
+	* GFinder/GFinder.m
+	* GFinder/FileViewer/GWViewer.m
+	* GFinder/FileViewer/GWSpatialViewer.m
+	* GFinder/FileViewer/GWViewersManager.m
+	Warn about OPEN_MAX being undefined but do not override it by default.
+
+2010-06-11 Riccardo Mottola <rmottola@users.sf.net>
+
+	* DBKit/DBKFreeNodesPage.m
+	* GFinder/Dialogs/CompletionField.m
+	* GFinder/GWFunctions.m
+	* GFinder/Finder/LiveSearch/LSFolder.m
+	* GFinder/Finder/SearchResults/SearchResults.m
+	* GFinder/Desktop/GWDesktopView.m
+	* FSNode/FSNPathComponentsViewer.m:
+	Warning fixes
+	
+2010-06-11 Riccardo Mottola <rmottola@users.sf.net>
+	
+	* configure.ac
+	* configure
+	* GNUmakefile.in
+	Introduced option to disable gwmetadata build and really build it
+	if it is selected.
+	
+2010-03-16 Riccardo Mottola <rmottola@users.sf.net>
+
+	* Tools/searchtool/searchtool.m
+	* Tools/lsfupdater/lsfupdater.m
+	* GFinder/GFinder.m
+	* GFinder/Finder/SearchResults/SearchResults.m
+	* Inspector/ContentViewers/ImageViewer/ImageViewer.m
+	* Recycler/Recycler.m:
+	do not include <GNUstepBase/NSTask+GS.h>
+
+2010-03-27  Wolfgang Lux  <wolfgang.lux@gmail.com>
+
+	* GFinder/FileViewer/GWViewer.m (-windowWillClose:):
+	* GFinder/FileViewer/GWSpatialViewer.m (-windowWillClose:):
+	Set the window's delegate to nil to avoid crash when the viewer is
+	released before the window.
+
+2009-12-08 Riccardo Mottola <rmottola@users.sf.net>
+	* GFinder/FileViewer/GWViewerWindow.[h,m]:
+	removed local copy of delegate
+
+2009-11-14 Riccardo Mottola <rmottola@users.sf.net>
+	* GFinder/Preferences/XTermPref.m:
+	Reformatted and indented code
+	* GFinder/Resources/English.lproj/XTermPref.gorm
+	changed grouping of the Set button
+
+2009-11-12 19:48-EST Gregory John Casamento <greg.casamento@gmail.com>
+
+	* GFinder/Dialogs/CompletionField.m: Override initWithCoder:
+	to initialize the filemanager so that we can search for matching
+	paths as the user enters the command.
+
+2009-11-11 Riccardo Mottola <rmottola@users.sf.net>
+	* GFinder/Dialogs/RunExternalController.h
+	GFinder/Dialogs/CompletionField.h
+	GFinder/Dialogs/RunExternalController.m
+	GFinder/Dialogs/OpenWithController.h
+	GFinder/Dialogs/CompletionField.m
+	GFinder/Dialogs/OpenWithController.m
+	GFinder/Resources/English.lproj/OpenWith.gorm
+	GFinder/Resources/English.lproj/RunExternal.gorm:
+	Instantiate the CompletionField inside the gorm file,
+	adjusted the init methods of fields and controllers.
+
+2009-11-06 Riccardo Mottola <rmottola@users.sf.net>
+	* Tools\searchtool\searchtool.m,
+	Tools\lsfupdater\lsfupdater.m:
+	Fix problems with undefined GW_DEBUG_LOG
+
+	* Inspector/Contents.m:
+	Backup values for MinGW not set by configure
+
+2009-11-06 Riccardo Mottola <rmottola@users.sf.net>
+	* GWMetadata/gmds/mdextractor/Extractors/HtmlExtractor/HtmlExtractor.m:
+	Fix stack smash, reported by Tim Kack
+
+2009-09-27 Riccardo Mottola <rmottola@users.sf.net>
+	* Inspector/GNUmakefile.in:
+	install ContentViewersProtocol.h
+
+2009-09-26 Riccardo Mottola <rmottola@users.sf.net>
+
+	* GWMetadata/Preferences:
+	renamed Info.plist to MDIndexingInfo.plist
+	* GWMetadata/Preferences/GNUmakefile:
+	Do not package Info.plist explicitely
+
+2009-02-01  Richard Frith-Macdonald <rfm@gnu.org>
+
+	* GWMetadata/Preferences/Info.plist:
+	Use standard info keys.
+
+2008-12-19  Nicola Pero <nicola.pero@meta-innovation.com>
+
+	* All GNUmakefiles: removed GNUSTEP_CORE_SOFTWARE=YES and
+	added PACKAGE_NAME=gfinder.
+	* GNUmakefile: Export PACKAGE_NAME to reduce chances of a problem
+	if a GNUmakefile in a subdirectory is missing it.
+
+	* DBKit/Testing/GNUmakefile: Do not set
+	GNUSTEP_INSTALLATION_DOMAIN or RPM_DISABLE_RELOCATABLE.
+	* GWMetadata/MDFinder/GNUmakefile: Same changes.
+	* GWMetadata/Preferences/GNUmakefile: Same changes.
+	* GFinder/Desktop/XBundles/GNUmakefile: Same changes.
+	* GFinder/Desktop/XBundles/XDesktopWindow/GNUmakefile: Same changes.
+	
+2008-12-18  Nicola Pero  <nicola.pero@meta-innovation.com>
+
+	* All GNUmakefiles: added GNUSTEP_CORE_SOFTWARE=YES at the
+	beginning.
+	* GNUmakefile: Export GNUSTEP_CORE_SOFTWARE to reduce chances of a
+	problem if a GNUmakefile in a subdirectory is missing it.
+
+2008-12-07 Richard Frith-Macdonald <rfm@gnu.org>
+
+	Change order of configure for subsirectories so that people without
+	sqlite can build more easily.  Remove makefiles which are generated
+	by configure.
+
+2008-12-07 Richard Frith-Macdonald <rfm@gnu.org>
+
+	* DBKit/GNUmakefile.in:
+	* FSNode/FSNodeRep.m:
+	* FSNode/GNUmakefile.in:
+	* GNUmakefile.in:
+	* GWMetadata/gmds/gmds/GNUmakefile.in:
+	* GWMetadata/gmds/GNUmakefile.in:
+	* GWMetadata/gmds/mdextractor/Extractors/AbiwordExtractor/GNUmakefile.in:
+	* GWMetadata/gmds/mdextractor/Extractors/AppExtractor/GNUmakefile.in:
+	* GWMetadata/gmds/mdextractor/Extractors/GNUmakefile.in:
+	* GWMetadata/gmds/mdextractor/Extractors/HtmlExtractor/GNUmakefile.in:
+	* GWMetadata/gmds/mdextractor/Extractors/JpegExtractor/GNUmakefile.in:
+	* GWMetadata/gmds/mdextractor/Extractors/OpenOfficeExtractor/GNUmakefile.in:
+	* GWMetadata/gmds/mdextractor/Extractors/PdfExtractor/GNUmakefile.in:
+	* GWMetadata/gmds/mdextractor/Extractors/RtfExtractor/GNUmakefile.in:
+	* GWMetadata/gmds/mdextractor/Extractors/TextExtractor/GNUmakefile.in:
+	* GWMetadata/gmds/mdextractor/Extractors/XmlExtractor/GNUmakefile.in:
+	* GWMetadata/gmds/mdextractor/GNUmakefile.in:
+	* GWMetadata/gmds/mdextractor/mdextractor.m:
+	* GWMetadata/gmds/mdextractor/updater.m:
+	* GWMetadata/gmds/mdfind/GNUmakefile.in:
+	* GWMetadata/GNUmakefile.in:
+	* GWMetadata/MDKit/GNUmakefile.in:
+	* GWMetadata/MDKit/MDKQueryManager.m:
+	* GWMetadata/Preferences/MDIndexing.m:
+	* GFinder/Desktop/GWDesktopManager.m:
+	* GFinder/Finder/Finder.m:
+	* GFinder/Finder/LiveSearch/LSFolder.m:
+	* GFinder/Finder/Modules/FModuleAnnotations/GNUmakefile.in:
+	* GFinder/Finder/Modules/FModuleContents/GNUmakefile.in:
+	* GFinder/Finder/Modules/FModuleCrDate/GNUmakefile.in:
+	* GFinder/Finder/Modules/FModuleKind/GNUmakefile.in:
+	* GFinder/Finder/Modules/FModuleModDate/GNUmakefile.in:
+	* GFinder/Finder/Modules/FModuleName/GNUmakefile.in:
+	* GFinder/Finder/Modules/FModuleOwner/GNUmakefile.in:
+	* GFinder/Finder/Modules/FModuleSize/GNUmakefile.in:
+	* GFinder/Finder/Modules/GNUmakefile.in:
+	* GFinder/Finder/SearchResults/SearchResults.m:
+	* GFinder/GNUmakefile.in:
+	* GFinder/GFinder.m:
+	* Inspector/Contents.m:
+	* Inspector/ContentViewers/AppViewer/GNUmakefile.in:
+	* Inspector/ContentViewers/FolderViewer/GNUmakefile.in:
+	* Inspector/ContentViewers/GNUmakefile.in:
+	* Inspector/ContentViewers/IBViewViewer/GNUmakefile.in:
+	* Inspector/ContentViewers/ImageViewer/GNUmakefile.in:
+	* Inspector/ContentViewers/ImageViewer/ImageViewer.m:
+	* Inspector/ContentViewers/ImageViewer/resizer/GNUmakefile.in:
+	* Inspector/ContentViewers/NSColorViewer/GNUmakefile.in:
+	* Inspector/ContentViewers/NSRTFViewer/GNUmakefile.in:
+	* Inspector/ContentViewers/NSTIFFViewer/GNUmakefile.in:
+	* Inspector/ContentViewers/PdfViewer/GNUmakefile.in:
+	* Inspector/ContentViewers/RtfViewer/GNUmakefile.in:
+	* Inspector/ContentViewers/SoundViewer/GNUmakefile.in:
+	* Inspector/GNUmakefile.in:
+	* Operation/GNUmakefile.in:
+	* Recycler/GNUmakefile.in:
+	* Recycler/Recycler.m:
+	* Tools/ddbd/DDBPathsManager.m:
+	* Tools/ddbd/GNUmakefile.in:
+	* Tools/ddbd/MDModules/GNUmakefile.in:
+	* Tools/ddbd/MDModules/MDModuleAnnotations/GNUmakefile.in:
+	* Tools/fswatcher/GNUmakefile.in:
+	* Tools/lsfupdater/GNUmakefile.in:
+	* Tools/lsfupdater/lsfupdater.m:
+	* Tools/searchtool/GNUmakefile.in:
+	* Tools/searchtool/searchtool.m:
+	* Tools/thumbnailer/GNUmakefile.in:
+	* Tools/thumbnailer/ImageThumbnailer/GNUmakefile.in:
+	* Tools/thumbnailer/main.m:
+	* Tools/wopen/GNUmakefile.in:
+	Updates to honor installation domain and install in right place.
+	Tool lookup fixed to locate tools wherever they are.
+	Bundle lookup changed to locate bundles in any domain.
+
+2008-09-16 Riccardo Mottola for Wolfgang Lux <wolfgang.lux@gmail.com>
+
+	* Recycler/RecyclerIcon.m, Recycler/Recycler.m: patches for dockability
+	of Recycler when not using WindowMaker
+    	
+2008-09-27 17:42-EDT Gregory John Casamento <greg_casamento@yahoo.com>
+
+	* .dist-ignore: Remove GFinder.plist from this file so that it is
+	in the distribution.
+
+2008-09-16 Riccardo Mottola <rmottola@users.sourceforge.net>
+
+	* GFinder/Preferences/DesktopPref.m: always convert to RGB color
+	
+2008-06-30 Nicola Pero <nicola.pero@meta-innovation.com>
+
+	* Tools/thumbnailer/GNUmakefile.in: Do not include bundle.make
+	since there is no bundle to build.  Including bundle.make with no
+	bundle defined caused 'rm -rf' to be executed with no argument
+	during make clean by gnustep-make v2.0.6.  Riccardo reported that
+	on his system 'rm -rf' with no arguments produces an error,
+	aborting 'make clean'.  Hmmm.
+	
+2008-06-27 Riccardo Mottola <rmottola@users.sourceforge.net>
+
+	* configure/configure.ac: updated and regenerated
+
+2008-06-26 Riccardo Mottola <rmottola@users.sourceforge.net>
+
+	* GWMetadata/gmds/mdextractor/updater.m: fixed missing bracket
+	* Configure system: added autoconf files
+	* Apps_wrappers: OpenOffice.app: added openoffice wrapper
+
+2008-06-24 Riccardo Mottola <rmottola@users.sourceforge.net>
+
+	* TODO:added notes
+	* configure/configure.ac: all were updated and regenerated
+	* GNUmakefile/GNUmakefile.in: most makefiles were renamed to .in to
+	comply with configure requirements  
+
+
+2008-06-15 Riccardo Mottola <rmottola@users.sourceforge.net>
+
+	* GFinder/FSNote/ExtendedInfo/GNUstep.h: deleted
+	* GFinder/FSNote/ExtendedInfo/GNUmakefile: removed local ref
+
+2008-06-11 Riccardo Mottola <rmottola@users.sourceforge.net>
+
+	* GFinder/GFinder.m:
+	use standard info panel
+	* GFinder/GFinderInfo.plist:
+	corrected version
+	* configure:
+	define package name and version
+
+2008-06-07 Riccardo Mottola <rmottola@users.sourceforge.net>
+
+	* GFinder/GFinder.m,
+	GWMetadata/gmds/mdextractor/updater.m:
+	start fswatcher with --daemon --auto
+	
+	* Tools/fswatcher/fswatcher.m:
+	shut down when the last connection closes
+
+
+2008-01-22 Riccardo Mottola <rmottola@users.sourceforge.net>
+
+	* GFinder/FileViewer/GWViewer.m,
+	GFinder/FileViewer/GWSpatialViewer.m:
+	Removed special case for BSD operating systems since it broke NetBSD

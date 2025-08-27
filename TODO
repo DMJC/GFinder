@@ -1,0 +1,13 @@
+1- See InspectorViewer.m
+2- See ThemeViewer.m 
+3- Fix scroll/refresh during File Operations
+4- Add a cache system for Inspector ?
+5- Add nice Icons
+6- Rewrite/remove some Prefs
+7- fix dameons and recycler under NetBSD
+8- on icon click, if no fileviewer exists, a new one should be created like on mac
+9- check ddbd connection died messages
+10- check for code duplication (isDotFile everywhere)
+11- make Dock placeable on all screen borders
+12- make "classic" theme for dock draw real icons
+13- make dock display real icons

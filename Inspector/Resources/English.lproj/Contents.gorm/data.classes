@@ -1,0 +1,33 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    Contents = {
+	Actions = (
+	);
+	Outlets = (
+	    win,
+	    topBox,
+	    iconView,
+	    titleField,
+	    viewersBox,
+	    mainBox
+	);
+	Super = NSObject;
+    };
+    FirstResponder = {
+	Actions = (
+	    "orderFrontFontPanel:",
+	    "closeMainWin:",
+	    "showInfo:",
+	    "okLoginAction:"
+	);
+	Super = NSObject;
+    };
+    IconView = {
+	Actions = (
+	);
+	Outlets = (
+	    inspector
+	);
+	Super = NSImageView;
+    };
+}

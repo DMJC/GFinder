@@ -1,0 +1,80 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    Attributes = {
+	Actions = (
+	    "permsButtonsAction:",
+	    "changePermissions:",
+	    "revertToOldPermissions:",
+	    "calculateSizes:",
+	    "insideButtonAction:"
+	);
+	Outlets = (
+	    win,
+	    mainBox,
+	    topBox,
+	    iconView,
+	    titleField,
+	    linkToLabel,
+	    linkToField,
+	    sizeLabel,
+	    sizeField,
+	    ownerLabel,
+	    ownerField,
+	    groupLabel,
+	    groupField,
+	    changedDateBox,
+	    permsBox,
+	    readLabel,
+	    writeLabel,
+	    executeLabel,
+	    uLabel,
+	    gLabel,
+	    oLabel,
+	    ureadbutt,
+	    uwritebutt,
+	    uexebutt,
+	    greadbutt,
+	    gwritebutt,
+	    gexebutt,
+	    oreadbutt,
+	    owritebutt,
+	    oexebutt,
+	    insideButt,
+	    revertButt,
+	    okButt,
+	    calculateButt,
+	    timeDateView
+	);
+	Super = NSObject;
+    };
+    FirstResponder = {
+	Actions = (
+	    "calculateSizes:",
+	    "changePermissions:",
+	    "closeMainWin:",
+	    "computeSize:",
+	    "insideButtonAction:",
+	    "okLoginAction:",
+	    "orderFrontFontPanel:",
+	    "permsButtonsAction:",
+	    "revertToOldPermissions:",
+	    "showInfo:"
+	);
+	Super = NSObject;
+    };
+    IconView = {
+	Actions = (
+	);
+	Outlets = (
+	    inspector
+	);
+	Super = NSImageView;
+    };
+    TimeDateView = {
+	Actions = (
+	);
+	Outlets = (
+	);
+	Super = NSView;
+    };
+}

@@ -1,0 +1,23 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    DefEditorPref = {
+	Actions = (
+	    "chooseEditor:"
+	);
+	Outlets = (
+	    win,
+	    prefbox,
+	    iconbox,
+	    imView,
+	    nameLabel,
+	    chooseButt
+	);
+	Super = NSObject;
+    };
+    FirstResponder = {
+	Actions = (
+	    "orderFrontFontPanel:"
+	);
+	Super = NSObject;
+    };
+}
