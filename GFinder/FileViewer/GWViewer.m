@@ -232,13 +232,38 @@
     if (defEntry && [defEntry count]) {
       [shelf setContents: defEntry];
     } else if (rootViewer) {
-      NSDictionary *sfdict = [NSDictionary dictionaryWithObjectsAndKeys:
+/*      NSDictionary *sfdict = [NSDictionary dictionaryWithObjectsAndKeys:
                         [NSNumber numberWithInt: 0], @"index",
                         [NSArray arrayWithObject: NSHomeDirectory()], @"paths",
 			nil];
-      [shelf setContents: [NSArray arrayWithObject: sfdict]];
+      [shelf setContents: [NSArray arrayWithObject: sfdict]];*/
+      NSMutableArray *sfdicts = [NSMutableArray array];
+      NSMutableArray *paths = [NSMutableArray arrayWithObjects:
+                        NSHomeDirectory(),
+                        [NSHomeDirectory() stringByAppendingPathComponent: @"Desktop"],
+                        [NSHomeDirectory() stringByAppendingPathComponent: @"Documents"],
+                        [NSHomeDirectory() stringByAppendingPathComponent: @"Downloads"],
+                        [NSHomeDirectory() stringByAppendingPathComponent: @"Pictures"],
+                        [NSHomeDirectory() stringByAppendingPathComponent: @"Music"],
+                        [NSHomeDirectory() stringByAppendingPathComponent: @"Videos"],
+                        @"/",
+                        @"/media",
+                        nil];
+      NSArray *appdirs = NSSearchPathForDirectoriesInDomains(NSApplicationDirectory, NSAllDomainsMask, YES);
+      if ([appdirs count]) {
+        [paths addObject: [appdirs objectAtIndex: 0]];
+      }
+      NSInteger i;
+      for (i = 0; i < [paths count]; i++) {
+        NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
+                        [NSNumber numberWithInteger: i], @"index",
+                        [NSArray arrayWithObject: [paths objectAtIndex: i]], @"paths",
+                        nil];
+        [sfdicts addObject: dict];
+      }
+      [shelf setContents: sfdicts];
     }
-    
+
     if (viewType == GWViewTypeIcon) {
 	      nodeView = [[GWViewerIconsView alloc] initForViewer: self];
 
