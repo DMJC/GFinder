@@ -35,7 +35,6 @@
 #import "GWViewerScrollView.h"
 #import "GWViewerSplit.h"
 #import "GWViewerShelf.h"
-#import "GWViewerIconsPath.h"
 #import "GFinder.h"
 #import "GWFunctions.h"
 #import "FSNBrowser.h"
@@ -219,52 +218,48 @@
     if (firstRootViewer) {
       [vwrwin setTitle: NSLocalizedString(@"File Viewer", @"")];
     } else {
-      if (rootViewer) {   
-        [vwrwin setTitle: [NSString stringWithFormat: @"%@ - %@", [node name], [node parentPath]]];   
+      if (rootViewer) {
+        [vwrwin setTitle: [NSString stringWithFormat: @"%@ - %@", [node name], [node parentPath]]];
       } else {
-        [vwrwin setTitle: [NSString stringWithFormat: @"%@", [node name]]];   
+        [vwrwin setTitle: [NSString stringWithFormat: @"%@", [node name]]];
       }
     }
 
     [self createSubviews];
-    
+
     defEntry = [viewerPrefs objectForKey: @"shelfdicts"];
 
     if (defEntry && [defEntry count]) {
       [shelf setContents: defEntry];
     } else if (rootViewer) {
       NSDictionary *sfdict = [NSDictionary dictionaryWithObjectsAndKeys:
-                        [NSNumber numberWithInt: 0], @"index", 
-                        [NSArray arrayWithObject: NSHomeDirectory()], @"paths", 
-                        nil];
+                        [NSNumber numberWithInt: 0], @"index",
+                        [NSArray arrayWithObject: NSHomeDirectory()], @"paths",
+			nil];
       [shelf setContents: [NSArray arrayWithObject: sfdict]];
     }
     
     if (viewType == GWViewTypeIcon) {
-      nodeView = [[GWViewerIconsView alloc] initForViewer: self];
-      
-      [pathsScroll setDelegate: pathsView];
-      
-    } else if (viewType == GWViewTypeList) { 
+	      nodeView = [[GWViewerIconsView alloc] initForViewer: self];
+
+    } else if (viewType == GWViewTypeList) {
       NSRect r = [[nviewScroll contentView] bounds];
       
       nodeView = [[GWViewerListView alloc] initWithFrame: r forViewer: self];
-       
-      [pathsScroll setDelegate: pathsView];
-       
-    } else if (viewType == GWViewTypeBrowser ) {    
+
+    } else if (viewType == GWViewTypeBrowser ) {
       nodeView = [[GWViewerBrowser alloc] initWithBaseNode: baseNode
                                       inViewer: self
 		                            visibleColumns: visibleCols
-                                      scroller: [pathsScroll horizontalScroller]
+                                      scroller: [nviewScroll horizontalScroller]
                                     cellsIcons: NO
-                                 editableCells: NO   
+                                 editableCells: NO
                                selectionColumn: YES];
     }
 
-    [nviewScroll setDocumentView: nodeView];	
-    RELEASE (nodeView);                 
-    [nodeView showContentsOfNode: baseNode]; 
+    [nviewScroll setDocumentView: nodeView];
+    RELEASE (nodeView);
+    [nodeView showContentsOfNode: baseNode];
     
     if (showsel) {
       defEntry = [viewerPrefs objectForKey: @"lastselection"];
@@ -323,26 +318,24 @@
 {
   NSRect r = [[vwrwin contentView] bounds];
   CGFloat w = r.size.width;
-  CGFloat h = r.size.height;   
+  CGFloat h = r.size.height;
   CGFloat d = 0.0;
   int xmargin = 8;
   int ymargin = 6;
-  int pathscrh = 98;
   NSUInteger resizeMask;
-  BOOL hasScroller;
-  
+
   split = [[GWViewerSplit alloc] initWithFrame: r];
   [split setAutoresizingMask: (NSViewWidthSizable | NSViewHeightSizable)];
   [split setDelegate: self];
-  
+  [split setVertical: YES];
   d = [split dividerThickness];
-  
-  r = NSMakeRect(0, 0, w, shelfHeight);  
+
+  r = NSMakeRect(0, 0, shelfHeight, h);
   shelf = [[GWViewerShelf alloc] initWithFrame: r forViewer: self];
   [split addSubview: shelf];
   RELEASE (shelf);
   
-  r = NSMakeRect(0, shelfHeight + d, w, h - shelfHeight - d);
+  r = NSMakeRect(shelfHeight + d, 0, w - shelfHeight - d, h);
   lowBox = [[NSView alloc] initWithFrame: r];
   resizeMask = NSViewWidthSizable | NSViewHeightSizable;
   [lowBox setAutoresizingMask: resizeMask];
@@ -352,41 +345,18 @@
 
   r = [lowBox bounds];
   w = r.size.width;
-  h = r.size.height; 
-  
-  r = NSMakeRect(xmargin, h - pathscrh, w - (xmargin * 2), pathscrh);
-  pathsScroll = [[GWViewerPathsScroll alloc] initWithFrame: r];
-  [pathsScroll setBorderType: NSBezelBorder];
-  [pathsScroll setHasHorizontalScroller: YES];
-  [pathsScroll setHasVerticalScroller: NO];
-  [pathsScroll setDelegate: nil];
-  resizeMask = NSViewNotSizable | NSViewWidthSizable | NSViewMinYMargin;
-  [pathsScroll setAutoresizingMask: resizeMask];
-  [lowBox addSubview: pathsScroll];
-  RELEASE (pathsScroll);
-
-  visibleCols = myrintf(r.size.width / [vwrwin resizeIncrements].width);  
-  
-  r = [[pathsScroll contentView] bounds];
-  pathsView = [[GWViewerIconsPath alloc] initWithFrame: r 
-                   visibleIcons: visibleCols forViewer: self
-                   ownsScroller: (viewType != GWViewTypeBrowser)];
-  resizeMask = NSViewNotSizable;
-  [pathsView setAutoresizingMask: resizeMask];
-  [pathsScroll setDocumentView: pathsView];
-  RELEASE (pathsView);
-  
-  r = NSMakeRect(xmargin, 0, w - (xmargin * 2), h - pathscrh - ymargin);
+  h = r.size.height;
+  visibleCols = myrintf(w / [vwrwin resizeIncrements].width);
+  r = NSMakeRect(xmargin, ymargin, w - (xmargin * 2), h - (ymargin * 2));
   nviewScroll = [[GWViewerScrollView alloc] initWithFrame: r inViewer: self];
   [nviewScroll setBorderType: NSBezelBorder];
-  hasScroller = ((viewType ==GWViewTypeIcon) || (viewType ==GWViewTypeList));
-  [nviewScroll setHasHorizontalScroller: hasScroller];
-  [nviewScroll setHasVerticalScroller: hasScroller];
+  [nviewScroll setHasHorizontalScroller: YES];
+  [nviewScroll setHasVerticalScroller: (viewType != GWViewTypeBrowser)];
   resizeMask = NSViewNotSizable | NSViewWidthSizable | NSViewHeightSizable;
   [nviewScroll setAutoresizingMask: resizeMask];
   [lowBox addSubview: nviewScroll];
   RELEASE (nviewScroll);
-  
+
   [vwrwin setContentView: split];
   RELEASE (split);
 }
@@ -431,7 +401,7 @@
 
 - (void)updateShownSelection
 {
-  [pathsView updateLastIcon];
+
 }
 
 - (GWViewerWindow *)win
@@ -480,11 +450,11 @@
 {
   NSRect r = [split bounds];
   CGFloat w = r.size.width;
-  CGFloat h = r.size.height;   
+  CGFloat h = r.size.height;
   CGFloat d = [split dividerThickness];
-    
-  [shelf setFrame: NSMakeRect(0, 0, w, shelfHeight)];
-  [lowBox setFrame: NSMakeRect(0, shelfHeight + d, w, h - shelfHeight - d)];
+
+  [shelf setFrame: NSMakeRect(0, 0, shelfHeight, h)];
+  [lowBox setFrame: NSMakeRect(shelfHeight + d, 0, w - shelfHeight - d, h)];
 }
 
 - (void)scrollToBeginning
@@ -509,15 +479,15 @@
   return closing;
 }
 
-- (void)setOpened:(BOOL)opened 
+- (void)setOpened:(BOOL)opened
         repOfNode:(FSNode *)anode
 {
   id rep = [nodeView repOfSubnode: anode];
 
   if (rep) {
     [rep setOpened: opened];
-    
-    if ([nodeView isSingleNode]) { 
+
+    if ([nodeView isSingleNode]) {
       [rep select];
     }
   }
@@ -557,8 +527,6 @@
   }
     
   components = [FSNode nodeComponentsFromNode: baseNode toNode: node];
-  
-  [pathsView showPathComponents: components selection: newsel];
 
   if ([node isDirectory] && ([newsel count] == 1)) {
     if ([nodeView isSingleNode] && ([node isEqual: [nodeView shownNode]] == NO)) {
@@ -604,23 +572,6 @@
 {
 }
 
-- (void)pathsViewDidSelectIcon:(id)icon
-{
-  FSNode *node = [icon node];
-  int index = [icon gridIndex];
-  
-  if ([node isDirectory] && (([node isPackage] == NO) || (index == 0))) {
-    if ([nodeView isSingleNode]) {
-      [nodeView showContentsOfNode: node];
-      [self scrollToBeginning];
-      [self selectionChanged: [NSArray arrayWithObject: node]];
-      
-    } else {
-      [nodeView setLastShownNode: node];
-    }
-  }
-}
-
 - (void)shelfDidSelectIcon:(id)icon
 {
   FSNode *node = [icon node];
@@ -659,7 +610,6 @@
 - (void)setSelectableNodesRange:(NSRange)range
 {
   visibleCols = range.length;
-  [pathsView setSelectableIconsRange: range];
 }
 
 - (void)updeateInfoLabels
@@ -811,28 +761,19 @@
 {
   NSRect r = [vwrwin frame];
   NSRange range;
-    
-  RETAIN (nodeView);  
+
+  RETAIN (nodeView);
   [nodeView removeFromSuperviewWithoutNeedingDisplay];
   [nviewScroll setDocumentView: nil];	
 
-  RETAIN (pathsView);  
-  [pathsView removeFromSuperviewWithoutNeedingDisplay];
-  [pathsScroll setDocumentView: nil];	  
-
   resizeIncrement = [(NSNumber *)[notification object] intValue];
   r.size.width = (visibleCols * resizeIncrement);
-  [vwrwin setFrame: r display: YES];  
-  [vwrwin setMinSize: NSMakeSize(resizeIncrement * 2, MIN_WIN_H)];    
+  [vwrwin setFrame: r display: YES];
+  [vwrwin setMinSize: NSMakeSize(resizeIncrement * 2, MIN_WIN_H)];
   [vwrwin setResizeIncrements: NSMakeSize(resizeIncrement, 1)];
 
-  [pathsScroll setDocumentView: pathsView];	
-  RELEASE (pathsView); 
-  range = NSMakeRange([pathsView firstVisibleIcon], [pathsView lastVisibleIcon]);
-  [pathsView setSelectableIconsRange: range];
-
-  [nviewScroll setDocumentView: nodeView];	
-  RELEASE (nodeView); 
+  [nviewScroll setDocumentView: nodeView];
+  RELEASE (nodeView);
   [nodeView resizeWithOldSuperviewSize: [nodeView bounds].size];
 
   [self windowDidResize: nil];
@@ -977,12 +918,11 @@ constrainMinCoordinate:(CGFloat)proposedMin
 - (void)windowDidResize:(NSNotification *)aNotification
 {
   if (nodeView) {
-    [nodeView stopRepNameEditing];  
-    [pathsView stopRepNameEditing];  
+    [nodeView stopRepNameEditing];
 
     if ([nodeView isSingleNode]) {
       NSRect r = [[vwrwin contentView] bounds];
-      int cols = myrintf(r.size.width / [vwrwin resizeIncrements].width);  
+      int cols = myrintf(r.size.width / [vwrwin resizeIncrements].width);
 
       if (cols != visibleCols) {
         [self setSelectableNodesRange: NSMakeRange(0, cols)];
@@ -1226,24 +1166,21 @@ constrainMinCoordinate:(CGFloat)proposedMin
  
       RETAIN (selection);
     
-      [nviewScroll setDocumentView: nil];	
-    
+      [nviewScroll setDocumentView: nil];
+
       if (tag == GWViewTypeBrowser)
         {
-          [pathsScroll setDelegate: nil];
-          [pathsView setOwnsScroller: NO];
-
           [nviewScroll setHasVerticalScroller: NO];
-          [nviewScroll setHasHorizontalScroller: NO];
+          [nviewScroll setHasHorizontalScroller: YES];
 
           nodeView = [[GWViewerBrowser alloc] initWithBaseNode: baseNode
                                                       inViewer: self
                                                 visibleColumns: visibleCols
-                                                      scroller: [pathsScroll horizontalScroller]
+                                                      scroller: [nviewScroll horizontalScroller]
                                                     cellsIcons: NO
                                                  editableCells: NO
                                                selectionColumn: YES];
-      
+
           viewType = GWViewTypeBrowser;
         }
       else if (tag == GWViewTypeIcon)
@@ -1269,16 +1206,6 @@ constrainMinCoordinate:(CGFloat)proposedMin
         {
           NSRect r = [[nviewScroll contentView] bounds];
 
-          NSScroller *scroller = RETAIN ([pathsScroll horizontalScroller]);
-
-          [pathsScroll setHasHorizontalScroller: NO];
-          [pathsScroll setHorizontalScroller: scroller]; 
-          [pathsScroll setHasHorizontalScroller: YES];
-          RELEASE (scroller);
-      
-          [pathsView setOwnsScroller: YES];
-          [pathsScroll setDelegate: pathsView];
-
           [nviewScroll setHasVerticalScroller: YES];
           [nviewScroll setHasHorizontalScroller: YES];
 
@@ -1286,11 +1213,11 @@ constrainMinCoordinate:(CGFloat)proposedMin
 
           viewType = GWViewTypeList;
         }
-    
-      [nviewScroll setDocumentView: nodeView];	
-      RELEASE (nodeView); 
-      [nodeView showContentsOfNode: baseNode]; 
-                    
+
+      [nviewScroll setDocumentView: nodeView];
+      RELEASE (nodeView);
+      [nodeView showContentsOfNode: baseNode];
+
       if ([selection count])
         {
           if ([nodeView isSingleNode])

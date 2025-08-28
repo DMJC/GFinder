@@ -36,7 +36,7 @@
 #import "FSNIcon.h"
 #import "FSNFunctions.h"
 
-#define DEF_ICN_SIZE 48
+#define DEF_ICN_SIZE 16
 #define DEF_TEXT_SIZE 12
 #define DEF_ICN_POS NSImageAbove
 
@@ -158,8 +158,7 @@
       }
     }
 
-    defentry = [defaults objectForKey: @"shelfcellswidth"];
-    gridSize.width = defentry ? [defentry intValue] : DEF_GRID_WIDTH; 
+    gridSize.width = frameRect.size.width;
 
     icons = [NSMutableArray new];
 
@@ -169,7 +168,7 @@
     dragIcon = nil;
     focusedIcon = nil;
 
-    [self calculateGridSize];    
+    [self calculateGridSize];
     [self makeIconsGrid];
  
     [self registerForDraggedTypes: [NSArray arrayWithObject: NSFilenamesPboardType]];
@@ -194,7 +193,6 @@
 {
   FSNode *baseNode = [viewer baseNode];
   NSInteger i;
-
   for (i = 0; i < [iconsInfo count]; i++)
     { 
       NSDictionary *info = [iconsInfo objectAtIndex: i];
@@ -549,6 +547,8 @@
   NSArray *subviews = [self subviews];
   NSUInteger i;
 
+  gridSize.width = [self bounds].size.width;
+  [self calculateGridSize];
   [self makeIconsGrid];
   
   for (i = 0; i < [icons count]; i++) {
