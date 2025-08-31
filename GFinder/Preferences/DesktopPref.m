@@ -138,6 +138,8 @@ static NSString *nibName = @"DesktopPref";
 	  [cell setTitle: NSLocalizedString(@"Left", @"")];
 	  cell = [dockPosMatrix cellAtRow: 1 column: 0];
 	  [cell setTitle: NSLocalizedString(@"Right", @"")];
+	  cell = [dockPosMatrix cellAtRow: 2 column: 0];
+	  [cell setTitle: NSLocalizedString(@"Bottom", @"")];
 	  [dockStyleLabel setStringValue: NSLocalizedString(@"Style:", @"")];
 	  cell = [dockStyleMatrix cellAtRow: 0 column: 0];
 	  [cell setTitle: NSLocalizedString(@"Classic", @"")];

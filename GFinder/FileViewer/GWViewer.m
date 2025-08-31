@@ -372,12 +372,14 @@
     CGFloat buttonHeight = 25;
     CGFloat buttonWidth = 40;
     CGFloat segmentedWidth = buttonWidth * 3;
-    CGFloat totalButtonsWidth = segmentedWidth;
+    CGFloat sortButtonWidth = 30;
+    CGFloat totalButtonsWidth = segmentedWidth + sortButtonWidth + 4;
     CGFloat navButtonWidth = 30;
     NSRect br;
     NSView *buttonsBox;
     NSButton *backButton;
     NSButton *forwardButton;
+    NSPopUpButton *sortButton;
     NSTextField *folderLabel;
     NSUInteger i;
 
@@ -448,6 +450,24 @@
 
     [buttonsBox addSubview: viewTypeControl];
     RELEASE (viewTypeControl);
+
+
+    sortButton = [[NSPopUpButton alloc] initWithFrame:
+      NSMakeRect(segmentedWidth + 4, 0, sortButtonWidth, buttonHeight)
+                                         pullsDown: YES];
+    [sortButton addItemWithTitle: @""];
+    [[sortButton itemAtIndex: 0] setImage:
+      [NSImage imageNamed: @"Sort_Options.tiff"]];
+    NSArray *sortOptions = [NSArray arrayWithObjects:
+      @"Name", @"Date Modified", @"Size", @"Type", nil];
+    for (i = 0; i < [sortOptions count]; i++)
+      {
+        [[sortButton menu] addItemWithTitle: [sortOptions objectAtIndex: i]
+                                     action: NULL
+                              keyEquivalent: @""];
+      }
+    [buttonsBox addSubview: sortButton];
+    RELEASE (sortButton);
 
     [self updateViewButtonsState];
 

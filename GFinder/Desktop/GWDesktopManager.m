@@ -88,7 +88,7 @@ static GWDesktopManager *desktopManager = nil;
 
     singleClickLaunch = [defaults boolForKey: @"singleclicklaunch"];
     defentry = [defaults objectForKey: @"dockposition"];
-    dockPosition = defentry ? [defentry intValue] : DockPositionRight;
+    dockPosition = defentry ? [defentry intValue] : DockPositionBottom;
 
     [self setReservedFrames];
     
@@ -357,12 +357,19 @@ static GWDesktopManager *desktopManager = nil;
   }
 
   dockReservedFrame.size.height = screenFrame.size.height;
-  dockReservedFrame.size.width = 64 + RESV_MARGIN;
+  if(dockPosition != DockPositionBottom){
+    dockReservedFrame.size.width = 64 + RESV_MARGIN;
+  } else {
+    dockReservedFrame.size.height = 64 + RESV_MARGIN;
+  }
   dockReservedFrame.origin.x = 0;
   dockReservedFrame.origin.y = 0;
   
   if (dockPosition == DockPositionRight) {
     dockReservedFrame.origin.x = screenFrame.size.width - 64 - RESV_MARGIN;
+  }
+  if (dockPosition == DockPositionBottom) {
+    dockReservedFrame.origin.y = screenFrame.size.height - 64 - RESV_MARGIN;
   }
   
   tshelfReservedFrame = NSMakeRect(0, 0, screenFrame.size.width, 106 + RESV_MARGIN);

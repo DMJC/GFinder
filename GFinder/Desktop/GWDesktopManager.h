@@ -29,7 +29,8 @@
 
 typedef enum DockPosition {   
   DockPositionLeft = 0,
-  DockPositionRight = 1
+  DockPositionRight = 1,
+  DockPositionBottom = 2
 } DockPosition;
 
 
