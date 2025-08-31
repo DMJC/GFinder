@@ -43,6 +43,8 @@ typedef enum
 @class GWViewerIconsPath;
 @class GWViewerPathsScroll;
 @class NSView;
+@class NSSegmentedControl;
+@class NSTextField;
 @class GFinder;
 
 @interface GWViewer : NSObject
@@ -56,7 +58,9 @@ typedef enum
   GWViewerIconsPath *pathsView;
   GWViewerScrollView *nviewScroll;
   id nodeView;
-  
+  NSSegmentedControl *viewTypeControl;
+  NSTextField *folderNameField;
+
   NSDictionary *viewerPrefs;
   GWViewType viewType;
 

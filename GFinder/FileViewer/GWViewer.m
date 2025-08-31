@@ -68,6 +68,7 @@
   RELEASE (vwrwin);
   RELEASE (viewerPrefs);
   RELEASE (history);
+  RELEASE (folderNameField);
   
   [super dealloc];
 }
@@ -232,11 +233,6 @@
     if (defEntry && [defEntry count]) {
       [shelf setContents: defEntry];
     } else if (rootViewer) {
-/*      NSDictionary *sfdict = [NSDictionary dictionaryWithObjectsAndKeys:
-                        [NSNumber numberWithInt: 0], @"index",
-                        [NSArray arrayWithObject: NSHomeDirectory()], @"paths",
-			nil];
-      [shelf setContents: [NSArray arrayWithObject: sfdict]];*/
       NSMutableArray *sfdicts = [NSMutableArray array];
       NSMutableArray *paths = [NSMutableArray arrayWithObjects:
                         NSHomeDirectory(),
@@ -285,7 +281,6 @@
     [nviewScroll setDocumentView: nodeView];
     RELEASE (nodeView);
     [nodeView showContentsOfNode: baseNode];
-    
     if (showsel) {
       defEntry = [viewerPrefs objectForKey: @"lastselection"];
     
@@ -316,6 +311,7 @@
             }
             
             [nodeView showContentsOfNode: basenode];
+            [self updeateInfoLabels];
             [nodeView selectRepsOfPaths: selection];
           
           } else {
@@ -372,18 +368,129 @@
   w = r.size.width;
   h = r.size.height;
   visibleCols = myrintf(w / [vwrwin resizeIncrements].width);
-  r = NSMakeRect(xmargin, ymargin, w - (xmargin * 2), h - (ymargin * 2));
-  nviewScroll = [[GWViewerScrollView alloc] initWithFrame: r inViewer: self];
-  [nviewScroll setBorderType: NSBezelBorder];
-  [nviewScroll setHasHorizontalScroller: YES];
-  [nviewScroll setHasVerticalScroller: (viewType != GWViewTypeBrowser)];
-  resizeMask = NSViewNotSizable | NSViewWidthSizable | NSViewHeightSizable;
-  [nviewScroll setAutoresizingMask: resizeMask];
-  [lowBox addSubview: nviewScroll];
-  RELEASE (nviewScroll);
+  {
+    CGFloat buttonHeight = 25;
+    CGFloat buttonWidth = 40;
+    CGFloat segmentedWidth = buttonWidth * 3;
+    CGFloat totalButtonsWidth = segmentedWidth;
+    CGFloat navButtonWidth = 30;
+    NSRect br;
+    NSView *buttonsBox;
+    NSButton *backButton;
+    NSButton *forwardButton;
+    NSTextField *folderLabel;
+    NSUInteger i;
 
+    backButton = [[NSButton alloc] initWithFrame:
+      NSMakeRect(xmargin, h - buttonHeight - ymargin,
+                 navButtonWidth, buttonHeight)];
+    [backButton setTitle: @"<"];
+    [backButton setTarget: vwrwin];
+    [backButton setAction: @selector(goBackwardInHistory:)];
+    [backButton setButtonType: NSMomentaryPushInButton];
+    [backButton setAutoresizingMask: (NSViewMaxXMargin | NSViewMinYMargin)];
+    [lowBox addSubview: backButton];
+    RELEASE (backButton);
+
+    forwardButton = [[NSButton alloc] initWithFrame:
+      NSMakeRect(xmargin + navButtonWidth + 4, h - buttonHeight - ymargin,
+                 navButtonWidth, buttonHeight)];
+    [forwardButton setTitle: @">"];
+    [forwardButton setTarget: vwrwin];
+    [forwardButton setAction: @selector(goForwardInHistory:)];
+    [forwardButton setButtonType: NSMomentaryPushInButton];
+    [forwardButton setAutoresizingMask: (NSViewMaxXMargin | NSViewMinYMargin)];
+    [lowBox addSubview: forwardButton];
+    RELEASE (forwardButton);
+
+    {
+      CGFloat buttonsStart = (w - totalButtonsWidth) / 2;
+      CGFloat labelX = xmargin + (navButtonWidth * 2) + 8;
+      CGFloat labelWidth = buttonsStart - labelX - 4;
+      NSRect lfr = NSMakeRect(labelX, h - buttonHeight - ymargin,
+                              labelWidth, buttonHeight);
+      folderLabel = [[NSTextField alloc] initWithFrame: lfr];
+      [folderLabel setBezeled: NO];
+      [folderLabel setDrawsBackground: NO];
+      [folderLabel setEditable: NO];
+      [folderLabel setSelectable: NO];
+      [folderLabel setAutoresizingMask: (NSViewWidthSizable | NSViewMinYMargin)];
+      [folderLabel setStringValue: [[nodeView shownNode] name]];
+      [lowBox addSubview: folderLabel];
+      ASSIGN (folderNameField, folderLabel);
+      RELEASE (folderLabel);
+    }
+
+    buttonsBox = [[NSView alloc] initWithFrame:
+      NSMakeRect((w - totalButtonsWidth) / 2, h - buttonHeight - ymargin,
+                 totalButtonsWidth, buttonHeight)];
+    [buttonsBox setAutoresizingMask: (NSViewMinXMargin | NSViewMaxXMargin
+                                      | NSViewMinYMargin)];
+
+    br = NSMakeRect(0, 0, segmentedWidth, buttonHeight);
+    viewTypeControl = [[NSSegmentedControl alloc] initWithFrame: br];
+    [viewTypeControl setSegmentCount: 3];
+    [viewTypeControl setTarget: self];
+    [viewTypeControl setAction: @selector(setViewerType:)];
+    [[viewTypeControl cell] setTrackingMode: NSSegmentSwitchTrackingSelectOne];
+
+    NSString *images[3] = {@"IconView.tiff",
+                            @"ListView.tiff",
+                            @"BrowserView.tiff"};
+
+    for (i = 0; i < 3; i++)
+      {
+        [viewTypeControl setWidth: buttonWidth forSegment: i];
+        [viewTypeControl setLabel: @"" forSegment: i];
+        [viewTypeControl setImage: [NSImage imageNamed: images[i]]
+                         forSegment: i];
+      }
+
+    [buttonsBox addSubview: viewTypeControl];
+    RELEASE (viewTypeControl);
+
+    [self updateViewButtonsState];
+
+    [lowBox addSubview: buttonsBox];
+    RELEASE (buttonsBox);
+
+    r = NSMakeRect(xmargin, ymargin,
+                   w - (xmargin * 2),
+                   h - (ymargin * 3) - buttonHeight);
+    nviewScroll = [[GWViewerScrollView alloc] initWithFrame: r inViewer: self];
+    [nviewScroll setBorderType: NSBezelBorder];
+    [nviewScroll setHasHorizontalScroller: YES];
+    [nviewScroll setHasVerticalScroller: (viewType != GWViewTypeBrowser)];
+    resizeMask = NSViewNotSizable | NSViewWidthSizable | NSViewHeightSizable;
+    [nviewScroll setAutoresizingMask: resizeMask];
+    [lowBox addSubview: nviewScroll];
+    RELEASE (nviewScroll);
+  }
   [vwrwin setContentView: split];
   RELEASE (split);
+}
+
+- (void)updateViewButtonsState
+{
+  if (viewTypeControl)
+    {
+      NSInteger count = [viewTypeControl segmentCount];
+      GWViewType types[3] = {GWViewTypeIcon, GWViewTypeList, GWViewTypeBrowser};
+      for (NSInteger i = 0; i < count && i < 3; i++)
+        {
+          [viewTypeControl setSelected: (types[i] == viewType)
+                           forSegment: i];
+        }
+    }
+}
+
+- (void)updateFolderNameLabel
+{
+  if (folderNameField)
+    {
+      FSNode *shown = [nodeView shownNode];
+      [folderNameField setStringValue: shown ? [shown name] : @""];
+    }
 }
 
 - (FSNode *)baseNode
@@ -643,7 +750,7 @@
   NSDictionary *attributes = [fm fileSystemAttributesAtPath: [[nodeView shownNode] path]];
   NSNumber *freefs = [attributes objectForKey: NSFileSystemFreeSize];
   NSString *labelstr;
-  
+
   if (freefs == nil)
     {
       labelstr = NSLocalizedString(@"unknown volume size", @"");
@@ -1178,19 +1285,43 @@ constrainMinCoordinate:(CGFloat)proposedMin
 
 - (void)setViewerType:(id)sender
 {
-  NSInteger tag = [sender tag];
+  NSInteger tag;
+
+  if ([sender isKindOfClass: [NSSegmentedControl class]])
+    {
+      NSInteger seg = [sender selectedSegment];
+      switch (seg)
+        {
+          case 0:
+            tag = GWViewTypeIcon;
+            break;
+          case 1:
+            tag = GWViewTypeList;
+            break;
+          case 2:
+            tag = GWViewTypeBrowser;
+            break;
+          default:
+            tag = 0;
+            break;
+        }
+    }
+  else
+    {
+      tag = [sender tag];
+    }
 
   if (tag > 0)
     {
       NSArray *selection = [nodeView selectedNodes];
       NSUInteger i;
-    
+
       [nodeView updateNodeInfo: YES];
       if ([nodeView isSingleNode] && ([selection count] == 0))
         selection = [NSArray arrayWithObject: [nodeView shownNode]];
- 
+
       RETAIN (selection);
-    
+
       [nviewScroll setDocumentView: nil];
 
       if (tag == GWViewTypeBrowser)
@@ -1290,6 +1421,7 @@ constrainMinCoordinate:(CGFloat)proposedMin
       [self selectionChanged: selection];
       
       [self updateDefaults];
+      [self updateViewButtonsState];
     }
 }
 

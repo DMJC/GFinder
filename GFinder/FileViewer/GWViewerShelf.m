@@ -38,7 +38,7 @@
 
 #define DEF_ICN_SIZE 16
 #define DEF_TEXT_SIZE 12
-#define DEF_ICN_POS NSImageAbove
+#define DEF_ICN_POS NSImageLeft
 
 #define DEF_GRID_WIDTH 90
 #define Y_MARGIN (4)

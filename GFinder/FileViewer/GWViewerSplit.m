@@ -42,7 +42,6 @@
   [diskInfoField setBordered: NO];
   [diskInfoField setAlignment: NSLeftTextAlignment];
   [diskInfoField setTextColor: [NSColor controlShadowColor]];		
-  
   diskInfoRect = NSZeroRect;
       
   return self;
@@ -68,9 +67,9 @@
 
 - (void)drawDividerInRect:(NSRect)aRect
 {
-  diskInfoRect = NSMakeRect(8, aRect.origin.y, 200, 10);    
-  
-  [super drawDividerInRect: aRect];   
+  diskInfoRect = NSMakeRect(8, aRect.origin.y+20, 200, 10);    
+
+  [super drawDividerInRect: aRect];
   [diskInfoField setBackgroundColor: [self backgroundColor]];
   [diskInfoField drawWithFrame: diskInfoRect inView: self];
 }
