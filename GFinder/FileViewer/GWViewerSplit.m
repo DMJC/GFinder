@@ -30,20 +30,28 @@
 - (void)dealloc
 {
   RELEASE (diskInfoField);
+  RELEASE (fileCountField);
   [super dealloc];
 }
 
 - (id)initWithFrame:(NSRect)frameRect
 {
   self = [super initWithFrame: frameRect]; 
- 		
+
   diskInfoField = [NSTextFieldCell new];
   [diskInfoField setFont: [NSFont systemFontOfSize: 10]];
   [diskInfoField setBordered: NO];
   [diskInfoField setAlignment: NSLeftTextAlignment];
-  [diskInfoField setTextColor: [NSColor controlShadowColor]];		
+  [diskInfoField setTextColor: [NSColor controlShadowColor]];
   diskInfoRect = NSZeroRect;
-      
+
+  fileCountField = [NSTextFieldCell new];
+  [fileCountField setFont: [NSFont systemFontOfSize: 10]];
+  [fileCountField setBordered: NO];
+  [fileCountField setAlignment: NSLeftTextAlignment];
+  [fileCountField setTextColor: [NSColor controlShadowColor]];
+  fileCountRect = NSZeroRect;
+
   return self;
 }
 
@@ -60,6 +68,19 @@
   }
 }
 
+- (void)updateFileCountInfo:(NSString *)info
+{
+  if (info) {
+    [fileCountField setStringValue: info];
+  } else {
+    [fileCountField setStringValue: @""];
+  }
+
+  if (NSEqualRects(fileCountRect, NSZeroRect) == NO) {
+    [fileCountField drawWithFrame: fileCountRect inView: self];
+  }
+}
+
 - (CGFloat)dividerThickness
 {
   return 11;
@@ -67,11 +88,11 @@
 
 - (void)drawDividerInRect:(NSRect)aRect
 {
-  diskInfoRect = NSMakeRect(8, aRect.origin.y+20, 200, 10);    
-
   [super drawDividerInRect: aRect];
   [diskInfoField setBackgroundColor: [self backgroundColor]];
+  [fileCountField setBackgroundColor: [self backgroundColor]];
   [diskInfoField drawWithFrame: diskInfoRect inView: self];
+  [fileCountField drawWithFrame: fileCountRect inView: self];
 }
 
 @end

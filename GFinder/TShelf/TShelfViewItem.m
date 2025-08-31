@@ -202,7 +202,11 @@
   if (state == NSSelectedTab) {
     fRect.origin.y -= 1;
     fRect.size.height += 1;
-    [[NSColor controlColor] set];
+//    [[NSColor controlColor] set];
+    [[NSColor colorWithCalibratedRed: 0.871
+                                 green: 0.894
+                                  blue: 0.914
+                                 alpha: 1.0] set];
     NSRectFill(fRect);
   } else if (state == NSBackgroundTab) {
     [[NSColor controlBackgroundColor] set];
@@ -233,7 +237,11 @@
   if (state == NSSelectedTab) {
     fRect.origin.y -= 1;
     fRect.size.height += 1;
-    [[NSColor controlColor] set];
+//    [[NSColor controlColor] set];
+    [[NSColor colorWithCalibratedRed: 0.871
+                                 green: 0.894
+                                  blue: 0.914
+                                 alpha: 1.0] set];
     NSRectFill(fRect);
   } else if (state == NSBackgroundTab) {
     [[NSColor controlBackgroundColor] set];

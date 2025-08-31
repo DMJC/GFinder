@@ -3,13 +3,13 @@
 ADDITIONAL_CPPFLAGS += 
 
 # Additional flags to pass to the Objective-C compiler
-ADDITIONAL_OBJCFLAGS += -Wall 
+ADDITIONAL_OBJCFLAGS += -Wall -I/usr/GNUstep/Local/Library/Headers
 
 # Additional flags to pass to the C compiler
 ADDITIONAL_CFLAGS += -Wall 
 
 # Additional include directories the compiler should search
-ADDITIONAL_INCLUDE_DIRS += -IExtendedInfo -I..
+ADDITIONAL_INCLUDE_DIRS += -IExtendedInfo -I.. -I/usr/GNUstep/Local/Library/Headers
 
 #
 # Flags dealing with installing and uninstalling

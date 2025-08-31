@@ -474,9 +474,9 @@
     [lowBox addSubview: buttonsBox];
     RELEASE (buttonsBox);
 
-    r = NSMakeRect(xmargin, ymargin,
+    r = NSMakeRect(xmargin, ymargin + buttonHeight,
                    w - (xmargin * 2),
-                   h - (ymargin * 3) - buttonHeight);
+                   h - (ymargin * 3) - (buttonHeight*2));
     nviewScroll = [[GWViewerScrollView alloc] initWithFrame: r inViewer: self];
     [nviewScroll setBorderType: NSBezelBorder];
     [nviewScroll setHasHorizontalScroller: YES];
@@ -770,6 +770,7 @@
   NSDictionary *attributes = [fm fileSystemAttributesAtPath: [[nodeView shownNode] path]];
   NSNumber *freefs = [attributes objectForKey: NSFileSystemFreeSize];
   NSString *labelstr;
+  NSString *countstr;
 
   if (freefs == nil)
     {
@@ -792,8 +793,18 @@
 			   sizeDescription(freeSize),
 			   NSLocalizedString(@"free", @"")];
     }
+  NSArray *subNodes = [[nodeView shownNode] subNodes];
+  NSUInteger count = 0;
+  for (NSUInteger i = 0; i < [subNodes count]; i++) {
+    FSNode *nd = [subNodes objectAtIndex: i];
+    if ([nd isReserved] == NO) {
+      count++;
+    }
+  }
+  countstr = [NSString stringWithFormat: @"%lu %@", (unsigned long)count, NSLocalizedString(@"files", @"")];
 
   [split updateDiskSpaceInfo: labelstr];
+  [split updateFileCountInfo: countstr];
 }
 
 - (BOOL)involvedByFileOperation:(NSDictionary *)opinfo

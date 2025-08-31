@@ -306,6 +306,7 @@ void drawRightTabBezier(NSPoint origin, float tabh,
   NSImage *backImage;
   NSColor *scolor;
   NSColor *fcolor;
+  NSColor *shelfColor;
   NSPoint selp[2];
   NSBezierPath *bpath;
   NSUInteger i;
@@ -318,7 +319,13 @@ void drawRightTabBezier(NSPoint origin, float tabh,
   count = [items count];
   itemxspace = (int)((aRect.size.width - SPECIAL_TAB_W) / (count - 1));
   
-  [[NSColor controlColor] set];
+//  [[NSColor controlColor] set];
+  shelfColor = [NSColor colorWithCalibratedRed: 0.871
+                                          green: 0.894
+                                           blue: 0.914
+                                          alpha: 1.0];
+
+  [shelfColor set];
   NSRectFill(NSMakeRect(p.x, p.y, s.width, s.height - TAB_H));
 
   if (selected == nil) {
@@ -344,7 +351,8 @@ void drawRightTabBezier(NSPoint origin, float tabh,
 	  if ([anItem tabState] == NSSelectedTab)
 	    {
 	      selp[0] = ipoint;
-	      fcolor = [NSColor controlColor];
+              fcolor = shelfColor;
+//	      fcolor = [NSColor controlColor];
 	    } 
 	  else
 	    {
@@ -377,7 +385,8 @@ void drawRightTabBezier(NSPoint origin, float tabh,
 	  if ([anItem tabState] == NSSelectedTab)
 	    {
 	      selp[1] = NSMakePoint(ipoint.x + BEZ_TAB_W, ipoint.y);
-	      fcolor = [NSColor controlColor];
+              fcolor = shelfColor;
+//	      fcolor = [NSColor controlColor];
 	    }
 	  else
 	    {
@@ -421,8 +430,8 @@ void drawRightTabBezier(NSPoint origin, float tabh,
 	    [anItem drawLabelInRect: r];
 	  }  
 	}
-  
-  fcolor = [NSColor controlColor];
+        fcolor = shelfColor;
+//  fcolor = [NSColor controlColor];
   
   if (NSEqualPoints(selp[0], NSZeroPoint) == NO) {
     scolor = [NSColor whiteColor];

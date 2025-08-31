@@ -35,8 +35,12 @@
   NSTextFieldCell *diskInfoField;
   NSString *diskInfoString;
   NSRect diskInfoRect;
+  NSTextFieldCell *fileCountField;
+  NSString *fileCountString;
+  NSRect fileCountRect;
 }
 
 - (void)updateDiskSpaceInfo:(NSString *)info;
+- (void)updateFileCountInfo:(NSString *)info;
 
 @end

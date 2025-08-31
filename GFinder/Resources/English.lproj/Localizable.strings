@@ -361,6 +361,7 @@
 "Shown files" = "Shown files";
 "Select and move the files to hide or to show" = "Select and move the files to hide or to show";
 "Hidden directories" = "Hidden directories";
+"files" = "files";
 
 /* IconsPrefs.m */
 "Icons" = "Icons";
