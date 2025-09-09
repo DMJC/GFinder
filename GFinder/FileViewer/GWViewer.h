@@ -43,11 +43,14 @@ typedef enum
 @class GWViewerIconsPath;
 @class GWViewerPathsScroll;
 @class NSView;
-@class NSSegmentedControl;
 @class NSTextField;
+@class NSToolbar;
+@class NSToolbarItem;
+@class NSButton;
+@class NSPopUpButton;
 @class GFinder;
 
-@interface GWViewer : NSObject
+@interface GWViewer : NSObject <NSToolbarDelegate>
 {
   GWViewerWindow *vwrwin;
   GWViewerSplit *split;
@@ -58,8 +61,18 @@ typedef enum
   GWViewerIconsPath *pathsView;
   GWViewerScrollView *nviewScroll;
   id nodeView;
-  NSSegmentedControl *viewTypeControl;
   NSTextField *folderNameField;
+  NSToolbar *toolbar;
+  NSToolbarItem *backItem;
+  NSToolbarItem *forwardItem;
+  NSToolbarItem *iconItem;
+  NSToolbarItem *listItem;
+  NSToolbarItem *browserItem;
+  NSToolbarItem *sortItem;
+  NSButton *iconButton;
+  NSButton *listButton;
+  NSButton *browserButton;
+  NSPopUpButton *sortButton;
 
   NSDictionary *viewerPrefs;
   GWViewType viewType;
