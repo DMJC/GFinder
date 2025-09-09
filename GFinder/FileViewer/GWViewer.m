@@ -69,7 +69,7 @@
   RELEASE (viewerPrefs);
   RELEASE (history);
   RELEASE (folderNameField);
-  
+
   [super dealloc];
 }
 
@@ -80,14 +80,14 @@
 	  withKey:(NSString *)key
 {
   self = [super init];
-  
+
   if (self) {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSString *prefsname;
     id defEntry;
     NSRect r;
     NSString *viewTypeStr;
-        
+
     ASSIGN (baseNode, [FSNode nodeWithPath: [node path]]);
     ASSIGN (baseNodeArray, [NSArray arrayWithObject: baseNode]);
     fsnodeRep = [FSNodeRep sharedInstance];
@@ -98,17 +98,17 @@
     manager = [GWViewersManager viewersManager];
     gfinder = [GFinder gfinder];
     nc = [NSNotificationCenter defaultCenter];
-    
+
     defEntry = [defaults objectForKey: @"browserColsWidth"];
     if (defEntry) {
       resizeIncrement = [defEntry intValue];
     } else {
       resizeIncrement = DEFAULT_INCR;
     }
-    
+
     rootViewer = [[baseNode path] isEqual: path_separator()];
     firstRootViewer = (rootViewer && ([[manager viewersForBaseNode: baseNode] count] == 0));
-    
+
     if (rootViewer == YES)
       {
 	if (firstRootViewer)
@@ -213,7 +213,7 @@
       [vwrwin setFrame: r display: NO];
     }
 
-    [vwrwin setMinSize: NSMakeSize(resizeIncrement * 2, MIN_WIN_H)];    
+    [vwrwin setMinSize: NSMakeSize(resizeIncrement * 2, MIN_WIN_H)];
     [vwrwin setResizeIncrements: NSMakeSize(resizeIncrement, 1)];
 
     if (firstRootViewer) {
@@ -265,7 +265,7 @@
 
     } else if (viewType == GWViewTypeList) {
       NSRect r = [[nviewScroll contentView] bounds];
-      
+
       nodeView = [[GWViewerListView alloc] initWithFrame: r forViewer: self];
 
     } else if (viewType == GWViewTypeBrowser ) {
@@ -283,7 +283,7 @@
     [nodeView showContentsOfNode: baseNode];
     if (showsel) {
       defEntry = [viewerPrefs objectForKey: @"lastselection"];
-    
+
       if (defEntry) {
         NSFileManager *fm = [NSFileManager defaultManager];
         NSMutableArray *selection = [defEntry mutableCopy];
@@ -304,16 +304,16 @@
           if ([nodeView isSingleNode]) {
             NSString *base = [selection objectAtIndex: 0];
             FSNode *basenode = [FSNode nodeWithPath: base];
-          
+
             if (([basenode isDirectory] == NO) || [basenode isPackage]) {
               base = [base stringByDeletingLastPathComponent];
               basenode = [FSNode nodeWithPath: base];
             }
-            
+
             [nodeView showContentsOfNode: basenode];
             [self updeateInfoLabels];
             [nodeView selectRepsOfPaths: selection];
-          
+
           } else {
             [nodeView selectRepsOfPaths: selection];
           }
@@ -322,16 +322,16 @@
         RELEASE (selection);
       }
     }
-        
-    [nc addObserver: self 
-           selector: @selector(columnsWidthChanged:) 
+
+    [nc addObserver: self
+           selector: @selector(columnsWidthChanged:)
                name: @"GWBrowserColumnWidthChangedNotification"
              object: nil];
 
     invalidated = NO;
-    closing = NO;    
+    closing = NO;
   }
-  
+
   return self;
 }
 
@@ -386,9 +386,9 @@
     ASSIGN (folderNameField, folderLabel);
     RELEASE (folderLabel);
 
-    r = NSMakeRect(xmargin, ymargin + buttonHeight,
-                   w - (xmargin * 2),
-                   h - (ymargin * 3) - (buttonHeight*2));
+    r = NSMakeRect(xmargin, ymargin-5,
+                   w-5,
+                   h);
     nviewScroll = [[GWViewerScrollView alloc] initWithFrame: r inViewer: self];
     [nviewScroll setBorderType: NSBezelBorder];
     [nviewScroll setHasHorizontalScroller: YES];
@@ -1692,7 +1692,7 @@ constrainMinCoordinate:(CGFloat)proposedMin
 
             if ([node isDirectory] && ([node isPackage] == NO)) {
               canopen = NO;
-              break;      
+              break;
             }
           }
         } else {
