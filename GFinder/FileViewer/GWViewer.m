@@ -370,109 +370,21 @@
   visibleCols = myrintf(w / [vwrwin resizeIncrements].width);
   {
     CGFloat buttonHeight = 25;
-    CGFloat buttonWidth = 40;
-    CGFloat segmentedWidth = buttonWidth * 3;
-    CGFloat sortButtonWidth = 30;
-    CGFloat totalButtonsWidth = segmentedWidth + sortButtonWidth + 4;
-    CGFloat navButtonWidth = 30;
-    NSRect br;
-    NSView *buttonsBox;
-    NSButton *backButton;
-    NSButton *forwardButton;
-    NSPopUpButton *sortButton;
     NSTextField *folderLabel;
-    NSUInteger i;
+    CGFloat labelWidth = w - (xmargin * 2);
 
-    backButton = [[NSButton alloc] initWithFrame:
+    folderLabel = [[NSTextField alloc] initWithFrame:
       NSMakeRect(xmargin, h - buttonHeight - ymargin,
-                 navButtonWidth, buttonHeight)];
-    [backButton setTitle: @"<"];
-    [backButton setTarget: vwrwin];
-    [backButton setAction: @selector(goBackwardInHistory:)];
-    [backButton setButtonType: NSMomentaryPushInButton];
-    [backButton setAutoresizingMask: (NSViewMaxXMargin | NSViewMinYMargin)];
-    [lowBox addSubview: backButton];
-    RELEASE (backButton);
-
-    forwardButton = [[NSButton alloc] initWithFrame:
-      NSMakeRect(xmargin + navButtonWidth + 4, h - buttonHeight - ymargin,
-                 navButtonWidth, buttonHeight)];
-    [forwardButton setTitle: @">"];
-    [forwardButton setTarget: vwrwin];
-    [forwardButton setAction: @selector(goForwardInHistory:)];
-    [forwardButton setButtonType: NSMomentaryPushInButton];
-    [forwardButton setAutoresizingMask: (NSViewMaxXMargin | NSViewMinYMargin)];
-    [lowBox addSubview: forwardButton];
-    RELEASE (forwardButton);
-
-    {
-      CGFloat buttonsStart = (w - totalButtonsWidth) / 2;
-      CGFloat labelX = xmargin + (navButtonWidth * 2) + 8;
-      CGFloat labelWidth = buttonsStart - labelX - 4;
-      NSRect lfr = NSMakeRect(labelX, h - buttonHeight - ymargin,
-                              labelWidth, buttonHeight);
-      folderLabel = [[NSTextField alloc] initWithFrame: lfr];
-      [folderLabel setBezeled: NO];
-      [folderLabel setDrawsBackground: NO];
-      [folderLabel setEditable: NO];
-      [folderLabel setSelectable: NO];
-      [folderLabel setAutoresizingMask: (NSViewWidthSizable | NSViewMinYMargin)];
-      [folderLabel setStringValue: [[nodeView shownNode] name]];
-      [lowBox addSubview: folderLabel];
-      ASSIGN (folderNameField, folderLabel);
-      RELEASE (folderLabel);
-    }
-
-    buttonsBox = [[NSView alloc] initWithFrame:
-      NSMakeRect((w - totalButtonsWidth) / 2, h - buttonHeight - ymargin,
-                 totalButtonsWidth, buttonHeight)];
-    [buttonsBox setAutoresizingMask: (NSViewMinXMargin | NSViewMaxXMargin
-                                      | NSViewMinYMargin)];
-
-    br = NSMakeRect(0, 0, segmentedWidth, buttonHeight);
-    viewTypeControl = [[NSSegmentedControl alloc] initWithFrame: br];
-    [viewTypeControl setSegmentCount: 3];
-    [viewTypeControl setTarget: self];
-    [viewTypeControl setAction: @selector(setViewerType:)];
-    [[viewTypeControl cell] setTrackingMode: NSSegmentSwitchTrackingSelectOne];
-
-    NSString *images[3] = {@"IconView.tiff",
-                            @"ListView.tiff",
-                            @"BrowserView.tiff"};
-
-    for (i = 0; i < 3; i++)
-      {
-        [viewTypeControl setWidth: buttonWidth forSegment: i];
-        [viewTypeControl setLabel: @"" forSegment: i];
-        [viewTypeControl setImage: [NSImage imageNamed: images[i]]
-                         forSegment: i];
-      }
-
-    [buttonsBox addSubview: viewTypeControl];
-    RELEASE (viewTypeControl);
-
-
-    sortButton = [[NSPopUpButton alloc] initWithFrame:
-      NSMakeRect(segmentedWidth + 4, 0, sortButtonWidth, buttonHeight)
-                                         pullsDown: YES];
-    [sortButton addItemWithTitle: @""];
-    [[sortButton itemAtIndex: 0] setImage:
-      [NSImage imageNamed: @"Sort_Options.tiff"]];
-    NSArray *sortOptions = [NSArray arrayWithObjects:
-      @"Name", @"Date Modified", @"Size", @"Type", nil];
-    for (i = 0; i < [sortOptions count]; i++)
-      {
-        [[sortButton menu] addItemWithTitle: [sortOptions objectAtIndex: i]
-                                     action: NULL
-                              keyEquivalent: @""];
-      }
-    [buttonsBox addSubview: sortButton];
-    RELEASE (sortButton);
-
-    [self updateViewButtonsState];
-
-    [lowBox addSubview: buttonsBox];
-    RELEASE (buttonsBox);
+                 labelWidth, buttonHeight)];
+    [folderLabel setBezeled: NO];
+    [folderLabel setDrawsBackground: NO];
+    [folderLabel setEditable: NO];
+    [folderLabel setSelectable: NO];
+    [folderLabel setAutoresizingMask: (NSViewWidthSizable | NSViewMinYMargin)];
+    [folderLabel setStringValue: [[nodeView shownNode] name]];
+    [lowBox addSubview: folderLabel];
+    ASSIGN (folderNameField, folderLabel);
+    RELEASE (folderLabel);
 
     r = NSMakeRect(xmargin, ymargin + buttonHeight,
                    w - (xmargin * 2),
@@ -488,20 +400,176 @@
   }
   [vwrwin setContentView: split];
   RELEASE (split);
+  [self setupToolbar];
+  [self updateViewButtonsState];
+}
+
+- (void)setupToolbar
+{
+  NSToolbar *tb = [[NSToolbar alloc] initWithIdentifier: @"GWViewerToolbar"];
+  [tb setAllowsUserCustomization: NO];
+  [tb setAutosavesConfiguration: NO];
+  [tb setDisplayMode: NSToolbarDisplayModeIconOnly];
+  [tb setDelegate: self];
+
+  NSButton *button;
+  NSToolbarItem *item;
+
+  button = [[NSButton alloc] initWithFrame: NSMakeRect(0, 0, 30, 25)];
+  [button setTitle: @"<"];
+  [button setTarget: vwrwin];
+  [button setAction: @selector(goBackwardInHistory:)];
+  [button setButtonType: NSMomentaryPushInButton];
+  item = [[NSToolbarItem alloc] initWithItemIdentifier: @"BackItem"];
+  [item setLabel: @"Back"];
+  [item setView: button];
+  [item setMinSize: NSMakeSize(30, 25)];
+  [item setMaxSize: NSMakeSize(30, 25)];
+  ASSIGN (backItem, item);
+  RELEASE (item);
+  RELEASE (button);
+
+  button = [[NSButton alloc] initWithFrame: NSMakeRect(0, 0, 30, 25)];
+  [button setTitle: @">"];
+  [button setTarget: vwrwin];
+  [button setAction: @selector(goForwardInHistory:)];
+  [button setButtonType: NSMomentaryPushInButton];
+  item = [[NSToolbarItem alloc] initWithItemIdentifier: @"ForwardItem"];
+  [item setLabel: @"Forward"];
+  [item setView: button];
+  [item setMinSize: NSMakeSize(30, 25)];
+  [item setMaxSize: NSMakeSize(30, 25)];
+  ASSIGN (forwardItem, item);
+  RELEASE (item);
+  RELEASE (button);
+
+  button = [[NSButton alloc] initWithFrame: NSMakeRect(0, 0, 40, 25)];
+  [button setButtonType: NSOnOffButton];
+  [button setImage: [NSImage imageNamed: @"IconView.tiff"]];
+  [button setTarget: self];
+  [button setAction: @selector(setViewerType:)];
+  [button setTag: GWViewTypeIcon];
+  item = [[NSToolbarItem alloc] initWithItemIdentifier: @"IconItem"];
+  [item setLabel: @"Icon"];
+  [item setView: button];
+  [item setMinSize: NSMakeSize(40, 25)];
+  [item setMaxSize: NSMakeSize(40, 25)];
+  ASSIGN (iconItem, item);
+  ASSIGN (iconButton, button);
+  RELEASE (item);
+  RELEASE (button);
+
+  button = [[NSButton alloc] initWithFrame: NSMakeRect(0, 0, 40, 25)];
+  [button setButtonType: NSOnOffButton];
+  [button setImage: [NSImage imageNamed: @"ListView.tiff"]];
+  [button setTarget: self];
+  [button setAction: @selector(setViewerType:)];
+  [button setTag: GWViewTypeList];
+  item = [[NSToolbarItem alloc] initWithItemIdentifier: @"ListItem"];
+  [item setLabel: @"List"];
+  [item setView: button];
+  [item setMinSize: NSMakeSize(40, 25)];
+  [item setMaxSize: NSMakeSize(40, 25)];
+  ASSIGN (listItem, item);
+  ASSIGN (listButton, button);
+  RELEASE (item);
+  RELEASE (button);
+
+  button = [[NSButton alloc] initWithFrame: NSMakeRect(0, 0, 40, 25)];
+  [button setButtonType: NSOnOffButton];
+  [button setImage: [NSImage imageNamed: @"BrowserView.tiff"]];
+  [button setTarget: self];
+  [button setAction: @selector(setViewerType:)];
+  [button setTag: GWViewTypeBrowser];
+  item = [[NSToolbarItem alloc] initWithItemIdentifier: @"BrowserItem"];
+  [item setLabel: @"Browser"];
+  [item setView: button];
+  [item setMinSize: NSMakeSize(40, 25)];
+  [item setMaxSize: NSMakeSize(40, 25)];
+  ASSIGN (browserItem, item);
+  ASSIGN (browserButton, button);
+  RELEASE (item);
+  RELEASE (button);
+
+  NSPopUpButton *popup = [[NSPopUpButton alloc] initWithFrame:
+    NSMakeRect(0, 0, 30, 25)
+                                pullsDown: YES];
+  [popup addItemWithTitle: @""];
+  [[popup itemAtIndex: 0] setImage:
+    [NSImage imageNamed: @"Sort_Options.tiff"]];
+  NSArray *sortOptions = [NSArray arrayWithObjects:
+    @"Name", @"Date Modified", @"Size", @"Type", nil];
+  NSUInteger i;
+  for (i = 0; i < [sortOptions count]; i++)
+    {
+      [[popup menu] addItemWithTitle: [sortOptions objectAtIndex: i]
+                               action: NULL
+                        keyEquivalent: @""];
+    }
+  item = [[NSToolbarItem alloc] initWithItemIdentifier: @"SortItem"];
+  [item setLabel: @"Sort"];
+  [item setView: popup];
+  [item setMinSize: NSMakeSize(30, 25)];
+  [item setMaxSize: NSMakeSize(30, 25)];
+  ASSIGN (sortItem, item);
+  ASSIGN (sortButton, popup);
+  RELEASE (item);
+  RELEASE (popup);
+
+  ASSIGN (toolbar, tb);
+  [tb insertItemWithItemIdentifier: @"BackItem" atIndex: 0];
+  [tb insertItemWithItemIdentifier: @"ForwardItem" atIndex: 1];
+  [tb insertItemWithItemIdentifier: @"IconItem" atIndex: 2];
+  [tb insertItemWithItemIdentifier: @"ListItem" atIndex: 3];
+  [tb insertItemWithItemIdentifier: @"BrowserItem" atIndex: 4];
+  [tb insertItemWithItemIdentifier: @"SortItem" atIndex: 5];
+  [vwrwin setToolbar: tb];
+  RELEASE (tb);
 }
 
 - (void)updateViewButtonsState
 {
-  if (viewTypeControl)
+  if (iconButton && listButton && browserButton)
     {
-      NSInteger count = [viewTypeControl segmentCount];
-      GWViewType types[3] = {GWViewTypeIcon, GWViewTypeList, GWViewTypeBrowser};
-      for (NSInteger i = 0; i < count && i < 3; i++)
-        {
-          [viewTypeControl setSelected: (types[i] == viewType)
-                           forSegment: i];
-        }
+      [iconButton setState: (viewType == GWViewTypeIcon)];
+      [listButton setState: (viewType == GWViewTypeList)];
+      [browserButton setState: (viewType == GWViewTypeBrowser)];
     }
+}
+
+- (NSToolbarItem *)toolbar:(NSToolbar *)tb
+    itemForItemIdentifier:(NSString *)itemIdentifier
+ willBeInsertedIntoToolbar:(BOOL)flag
+{
+  if ([itemIdentifier isEqual: @"BackItem"])
+    return backItem;
+  if ([itemIdentifier isEqual: @"ForwardItem"])
+    return forwardItem;
+  if ([itemIdentifier isEqual: @"IconItem"])
+    return iconItem;
+  if ([itemIdentifier isEqual: @"ListItem"])
+    return listItem;
+  if ([itemIdentifier isEqual: @"BrowserItem"])
+    return browserItem;
+  if ([itemIdentifier isEqual: @"SortItem"])
+    return sortItem;
+  return nil;
+}
+
+- (NSArray *)toolbarDefaultItemIdentifiers:(NSToolbar *)tb
+{
+  return [NSArray arrayWithObjects:
+                     @"BackItem",
+                     @"ForwardItem",
+                     @"IconItem",
+                     @"ListItem",
+                     @"BrowserItem",
+                     @"SortItem", nil];
+}
+
+- (NSArray *)toolbarAllowedItemIdentifiers:(NSToolbar *)tb
+{
+  return [self toolbarDefaultItemIdentifiers: tb];
 }
 
 - (void)updateFolderNameLabel
