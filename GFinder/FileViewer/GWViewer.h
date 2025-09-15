@@ -46,7 +46,7 @@ typedef enum
 @class NSTextField;
 @class NSToolbar;
 @class NSToolbarItem;
-@class NSButton;
+@class NSSegmentedControl;
 @class NSPopUpButton;
 @class GFinder;
 
@@ -65,13 +65,9 @@ typedef enum
   NSToolbar *toolbar;
   NSToolbarItem *backItem;
   NSToolbarItem *forwardItem;
-  NSToolbarItem *iconItem;
-  NSToolbarItem *listItem;
-  NSToolbarItem *browserItem;
+  NSToolbarItem *viewTypeItem;
   NSToolbarItem *sortItem;
-  NSButton *iconButton;
-  NSButton *listButton;
-  NSButton *browserButton;
+  NSSegmentedControl *viewTypeControl;
   NSPopUpButton *sortButton;
 
   NSDictionary *viewerPrefs;
