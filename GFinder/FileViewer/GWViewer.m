@@ -449,7 +449,7 @@ GWViewerViewTypeForSegmentIndex(NSInteger segment)
   NSToolbarItem *item;
 
   button = [[NSButton alloc] initWithFrame: NSMakeRect(0, 0, 30, 25)];
-  [button setTitle: @"<"];
+  [button setTitle: @"◀"];
   [button setTarget: vwrwin];
   [button setAction: @selector(goBackwardInHistory:)];
   [button setButtonType: NSMomentaryPushInButton];
@@ -463,7 +463,7 @@ GWViewerViewTypeForSegmentIndex(NSInteger segment)
   RELEASE (button);
 
   button = [[NSButton alloc] initWithFrame: NSMakeRect(0, 0, 30, 25)];
-  [button setTitle: @">"];
+  [button setTitle: @"▶"];
   [button setTarget: vwrwin];
   [button setAction: @selector(goForwardInHistory:)];
   [button setButtonType: NSMomentaryPushInButton];
