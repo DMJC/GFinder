@@ -53,6 +53,38 @@
 #define COLLAPSE_LIMIT 35
 #define MID_LIMIT 110
 
+static NSInteger
+GWViewerSegmentIndexForViewType(GWViewType type)
+{
+  switch (type)
+    {
+    case GWViewTypeIcon:
+      return 0;
+    case GWViewTypeList:
+      return 1;
+    case GWViewTypeBrowser:
+      return 2;
+    default:
+      return -1;
+    }
+}
+
+static GWViewType
+GWViewerViewTypeForSegmentIndex(NSInteger segment)
+{
+  switch (segment)
+    {
+    case 0:
+      return GWViewTypeIcon;
+    case 1:
+      return GWViewTypeList;
+    case 2:
+      return GWViewTypeBrowser;
+    default:
+      return 0;
+    }
+}
+
 
 @implementation GWViewer
 
@@ -413,6 +445,7 @@
   [tb setDelegate: self];
 
   NSButton *button;
+  NSSegmentedControl *segmented;
   NSToolbarItem *item;
 
   button = [[NSButton alloc] initWithFrame: NSMakeRect(0, 0, 30, 25)];
@@ -443,53 +476,35 @@
   RELEASE (item);
   RELEASE (button);
 
-  button = [[NSButton alloc] initWithFrame: NSMakeRect(0, 0, 40, 25)];
-  [button setButtonType: NSOnOffButton];
-  [button setImage: [NSImage imageNamed: @"IconView.tiff"]];
-  [button setTarget: self];
-  [button setAction: @selector(setViewerType:)];
-  [button setTag: GWViewTypeIcon];
-  item = [[NSToolbarItem alloc] initWithItemIdentifier: @"IconItem"];
-  [item setLabel: @"Icon"];
-  [item setView: button];
-  [item setMinSize: NSMakeSize(40, 25)];
-  [item setMaxSize: NSMakeSize(40, 25)];
-  ASSIGN (iconItem, item);
-  ASSIGN (iconButton, button);
+  segmented = [[NSSegmentedControl alloc] initWithFrame: NSMakeRect(0, 0, 120, 25)];
+  [segmented setSegmentCount: 3];
+  if ([segmented respondsToSelector: @selector(setTrackingMode:)])
+    {
+      [segmented setTrackingMode: NSSegmentSwitchTrackingSelectOne];
+    }
+  [segmented setTarget: self];
+  [segmented setAction: @selector(setViewerType:)];
+  [segmented setImage: [NSImage imageNamed: @"IconView.tiff"]
+            forSegment: 0];
+  [segmented setImage: [NSImage imageNamed: @"ListView.tiff"]
+            forSegment: 1];
+  [segmented setImage: [NSImage imageNamed: @"BrowserView.tiff"]
+            forSegment: 2];
+  if ([segmented respondsToSelector: @selector(setTag:forSegment:)])
+    {
+      [segmented setTag: GWViewTypeIcon forSegment: 0];
+      [segmented setTag: GWViewTypeList forSegment: 1];
+      [segmented setTag: GWViewTypeBrowser forSegment: 2];
+    }
+  item = [[NSToolbarItem alloc] initWithItemIdentifier: @"ViewTypeItem"];
+  [item setLabel: @"View"];
+  [item setView: segmented];
+  [item setMinSize: NSMakeSize(120, 25)];
+  [item setMaxSize: NSMakeSize(120, 25)];
+  ASSIGN (viewTypeItem, item);
+  ASSIGN (viewTypeControl, segmented);
   RELEASE (item);
-  RELEASE (button);
-
-  button = [[NSButton alloc] initWithFrame: NSMakeRect(0, 0, 40, 25)];
-  [button setButtonType: NSOnOffButton];
-  [button setImage: [NSImage imageNamed: @"ListView.tiff"]];
-  [button setTarget: self];
-  [button setAction: @selector(setViewerType:)];
-  [button setTag: GWViewTypeList];
-  item = [[NSToolbarItem alloc] initWithItemIdentifier: @"ListItem"];
-  [item setLabel: @"List"];
-  [item setView: button];
-  [item setMinSize: NSMakeSize(40, 25)];
-  [item setMaxSize: NSMakeSize(40, 25)];
-  ASSIGN (listItem, item);
-  ASSIGN (listButton, button);
-  RELEASE (item);
-  RELEASE (button);
-
-  button = [[NSButton alloc] initWithFrame: NSMakeRect(0, 0, 40, 25)];
-  [button setButtonType: NSOnOffButton];
-  [button setImage: [NSImage imageNamed: @"BrowserView.tiff"]];
-  [button setTarget: self];
-  [button setAction: @selector(setViewerType:)];
-  [button setTag: GWViewTypeBrowser];
-  item = [[NSToolbarItem alloc] initWithItemIdentifier: @"BrowserItem"];
-  [item setLabel: @"Browser"];
-  [item setView: button];
-  [item setMinSize: NSMakeSize(40, 25)];
-  [item setMaxSize: NSMakeSize(40, 25)];
-  ASSIGN (browserItem, item);
-  ASSIGN (browserButton, button);
-  RELEASE (item);
-  RELEASE (button);
+  RELEASE (segmented);
 
   NSPopUpButton *popup = [[NSPopUpButton alloc] initWithFrame:
     NSMakeRect(0, 0, 30, 25)
@@ -519,21 +534,51 @@
   ASSIGN (toolbar, tb);
   [tb insertItemWithItemIdentifier: @"BackItem" atIndex: 0];
   [tb insertItemWithItemIdentifier: @"ForwardItem" atIndex: 1];
-  [tb insertItemWithItemIdentifier: @"IconItem" atIndex: 2];
-  [tb insertItemWithItemIdentifier: @"ListItem" atIndex: 3];
-  [tb insertItemWithItemIdentifier: @"BrowserItem" atIndex: 4];
-  [tb insertItemWithItemIdentifier: @"SortItem" atIndex: 5];
+  [tb insertItemWithItemIdentifier: @"ViewTypeItem" atIndex: 2];
+  [tb insertItemWithItemIdentifier: @"SortItem" atIndex: 3];
   [vwrwin setToolbar: tb];
   RELEASE (tb);
 }
 
 - (void)updateViewButtonsState
 {
-  if (iconButton && listButton && browserButton)
+  if (viewTypeControl)
     {
-      [iconButton setState: (viewType == GWViewTypeIcon)];
-      [listButton setState: (viewType == GWViewTypeList)];
-      [browserButton setState: (viewType == GWViewTypeBrowser)];
+      NSInteger selectedSegment = -1;
+      NSInteger count = [viewTypeControl segmentCount];
+      NSInteger i;
+
+      if ([viewTypeControl respondsToSelector: @selector(tagForSegment:)])
+        {
+          for (i = 0; i < count; i++)
+            {
+              if ([viewTypeControl tagForSegment: i] == viewType)
+                {
+                  selectedSegment = i;
+                  break;
+                }
+            }
+        }
+      else
+        {
+          selectedSegment = GWViewerSegmentIndexForViewType(viewType);
+        }
+
+      if ([viewTypeControl respondsToSelector: @selector(setSelected:forSegment:)])
+        {
+          for (i = 0; i < count; i++)
+            {
+              [viewTypeControl setSelected: (i == selectedSegment)
+                               forSegment: i];
+            }
+        }
+      else if ([viewTypeControl respondsToSelector: @selector(setSelectedSegment:)])
+        {
+          if ((selectedSegment >= 0) && (selectedSegment < count))
+            {
+              [viewTypeControl setSelectedSegment: selectedSegment];
+            }
+        }
     }
 }
 
@@ -545,12 +590,8 @@
     return backItem;
   if ([itemIdentifier isEqual: @"ForwardItem"])
     return forwardItem;
-  if ([itemIdentifier isEqual: @"IconItem"])
-    return iconItem;
-  if ([itemIdentifier isEqual: @"ListItem"])
-    return listItem;
-  if ([itemIdentifier isEqual: @"BrowserItem"])
-    return browserItem;
+  if ([itemIdentifier isEqual: @"ViewTypeItem"])
+    return viewTypeItem;
   if ([itemIdentifier isEqual: @"SortItem"])
     return sortItem;
   return nil;
@@ -561,9 +602,7 @@
   return [NSArray arrayWithObjects:
                      @"BackItem",
                      @"ForwardItem",
-                     @"IconItem",
-                     @"ListItem",
-                     @"BrowserItem",
+                     @"ViewTypeItem",
                      @"SortItem", nil];
 }
 
@@ -1388,21 +1427,23 @@ constrainMinCoordinate:(CGFloat)proposedMin
 
   if ([sender isKindOfClass: [NSSegmentedControl class]])
     {
-      NSInteger seg = [sender selectedSegment];
-      switch (seg)
+      NSSegmentedControl *segmented = (NSSegmentedControl *)sender;
+      NSInteger seg = [segmented selectedSegment];
+
+      if (seg != -1)
         {
-          case 0:
-            tag = GWViewTypeIcon;
-            break;
-          case 1:
-            tag = GWViewTypeList;
-            break;
-          case 2:
-            tag = GWViewTypeBrowser;
-            break;
-          default:
-            tag = 0;
-            break;
+          if ([segmented respondsToSelector: @selector(tagForSegment:)])
+            {
+              tag = [segmented tagForSegment: seg];
+            }
+          else
+            {
+              tag = GWViewerViewTypeForSegmentIndex(seg);
+            }
+        }
+      else
+        {
+          tag = 0;
         }
     }
   else
