@@ -258,6 +258,21 @@ static GFinder *gfinder = nil;
 
   [menu addItemWithTitle:_(@"Viewer") action:@selector(showViewer:) keyEquivalent:@"V"];	
             
+  //Go
+  menuItem = [mainMenu addItemWithTitle:_(@"Go") action:NULL keyEquivalent:@""];
+  menu = AUTORELEASE ([NSMenu new]);
+  [mainMenu setSubmenu: menu forItem: menuItem];
+  [menu addItemWithTitle:_(@"Back") action:@selector(goBackwardInHistory:) keyEquivalent:@""];
+  [menu addItemWithTitle:_(@"Forward") action:@selector(goForwardInHistory:) keyEquivalent:@""];
+  [menu addItemWithTitle:_(@"Enclosing Folder") action:NULL keyEquivalent:@""];
+  [menu addItemWithTitle:_(@"") action:NULL keyEquivalent:@""];
+  [menu addItemWithTitle:_(@"All My Files") action:NULL keyEquivalent:@""];
+  [menu addItemWithTitle:_(@"Documents") action:NULL keyEquivalent:@""];
+  [menu addItemWithTitle:_(@"Desktop") action:NULL keyEquivalent:@""];
+  [menu addItemWithTitle:_(@"Downloads") action:NULL keyEquivalent:@""];
+  [menu addItemWithTitle:_(@"Home") action:NULL keyEquivalent:@""];
+  [menu addItemWithTitle:_(@"Computer") action:NULL keyEquivalent:@""];
+
   // Tools
   menuItem = [mainMenu addItemWithTitle:_(@"Tools") action:NULL keyEquivalent:@""];
   menu = AUTORELEASE ([NSMenu new]);
