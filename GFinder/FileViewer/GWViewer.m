@@ -29,6 +29,7 @@
 #import "GWViewer.h"
 #import "GWViewersManager.h"
 #import "GWViewerBrowser.h"
+#import "GWViewerIconsPath.h"
 #import "GWViewerIconsView.h"
 #import "GWViewerListView.h"
 #import "GWViewerWindow.h"
@@ -53,8 +54,7 @@
 #define COLLAPSE_LIMIT 35
 #define MID_LIMIT 110
 
-static NSInteger
-GWViewerSegmentIndexForViewType(GWViewType type)
+static NSInteger GWViewerSegmentIndexForViewType(GWViewType type)
 {
   switch (type)
     {
@@ -69,8 +69,7 @@ GWViewerSegmentIndexForViewType(GWViewType type)
     }
 }
 
-static GWViewType
-GWViewerViewTypeForSegmentIndex(NSInteger segment)
+static GWViewType GWViewerViewTypeForSegmentIndex(NSInteger segment)
 {
   switch (segment)
     {
@@ -442,45 +441,45 @@ GWViewerViewTypeForSegmentIndex(NSInteger segment)
   [tb setAllowsUserCustomization: NO];
   [tb setAutosavesConfiguration: NO];
   [tb setDisplayMode: NSToolbarDisplayModeIconOnly];
-  [tb setDelegate: self];
 
+  NSView *navigationView;
   NSButton *button;
   NSSegmentedControl *segmented;
   NSToolbarItem *item;
+  NSUInteger index;
+
+  navigationView = [[NSView alloc] initWithFrame: NSMakeRect(0, 0, 60, 25)];
 
   button = [[NSButton alloc] initWithFrame: NSMakeRect(0, 0, 30, 25)];
   [button setTitle: @"◀"];
   [button setTarget: vwrwin];
   [button setAction: @selector(goBackwardInHistory:)];
   [button setButtonType: NSMomentaryPushInButton];
-  item = [[NSToolbarItem alloc] initWithItemIdentifier: @"BackItem"];
-  [item setLabel: @"Back"];
-  [item setView: button];
-  [item setMinSize: NSMakeSize(30, 25)];
-  [item setMaxSize: NSMakeSize(30, 25)];
-  ASSIGN (backItem, item);
-  RELEASE (item);
+  [navigationView addSubview: button];
   RELEASE (button);
 
-  button = [[NSButton alloc] initWithFrame: NSMakeRect(0, 0, 30, 25)];
+  button = [[NSButton alloc] initWithFrame: NSMakeRect(30, 0, 30, 25)];
   [button setTitle: @"▶"];
   [button setTarget: vwrwin];
   [button setAction: @selector(goForwardInHistory:)];
   [button setButtonType: NSMomentaryPushInButton];
-  item = [[NSToolbarItem alloc] initWithItemIdentifier: @"ForwardItem"];
-  [item setLabel: @"Forward"];
-  [item setView: button];
-  [item setMinSize: NSMakeSize(30, 25)];
-  [item setMaxSize: NSMakeSize(30, 25)];
-  ASSIGN (forwardItem, item);
-  RELEASE (item);
+  [navigationView addSubview: button];
   RELEASE (button);
+
+  item = [[NSToolbarItem alloc] initWithItemIdentifier: @"NavigationItem"];
+  [item setLabel: @"Navigation"];
+  [item setView: navigationView];
+  [item setMinSize: NSMakeSize(60, 25)];
+  [item setMaxSize: NSMakeSize(60, 25)];
+  ASSIGN (navigationItem, item);
+  RELEASE (item);
+  RELEASE (navigationView);
 
   segmented = [[NSSegmentedControl alloc] initWithFrame: NSMakeRect(0, 0, 120, 25)];
   [segmented setSegmentCount: 3];
   if ([segmented respondsToSelector: @selector(setTrackingMode:)])
     {
-      [segmented setTrackingMode: NSSegmentSwitchTrackingSelectOne];
+      [(id)segmented setTrackingMode: NSSegmentSwitchTrackingSelectOne];
     }
   [segmented setTarget: self];
   [segmented setAction: @selector(setViewerType:)];
@@ -492,9 +491,9 @@ GWViewerViewTypeForSegmentIndex(NSInteger segment)
             forSegment: 2];
   if ([segmented respondsToSelector: @selector(setTag:forSegment:)])
     {
-      [segmented setTag: GWViewTypeIcon forSegment: 0];
-      [segmented setTag: GWViewTypeList forSegment: 1];
-      [segmented setTag: GWViewTypeBrowser forSegment: 2];
+      [(id)segmented setTag: GWViewTypeIcon forSegment: 0];
+      [(id)segmented setTag: GWViewTypeList forSegment: 1];
+      [(id)segmented setTag: GWViewTypeBrowser forSegment: 2];
     }
   item = [[NSToolbarItem alloc] initWithItemIdentifier: @"ViewTypeItem"];
   [item setLabel: @"View"];
@@ -531,11 +530,15 @@ GWViewerViewTypeForSegmentIndex(NSInteger segment)
   RELEASE (item);
   RELEASE (popup);
 
+  [tb setDelegate: self];
+
   ASSIGN (toolbar, tb);
-  [tb insertItemWithItemIdentifier: @"BackItem" atIndex: 0];
-  [tb insertItemWithItemIdentifier: @"ForwardItem" atIndex: 1];
-  [tb insertItemWithItemIdentifier: @"ViewTypeItem" atIndex: 2];
-  [tb insertItemWithItemIdentifier: @"SortItem" atIndex: 3];
+  index = [[tb items] count];
+  [tb insertItemWithItemIdentifier: @"NavigationItem" atIndex: index];
+  index = [[tb items] count];
+  [tb insertItemWithItemIdentifier: @"ViewTypeItem" atIndex: index];
+  index = [[tb items] count];
+  [tb insertItemWithItemIdentifier: @"SortItem" atIndex: index];
   [vwrwin setToolbar: tb];
   RELEASE (tb);
 }
@@ -552,7 +555,7 @@ GWViewerViewTypeForSegmentIndex(NSInteger segment)
         {
           for (i = 0; i < count; i++)
             {
-              if ([viewTypeControl tagForSegment: i] == viewType)
+              if ([(id)viewTypeControl tagForSegment: i] == viewType)
                 {
                   selectedSegment = i;
                   break;
@@ -568,15 +571,15 @@ GWViewerViewTypeForSegmentIndex(NSInteger segment)
         {
           for (i = 0; i < count; i++)
             {
-              [viewTypeControl setSelected: (i == selectedSegment)
-                               forSegment: i];
+              [(id)viewTypeControl setSelected: (i == selectedSegment)
+                                  forSegment: i];
             }
         }
       else if ([viewTypeControl respondsToSelector: @selector(setSelectedSegment:)])
         {
           if ((selectedSegment >= 0) && (selectedSegment < count))
             {
-              [viewTypeControl setSelectedSegment: selectedSegment];
+              [(id)viewTypeControl setSelectedSegment: selectedSegment];
             }
         }
     }
@@ -586,10 +589,8 @@ GWViewerViewTypeForSegmentIndex(NSInteger segment)
     itemForItemIdentifier:(NSString *)itemIdentifier
  willBeInsertedIntoToolbar:(BOOL)flag
 {
-  if ([itemIdentifier isEqual: @"BackItem"])
-    return backItem;
-  if ([itemIdentifier isEqual: @"ForwardItem"])
-    return forwardItem;
+  if ([itemIdentifier isEqual: @"NavigationItem"])
+    return navigationItem;
   if ([itemIdentifier isEqual: @"ViewTypeItem"])
     return viewTypeItem;
   if ([itemIdentifier isEqual: @"SortItem"])
@@ -600,8 +601,7 @@ GWViewerViewTypeForSegmentIndex(NSInteger segment)
 - (NSArray *)toolbarDefaultItemIdentifiers:(NSToolbar *)tb
 {
   return [NSArray arrayWithObjects:
-                     @"BackItem",
-                     @"ForwardItem",
+                     @"NavigationItem",
                      @"ViewTypeItem",
                      @"SortItem", nil];
 }
@@ -1030,7 +1030,6 @@ GWViewerViewTypeForSegmentIndex(NSInteger segment)
 - (void)columnsWidthChanged:(NSNotification *)notification
 {
   NSRect r = [vwrwin frame];
-  NSRange range;
 
   RETAIN (nodeView);
   [nodeView removeFromSuperviewWithoutNeedingDisplay];
@@ -1434,7 +1433,7 @@ constrainMinCoordinate:(CGFloat)proposedMin
         {
           if ([segmented respondsToSelector: @selector(tagForSegment:)])
             {
-              tag = [segmented tagForSegment: seg];
+              tag = [(id)segmented tagForSegment: seg];
             }
           else
             {

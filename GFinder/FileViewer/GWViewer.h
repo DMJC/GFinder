@@ -63,8 +63,7 @@ typedef enum
   id nodeView;
   NSTextField *folderNameField;
   NSToolbar *toolbar;
-  NSToolbarItem *backItem;
-  NSToolbarItem *forwardItem;
+  NSToolbarItem *navigationItem;
   NSToolbarItem *viewTypeItem;
   NSToolbarItem *sortItem;
   NSSegmentedControl *viewTypeControl;
