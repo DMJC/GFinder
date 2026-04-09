@@ -265,13 +265,16 @@ static GFinder *gfinder = nil;
   [menu addItemWithTitle:_(@"Back") action:@selector(goBackwardInHistory:) keyEquivalent:@""];
   [menu addItemWithTitle:_(@"Forward") action:@selector(goForwardInHistory:) keyEquivalent:@""];
   [menu addItemWithTitle:_(@"Enclosing Folder") action:NULL keyEquivalent:@""];
-  [menu addItemWithTitle:_(@"") action:NULL keyEquivalent:@""];
+  //Insert Separator Here [menu addSeparatorItem];
   [menu addItemWithTitle:_(@"All My Files") action:NULL keyEquivalent:@""];
   [menu addItemWithTitle:_(@"Documents") action:NULL keyEquivalent:@""];
   [menu addItemWithTitle:_(@"Desktop") action:NULL keyEquivalent:@""];
   [menu addItemWithTitle:_(@"Downloads") action:NULL keyEquivalent:@""];
   [menu addItemWithTitle:_(@"Home") action:NULL keyEquivalent:@""];
   [menu addItemWithTitle:_(@"Computer") action:NULL keyEquivalent:@""];
+  [menu addItemWithTitle:_(@"Network") action:NULL keyEquivalent:@""];
+  [menu addItemWithTitle:_(@"Applications") action:NULL keyEquivalent:@""];
+  [menu addItemWithTitle:_(@"Utilities") action:NULL keyEquivalent:@""];
 
   // Tools
   menuItem = [mainMenu addItemWithTitle:_(@"Tools") action:NULL keyEquivalent:@""];

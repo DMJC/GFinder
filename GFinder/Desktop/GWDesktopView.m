@@ -78,39 +78,10 @@
 
   if (self)
     {
-      NSSize size;
-      NSCachedImageRep *rep;
-
       manager = mngr;
 
       screenFrame = [[NSScreen mainScreen] frame];
       [self setFrame: screenFrame];
-
-      size = NSMakeSize(screenFrame.size.width, 2);
-      horizontalImage = [[NSImage allocWithZone: (NSZone *)[(NSObject *)self zone]]
-                                 initWithSize: size];
-
-      rep = [[NSCachedImageRep allocWithZone: (NSZone *)[(NSObject *)self zone]]
-                              initWithSize: size
-                                     depth: [NSWindow defaultDepthLimit]
-                                  separate: YES
-                                     alpha: YES];
-
-      [horizontalImage addRepresentation: rep];
-      RELEASE (rep);
-
-      size = NSMakeSize(2, screenFrame.size.height);
-      verticalImage = [[NSImage allocWithZone: (NSZone *)[(NSObject *)self zone]]
-                               initWithSize: size];
-
-      rep = [[NSCachedImageRep allocWithZone: (NSZone *)[(NSObject *)self zone]]
-                              initWithSize: size
-                                     depth: [NSWindow defaultDepthLimit]
-                                  separate: YES
-                                     alpha: YES];
-
-      [verticalImage addRepresentation: rep];
-      RELEASE (rep);
 
       ASSIGN (backColor, DEF_COLOR);
 

@@ -87,8 +87,6 @@ static void GWHighlightFrameRect(NSRect aRect)
   RELEASE (icons);
   RELEASE (labelFont);
   RELEASE (nameEditor);
-  RELEASE (horizontalImage);
-  RELEASE (verticalImage);
   RELEASE (lastSelection);
   RELEASE (charBuffer);
   RELEASE (backColor);
@@ -262,11 +260,9 @@ static void GWHighlightFrameRect(NSRect aRect)
   NSRect maxr = [[NSScreen mainScreen] frame];
   float px = 0 - gridSize.width;
   float py = gridSize.height + Y_MARGIN;
-  NSSize sz;
   NSUInteger poscount = 0;
   NSUInteger count = [icons count];
   NSRect *irects = NSZoneMalloc (NSDefaultMallocZone(), sizeof(NSRect) * count);
-  NSCachedImageRep *rep = nil;
   NSArray *selection;
   NSUInteger i;
 
@@ -312,36 +308,6 @@ static void GWHighlightFrameRect(NSRect aRect)
 
       [icon setGridIndex: i];
     }
-
-  DESTROY (horizontalImage);
-  sz = NSMakeSize(svr.size.width, 2);
-  CHECK_SIZE (sz);
-  horizontalImage = [[NSImage allocWithZone: (NSZone *)[(NSObject *)self zone]]
-                               initWithSize: sz];
-
-  rep = [[NSCachedImageRep allocWithZone: (NSZone *)[(NSObject *)self zone]]
-                            initWithSize: sz
-                                   depth: [NSWindow defaultDepthLimit]
-                                separate: YES
-                                   alpha: YES];
-
-  [horizontalImage addRepresentation: rep];
-  RELEASE (rep);
-
-  DESTROY (verticalImage);
-  sz = NSMakeSize(2, py);
-  CHECK_SIZE (sz);
-  verticalImage = [[NSImage allocWithZone: (NSZone *)[(NSObject *)self zone]]
-                             initWithSize: sz];
-
-  rep = [[NSCachedImageRep allocWithZone: (NSZone *)[(NSObject *)self zone]]
-                            initWithSize: sz
-                                   depth: [NSWindow defaultDepthLimit]
-                                separate: YES
-                                   alpha: YES];
-
-  [verticalImage addRepresentation: rep];
-  RELEASE (rep);
 
   NSZoneFree (NSDefaultMallocZone(), irects);
 

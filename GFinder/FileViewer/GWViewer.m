@@ -265,7 +265,12 @@ static GWViewType GWViewerViewTypeForSegmentIndex(NSInteger segment)
       [shelf setContents: defEntry];
     } else if (rootViewer) {
       NSMutableArray *sfdicts = [NSMutableArray array];
-      NSMutableArray *paths = [NSMutableArray arrayWithObjects:
+      NSArray *localappdirs = NSSearchPathForDirectoriesInDomains(NSApplicationDirectory, NSLocalDomainMask, YES);
+      NSMutableArray *paths = [NSMutableArray array];
+      if ([localappdirs count]) {
+        [paths addObject: [localappdirs objectAtIndex: 0]];
+      }
+      [paths addObjectsFromArray: @[
                         NSHomeDirectory(),
                         [NSHomeDirectory() stringByAppendingPathComponent: @"Desktop"],
                         [NSHomeDirectory() stringByAppendingPathComponent: @"Documents"],
@@ -274,12 +279,8 @@ static GWViewType GWViewerViewTypeForSegmentIndex(NSInteger segment)
                         [NSHomeDirectory() stringByAppendingPathComponent: @"Music"],
                         [NSHomeDirectory() stringByAppendingPathComponent: @"Videos"],
                         @"/",
-                        @"/media",
-                        nil];
-      NSArray *appdirs = NSSearchPathForDirectoriesInDomains(NSApplicationDirectory, NSAllDomainsMask, YES);
-      if ([appdirs count]) {
-        [paths addObject: [appdirs objectAtIndex: 0]];
-      }
+                        @"/media"
+                        ]];
       NSInteger i;
       for (i = 0; i < [paths count]; i++) {
         NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:

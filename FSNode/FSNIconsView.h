@@ -42,9 +42,6 @@
   FSNInfoType infoType;
   NSString *extInfoType;
   
-  NSImage *verticalImage;
-  NSImage *horizontalImage;
-
   FSNSelectionMask selectionMask;
   NSArray *lastSelection;
 
