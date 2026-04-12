@@ -113,8 +113,8 @@ static GWDesktopManager *desktopManager = nil;
     win = RETAIN (window);
     RELEASE (window);
 
-    hidedock = [defaults boolForKey: @"hidedock"];
-    dock = [[Dock alloc] initForManager: self];
+    hidedock = YES;
+    dock = nil;
         
     [nc addObserver: self 
            selector: @selector(fileSystemWillChange:) 
@@ -324,11 +324,14 @@ static GWDesktopManager *desktopManager = nil;
 - (void)setDockActive:(BOOL)value
 {
   hidedock = !value;
-  
+
+  if (dock == nil)
+    return;
+
   if (hidedock && [dock superview]) {
     [dock removeFromSuperview];
     [desktopView setNeedsDisplayInRect: dockReservedFrame];
-    
+
   } else if ([dock superview] == nil) {
     [desktopView addSubview: dock];
     [dock tile];
@@ -639,7 +642,8 @@ inFileViewerRootedAtPath:(NSString *)rootFullpath
   [defaults setBool: usexbundle forKey: @"xbundle"];
   [defaults setBool: hidedock forKey: @"hidedock"];
   
-  [dock updateDefaults];
+  if (dock)
+    [dock updateDefaults];
   [desktopView updateDefaults];
 }
 
@@ -652,12 +656,14 @@ inFileViewerRootedAtPath:(NSString *)rootFullpath
   [manager setContextHelp: (NSAttributedString *)help 
                withObject: [self desktopView]];
 
-  help = @"Dock.rtfd";
-  [manager setContextHelp: (NSAttributedString *)help withObject: dock];
-  
-  help = @"Recycler.rtfd";
-  [manager setContextHelp: (NSAttributedString *)help 
-               withObject: [dock trashIcon]];
+  if (dock) {
+    help = @"Dock.rtfd";
+    [manager setContextHelp: (NSAttributedString *)help withObject: dock];
+
+    help = @"Recycler.rtfd";
+    [manager setContextHelp: (NSAttributedString *)help
+                 withObject: [dock trashIcon]];
+  }
 }
 
 @end

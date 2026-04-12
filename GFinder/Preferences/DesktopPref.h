@@ -66,14 +66,6 @@
   IBOutlet NSButton *hideTShelfCheck;
   IBOutlet NSButton *launchSingleClick;
 
-  // Dock
-  IBOutlet NSBox *dockBox;
-  IBOutlet NSButton *useDockCheck;
-  IBOutlet NSTextField *dockPosLabel;
-  IBOutlet NSMatrix *dockPosMatrix;
-  IBOutlet NSTextField *dockStyleLabel;
-  IBOutlet NSMatrix *dockStyleMatrix;
-
   GWDesktopManager *manager;
   id gfinder;
 }
@@ -94,12 +86,6 @@
 
 // General
 - (IBAction)setOmnipresent:(id)sender;
-
-- (IBAction)setUsesDock:(id)sender;
-
-- (IBAction)setDockPosition:(id)sender;
-
-- (IBAction)setDockStyle:(id)sender;
 
 - (IBAction)setTShelfAutohide:(id)sender;
 

@@ -58,8 +58,6 @@ static NSString *nibName = @"DesktopPref";
       else
 	{
 	  NSString *impath;
-	  DockPosition dockpos;
-	  DockStyle dockstyle;
 	  id cell;
 
 	  RETAIN (prefbox);
@@ -108,11 +106,6 @@ static NSString *nibName = @"DesktopPref";
 	  // General
 	  [omnipresentCheck setState: ([manager usesXBundle] ? NSOnState : NSOffState)];
 	  [launchSingleClick setState: ([manager singleClickLaunch] ? NSOnState : NSOffState)];
-	  [useDockCheck setState: ([manager dockActive] ? NSOnState : NSOffState)];
-	  dockpos = [manager dockPosition];
-	  [dockPosMatrix selectCellAtRow: dockpos column: 0];
-	  dockstyle = [[manager dock] style];
-	  [dockStyleMatrix selectCellAtRow: dockstyle column: 0];
 	  [hideTShelfCheck setState: (([[gfinder tabbedShelf] autohide]) ? NSOnState : NSOffState)];
 
 	  /* Internationalization */
@@ -130,21 +123,6 @@ static NSString *nibName = @"DesktopPref";
 	  [cell setTitle: NSLocalizedString(@"scale", @"")];
 	  [useImageSwitch setTitle: NSLocalizedString(@"Use image", @"")];
 	  [chooseImageButt setTitle: NSLocalizedString(@"Choose", @"")];
-
-	  [dockBox setTitle: _(@"Dock")];
-	  [useDockCheck setTitle: NSLocalizedString(@"Show Dock", @"")];
-	  [dockPosLabel setStringValue: NSLocalizedString(@"Position:", @"")];
-	  cell = [dockPosMatrix cellAtRow: 0 column: 0];
-	  [cell setTitle: NSLocalizedString(@"Left", @"")];
-	  cell = [dockPosMatrix cellAtRow: 1 column: 0];
-	  [cell setTitle: NSLocalizedString(@"Right", @"")];
-	  cell = [dockPosMatrix cellAtRow: 2 column: 0];
-	  [cell setTitle: NSLocalizedString(@"Bottom", @"")];
-	  [dockStyleLabel setStringValue: NSLocalizedString(@"Style:", @"")];
-	  cell = [dockStyleMatrix cellAtRow: 0 column: 0];
-	  [cell setTitle: NSLocalizedString(@"Classic", @"")];
-	  cell = [dockStyleMatrix cellAtRow: 1 column: 0];
-	  [cell setTitle: NSLocalizedString(@"Modern", @"")];
 
 	  [omnipresentCheck setTitle: _(@"Omnipresent")];
 	  [hideTShelfCheck setTitle: NSLocalizedString(@"Autohide Tabbed Shelf", @"")];
@@ -251,28 +229,6 @@ static NSString *nibName = @"DesktopPref";
   }
 }
 
-- (IBAction)setUsesDock:(id)sender
-{
-  [manager setDockActive: ([sender state] == NSOnState)];
-}
-
-- (IBAction)setDockPosition:(id)sender
-{
-  id cell = [dockPosMatrix selectedCell];
-  NSInteger row, col;
-  
-  [dockPosMatrix getRow: &row column: &col ofCell: cell];
-  [manager setDockPosition: (row == 0) ? DockPositionLeft : DockPositionRight];
-}
-
-- (IBAction)setDockStyle:(id)sender
-{
-  id cell = [dockStyleMatrix selectedCell];
-  NSInteger row, col;
-  
-  [dockStyleMatrix getRow: &row column: &col ofCell: cell];
-  [[manager dock] setStyle: (row == 0) ? DockStyleClassic : DockStyleModern];
-}
 - (IBAction)setTShelfAutohide:(id)sender
 {
   [[gfinder tabbedShelf] setAutohide: ([sender state] == NSOnState)];
