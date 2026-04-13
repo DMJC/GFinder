@@ -93,7 +93,6 @@ static void GWHighlightFrameRect(NSRect aRect)
   RELEASE (textColor);
   RELEASE (disabledTextColor);
 
-  [super dealloc];
 }
 
 - (id)init
@@ -254,16 +253,16 @@ static void GWHighlightFrameRect(NSRect aRect)
 
 - (void)tile
 {
-  CREATE_AUTORELEASE_POOL (pool);
+  NSArray *selection;
+
+@autoreleasepool {
   NSRect svr = [[self superview] frame];
   NSRect r = [self frame];
-  NSRect maxr = [[NSScreen mainScreen] frame];
   float px = 0 - gridSize.width;
   float py = gridSize.height + Y_MARGIN;
   NSUInteger poscount = 0;
   NSUInteger count = [icons count];
   NSRect *irects = NSZoneMalloc (NSDefaultMallocZone(), sizeof(NSRect) * count);
-  NSArray *selection;
   NSUInteger i;
 
   colItemsCount = 0;
@@ -311,7 +310,7 @@ static void GWHighlightFrameRect(NSRect aRect)
 
   NSZoneFree (NSDefaultMallocZone(), irects);
 
-  RELEASE (pool);
+  } // @autoreleasepool
 
   selection = [self selectedReps];
   if ([selection count])
@@ -519,7 +518,7 @@ static void GWHighlightFrameRect(NSRect aRect)
     {
       BOOL scrolled = NO;
 
-      CREATE_AUTORELEASE_POOL (arp);
+@autoreleasepool {
 
       theEvent = [NSApp nextEventMatchingMask: eventMask
 				    untilDate: future
@@ -592,7 +591,7 @@ static void GWHighlightFrameRect(NSRect aRect)
       [[self window] flushWindow];
       [[self window] disableFlushWindow];
 
-      DESTROY (arp);
+      } // @autoreleasepool
     }
 
   [NSEvent stopPeriodicEvents];
@@ -776,7 +775,6 @@ static void GWHighlightFrameRect(NSRect aRect)
   selnodes = [self selectedNodes];
 
   if ([selnodes count]) {
-    NSAutoreleasePool *pool;
 
     firstext = [[[selnodes objectAtIndex: 0] path] pathExtension];
 
@@ -810,7 +808,7 @@ static void GWHighlightFrameRect(NSRect aRect)
     apps = [[NSWorkspace sharedWorkspace] infoForExtension: firstext];
     app_enum = [[apps allKeys] objectEnumerator];
 
-    pool = [NSAutoreleasePool new];
+    @autoreleasepool {
 
     while ((key = [app_enum nextObject]))
       {
@@ -824,9 +822,9 @@ static void GWHighlightFrameRect(NSRect aRect)
 	RELEASE (menuItem);
       }
 
-    RELEASE (pool);
+    } // @autoreleasepool
 
-    return [menu autorelease];
+    return menu;
   }
 
   return [super menuForEvent: theEvent];
@@ -871,7 +869,7 @@ static void GWHighlightFrameRect(NSRect aRect)
 
 - (void)showContentsOfNode:(FSNode *)anode
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSArray *subNodes = [anode subNodes];
   NSUInteger i;
 
@@ -910,7 +908,7 @@ static void GWHighlightFrameRect(NSRect aRect)
 
   DESTROY (lastSelection);
   [self selectionDidChange];
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 - (NSDictionary *)readNodeInfo
@@ -987,8 +985,9 @@ static void GWHighlightFrameRect(NSRect aRect)
 
 - (NSMutableDictionary *)updateNodeInfo:(BOOL)ondisk
 {
-  CREATE_AUTORELEASE_POOL(arp);
   NSMutableDictionary *updatedInfo = nil;
+
+@autoreleasepool {
 
   if ([node isValid]) {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -1053,9 +1052,9 @@ static void GWHighlightFrameRect(NSRect aRect)
       }
   }
 
-  RELEASE (arp);
+  } // @autoreleasepool
 
-  return (AUTORELEASE (updatedInfo));
+  return updatedInfo;
 }
 
 - (void)reloadContents
@@ -1064,7 +1063,6 @@ static void GWHighlightFrameRect(NSRect aRect)
   NSMutableArray *opennodes = [NSMutableArray array];
   NSUInteger i;
 
-  RETAIN (selection);
 
   for (i = 0; i < [icons count]; i++)
     {
@@ -1076,7 +1074,6 @@ static void GWHighlightFrameRect(NSRect aRect)
 	}
     }
 
-  RETAIN (opennodes);
 
   [self showContentsOfNode: node];
 
@@ -1493,7 +1490,6 @@ static void GWHighlightFrameRect(NSRect aRect)
 
 - (id)addRepForSubnode:(FSNode *)anode
 {
-  CREATE_AUTORELEASE_POOL(arp);
   FSNIcon *icon = [[FSNIcon alloc] initForNode: anode
                                   nodeInfoType: infoType
                                   extendedType: extInfoType
@@ -1507,9 +1503,6 @@ static void GWHighlightFrameRect(NSRect aRect)
                                      slideBack: YES];
   [icons addObject: icon];
   [self addSubview: icon];
-  RELEASE (icon);
-  RELEASE (arp);
-
   return icon;
 }
 
@@ -2094,28 +2087,27 @@ static void GWHighlightFrameRect(NSRect aRect)
 
       for (i = 0; i < (int)fabsf(sc / margin); i++)
 	{
-	  CREATE_AUTORELEASE_POOL (pool);
-	  NSDate *limit = [NSDate dateWithTimeIntervalSinceNow: 0.01];
-	  int x = (abs(xsc) >= i) ? (xsc > 0 ? margin : -margin) : 0;
-	  int y = (abs(ysc) >= i) ? (ysc > 0 ? margin : -margin) : 0;
+	  @autoreleasepool {
+	    NSDate *limit = [NSDate dateWithTimeIntervalSinceNow: 0.01];
+	    int x = (abs(xsc) >= i) ? (xsc > 0 ? margin : -margin) : 0;
+	    int y = (abs(ysc) >= i) ? (ysc > 0 ? margin : -margin) : 0;
 
-	  scr = NSOffsetRect(scr, x, y);
-	  [self scrollRectToVisible: scr];
+	    scr = NSOffsetRect(scr, x, y);
+	    [self scrollRectToVisible: scr];
 
-	  vr = [self visibleRect];
-	  ir = NSInsetRect(vr, margin, margin);
+	    vr = [self visibleRect];
+	    ir = NSInsetRect(vr, margin, margin);
 
-	  p = [[self window] mouseLocationOutsideOfEventStream];
-	  p = [self convertPoint: p fromView: nil];
+	    p = [[self window] mouseLocationOutsideOfEventStream];
+	    p = [self convertPoint: p fromView: nil];
 
-	  if ([self mouse: p inRect: ir])
-	    {
-	      RELEASE (pool);
-	      break;
-	    }
+	    if ([self mouse: p inRect: ir])
+	      {
+		break;
+	      }
 
-	  [[NSRunLoop currentRunLoop] runUntilDate: limit];
-	  RELEASE (pool);
+	    [[NSRunLoop currentRunLoop] runUntilDate: limit];
+	  }
 	}
     }
 

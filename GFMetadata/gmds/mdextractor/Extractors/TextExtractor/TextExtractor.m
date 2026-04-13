@@ -35,7 +35,6 @@
 {
   RELEASE (extensions);
   RELEASE (skipSet);
-	[super dealloc];
 }
 
 - (id)initForExtractor:(id)extr
@@ -107,7 +106,7 @@
                        withID:(int)path_id
                    attributes:(NSDictionary *)attributes
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSString *contents = [NSString stringWithContentsOfFile: path];
   BOOL success = YES;
   
@@ -148,7 +147,7 @@
     RELEASE (wordset);   
   }
 
-  RELEASE (arp);
+  } // @autoreleasepool
   
   return success;
 }

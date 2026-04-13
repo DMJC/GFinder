@@ -24,6 +24,9 @@
 
 #import "DBKPathsTree.h"
 
+extern id objc_retain(id);
+extern void objc_release(id);
+
 #define GROW_FACTOR 32
 
 static SEL pathCompsSel = NULL;
@@ -40,7 +43,6 @@ static intIMP pathCompareImp = NULL;
   freeTree(tree);
   RELEASE (identifier);
 
-  [super dealloc];
 }
 
 - (id)initWithIdentifier:(id)ident
@@ -119,7 +121,7 @@ pcomp *newTreeWithIdentifier(id identifier)
   if (identifier) {
     pcomp *comp = NSZoneCalloc(NSDefaultMallocZone(), 1, sizeof(pcomp));
 
-    comp->name = [identifier retain];
+    comp->name = objc_retain(identifier);
     comp->subcomps = NSZoneCalloc(NSDefaultMallocZone(), 1, sizeof(pcomp *)); 
     comp->sub_count = 0;  
     comp->capacity = 0;
@@ -202,7 +204,7 @@ pcomp *compInsertingName(NSString *name, pcomp *parent)
   parent->sub_count++;
     
   parent->subcomps[ins] = NSZoneCalloc(NSDefaultMallocZone(), 1, sizeof(pcomp));
-  parent->subcomps[ins]->name = [[NSString alloc] initWithString: name];
+  parent->subcomps[ins]->name = objc_retain([NSString stringWithString: name]);
   parent->subcomps[ins]->subcomps = NSZoneCalloc(NSDefaultMallocZone(), 1, sizeof(pcomp *)); 
   parent->subcomps[ins]->sub_count = 0;  
   parent->subcomps[ins]->capacity = 0;
@@ -354,7 +356,10 @@ void freeTree(pcomp *base)
 
 void freeComp(pcomp *comp)
 {
-  DESTROY (comp->name);
+  if (comp->name) {
+    objc_release(comp->name);
+    comp->name = nil;
+  }
   NSZoneFree(NSDefaultMallocZone(), comp->subcomps);
   NSZoneFree(NSDefaultMallocZone(), comp);
 }

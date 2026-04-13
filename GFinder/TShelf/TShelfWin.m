@@ -41,7 +41,6 @@
 {
   RELEASE (tView);
   
-  [super dealloc];
 }
 
 - (id)init
@@ -180,7 +179,7 @@
   }
 
   if (autohidden) {
-    CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
     int p = (int)(SHELF_HEIGHT / 10);
     int h = -SHELF_HEIGHT;
     
@@ -204,7 +203,7 @@
     [self enableFlushWindow];
     [self flushWindowIfNeeded];
     
-    RELEASE (arp);
+  } // @autoreleasepool
   }
   
   autohidden = NO;
@@ -217,7 +216,7 @@
   }
 
   if (autohidden == NO) {
-    CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
     int p = (int)(SHELF_HEIGHT / 10);
     int h = 0;
     
@@ -241,7 +240,7 @@
     [self enableFlushWindow];
     [self flushWindowIfNeeded];
     
-    RELEASE (arp);
+  } // @autoreleasepool
   }
     
   autohidden = YES;
@@ -298,7 +297,6 @@
   [dialog orderFrontRegardless];
   
   result = [dialog runModal];
-  [dialog release];
   if (result != NSAlertDefaultReturn) {
     return;
   }  
@@ -433,7 +431,6 @@
   [dialog orderFrontRegardless];
   
   result = [dialog runModal];
-  [dialog release];
 
   if(result != NSAlertDefaultReturn) {
     return;

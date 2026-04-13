@@ -44,7 +44,6 @@ static const int posy[4]  = { 1, 13, 29, 38 };
   RELEASE (daymont1Image);
   RELEASE (daymont2Image);
   RELEASE (monthImage);
-  [super dealloc];
 }
 
 - (id)initWithFrame:(NSRect)frameRect
@@ -64,7 +63,7 @@ static const int posy[4]  = { 1, 13, 29, 38 };
 
 - (void)setDate:(NSCalendarDate *)adate
 {
-  CREATE_AUTORELEASE_POOL (pool);
+@autoreleasepool {
   NSBundle *bundle;
   NSString *imgName;
   NSString *imagepath;
@@ -161,7 +160,7 @@ static const int posy[4]  = { 1, 13, 29, 38 };
   
   [yearlabel setStringValue: [NSString stringWithFormat: @"%li", (long int)[adate yearOfCommonEra]]];
 
-  RELEASE (pool);
+  } // @autoreleasepool
   [self setNeedsDisplay: YES];
 }
 

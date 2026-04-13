@@ -33,7 +33,7 @@ void createMenu();
 
 int main(int argc, char **argv, char **env)
 {
-  CREATE_AUTORELEASE_POOL (pool);
+@autoreleasepool {
   Recycler *recycler = [Recycler recycler];
   NSApplication *app = [NSApplication sharedApplication];
 
@@ -41,7 +41,7 @@ int main(int argc, char **argv, char **env)
 
   [app setDelegate: recycler];    
   [app run];
-  RELEASE (pool);
+  } // @autoreleasepool
   
   return 0;
 }

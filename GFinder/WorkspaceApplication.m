@@ -750,7 +750,7 @@
 
 - (void)updateStoredAppInfoWithLaunchedApps:(NSArray *)apps
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSMutableDictionary *runningInfo = nil;
   NSDictionary *oldapps = nil;
   NSMutableDictionary *newapps = nil;
@@ -841,7 +841,7 @@
 
   RELEASE (newapps);  
   [storedAppinfoLock unlock];
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 - (void)checkLastRunningApps
@@ -1077,7 +1077,6 @@
   RELEASE (identifier);
   RELEASE (task);
     
-  [super dealloc];
 }
 
 - (id)init
@@ -1087,12 +1086,13 @@
   if (self) {
     task = nil;
     name = nil;
-    path = nil; 
+    path = nil;
     identifier = nil;
     conn = nil;
     application = nil;
     active = NO;
     hidden = NO;
+    terminated = NO;
     
     gw = [GFinder gfinder];
     nc = [NSNotificationCenter defaultCenter];      
@@ -1137,6 +1137,31 @@
 - (void)setTask:(NSTask *)atask
 {
   ASSIGN (task, atask);
+
+  if (task != nil) {
+    [nc addObserver: self
+           selector: @selector(taskDidTerminate:)
+               name: NSTaskDidTerminateNotification
+             object: task];
+  }
+}
+
+- (void)taskDidTerminate:(NSNotification *)notif
+{
+  [nc removeObserver: self
+                name: NSTaskDidTerminateNotification
+              object: task];
+
+  /* Calling terminationStatus ensures the child is reaped (waitpid) even
+     if GNUstep's internal SIGCHLD handling missed it. */
+  (void)[task terminationStatus];
+
+  if (!terminated) {
+    terminated = YES;
+    /* For wrapper apps that never establish a DO connection, connectionDidDie:
+       will never fire, so we must notify GFinder of termination here. */
+    [gw applicationTerminated: self];
+  }
 }
 
 - (NSTask *)task
@@ -1339,7 +1364,6 @@
 		           object: c];
       
       application = app;
-      RETAIN (application);
       ASSIGN (conn, c);
       
 	  } else {
@@ -1378,7 +1402,6 @@
 		               object: c];
 
           application = app;
-          RETAIN (application);
           ASSIGN (conn, c);
           break;
         }
@@ -1416,10 +1439,13 @@
 
     DESTROY (application);
     DESTROY (conn);
-    
+
     GWDebugLog(@"\"%@\" application connection did die", name);
 
-    [gw applicationTerminated: self];
+    if (!terminated) {
+      terminated = YES;
+      [gw applicationTerminated: self];
+    }
   }
 }
 

@@ -42,7 +42,6 @@
   RELEASE (mdtype);            
   RELEASE (extension);   
            
-  [super dealloc];
 }
 
 - (id)init

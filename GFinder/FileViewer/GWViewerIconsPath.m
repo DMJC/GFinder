@@ -56,7 +56,6 @@
   RELEASE (textColor);
   RELEASE (disabledTextColor);
   
-  [super dealloc];
 }
 
 - (id)initWithFrame:(NSRect)frameRect
@@ -391,7 +390,6 @@
     selnodes = [self selectedNodes];
 
     if ([selnodes count]) {
-      NSAutoreleasePool *pool;
 
       firstext = [[[selnodes objectAtIndex: 0] path] pathExtension];
 
@@ -419,22 +417,22 @@
       apps = [[NSWorkspace sharedWorkspace] infoForExtension: firstext];
       app_enum = [[apps allKeys] objectEnumerator];
 
-      pool = [NSAutoreleasePool new];
+      @autoreleasepool {
 
       while ((key = [app_enum nextObject])) {
-        menuItem = [NSMenuItem new];    
+        menuItem = [NSMenuItem new];
         key = [key stringByDeletingPathExtension];
         [menuItem setTitle: key];
-        [menuItem setTarget: [GFinder gfinder]];      
-        [menuItem setAction: @selector(openSelectionWithApp:)];      
-        [menuItem setRepresentedObject: key];            
+        [menuItem setTarget: [GFinder gfinder]];
+        [menuItem setAction: @selector(openSelectionWithApp:)];
+        [menuItem setRepresentedObject: key];
         [menu addItem: menuItem];
         RELEASE (menuItem);
       }
 
-      RELEASE (pool);
+      } // @autoreleasepool
 
-      return [menu autorelease];
+      return menu;
     }
   }
      

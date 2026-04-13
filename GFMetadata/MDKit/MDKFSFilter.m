@@ -31,7 +31,6 @@
 - (void)dealloc
 {
   TEST_RELEASE (srcvalue);
-  [super dealloc];
 }
 
 + (id)filterForAttribute:(MDKAttribute *)attr

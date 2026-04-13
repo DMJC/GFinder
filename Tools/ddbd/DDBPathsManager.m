@@ -42,7 +42,6 @@
   RELEASE (dummyOffsets[1]);
   RELEASE (mdmodules);
       
-  [super dealloc];
 }
 
 - (id)initWithBasePath:(NSString *)bpath
@@ -99,13 +98,13 @@
 	    
 	      if ([principalClass conformsToProtocol:
 		@protocol(MDModulesProtocol)]) {	
-		CREATE_AUTORELEASE_POOL (pool);
+@autoreleasepool {
 		id module = [[principalClass alloc] init];
 	    
 		[mdmodules setObject: module forKey: [module mdtype]];
 	    
 		RELEASE ((id)module);	
-		RELEASE (pool);		
+  } // @autoreleasepool		
 	      }
 	    }
 	  }
@@ -127,78 +126,78 @@
 
 - (DDBPath *)ddbpathForPath:(NSString *)path
 {
-  CREATE_AUTORELEASE_POOL(arp);
   DDBPath *ddbpath = nil;
-  DBKBTreeNode *node;
-  BOOL exists;
-  NSUInteger index;
 
-  DESTROY (dummyPaths[1]);  
-  DESTROY (dummyPaths[0]);  
-  dummyPaths[0] = [[DDBPath alloc] initForPath: path];
+  @autoreleasepool {
+    DBKBTreeNode *node;
+    BOOL exists;
+    NSUInteger index;
 
-  [tree begin];
-  node = [tree nodeOfKey: dummyOffsets[0] getIndex: &index didExist: &exists];
-  
-  if (exists) {
-    NSNumber *offset = [node keyAtIndex: index];
-    NSData *data = [vlfile dataAtOffset: offset];
-  
-    ddbpath = [NSUnarchiver unarchiveObjectWithData: data];
-  }
-  
-  [tree end];  
-  DESTROY (dummyPaths[0]);
-  RETAIN (ddbpath);
-  RELEASE (arp);
-  
-  return AUTORELEASE (ddbpath);  
+    DESTROY (dummyPaths[1]);
+    DESTROY (dummyPaths[0]);
+    dummyPaths[0] = [[DDBPath alloc] initForPath: path];
+
+    [tree begin];
+    node = [tree nodeOfKey: dummyOffsets[0] getIndex: &index didExist: &exists];
+
+    if (exists) {
+      NSNumber *offset = [node keyAtIndex: index];
+      NSData *data = [vlfile dataAtOffset: offset];
+
+      ddbpath = [NSUnarchiver unarchiveObjectWithData: data];
+    }
+
+    [tree end];
+    DESTROY (dummyPaths[0]);
+  } // @autoreleasepool
+
+  return ddbpath;
 }
 
 - (DDBPath *)addPath:(NSString *)path
 {
-  CREATE_AUTORELEASE_POOL(arp);
   DDBPath *ddbpath = nil;
-  DBKBTreeNode *node;
-  
-  DESTROY (dummyPaths[1]);  
-  DESTROY (dummyPaths[0]);  
-  dummyPaths[0] = [[DDBPath alloc] initForPath: path];
-  
-  [tree begin];
 
-  node = [tree insertKey: dummyOffsets[0]];
+  @autoreleasepool {
+    DBKBTreeNode *node;
 
-  if (node) {
-    NSString *mdpath = [mdstorage nextEntry];
-    NSTimeInterval stamp = [[NSDate date] timeIntervalSinceReferenceDate];
-    NSData *data;
-    NSNumber *offset;
+    DESTROY (dummyPaths[1]);
+    DESTROY (dummyPaths[0]);
+    dummyPaths[0] = [[DDBPath alloc] initForPath: path];
 
-    [dummyPaths[0] setMDPath: mdpath];
-    [dummyPaths[0] setTimestamp: stamp];
+    [tree begin];
 
-    data = [NSArchiver archivedDataWithRootObject: dummyPaths[0]];
-    offset = [vlfile writeData: data];
+    node = [tree insertKey: dummyOffsets[0]];
 
-    [node replaceKey: dummyOffsets[0] withKey: offset];
-    [self synchronize];
-    
-    ddbpath = dummyPaths[0];
-    RETAIN (ddbpath);
-  } 
-  
-  [tree end];
-  
-  DESTROY (dummyPaths[0]);  
-  RELEASE (arp);
-  
-  return AUTORELEASE (ddbpath);
+    if (node) {
+      NSString *mdpath = [mdstorage nextEntry];
+      NSTimeInterval stamp = [[NSDate date] timeIntervalSinceReferenceDate];
+      NSData *data;
+      NSNumber *offset;
+
+      [dummyPaths[0] setMDPath: mdpath];
+      [dummyPaths[0] setTimestamp: stamp];
+
+      data = [NSArchiver archivedDataWithRootObject: dummyPaths[0]];
+      offset = [vlfile writeData: data];
+
+      [node replaceKey: dummyOffsets[0] withKey: offset];
+      [self synchronize];
+
+      ddbpath = dummyPaths[0];
+    }
+
+    [tree end];
+
+    DESTROY (dummyPaths[0]);
+  } // @autoreleasepool
+
+  return ddbpath;
 }
 
 - (void)removePath:(NSString *)path
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   DBKBTreeNode *node; 
   NSUInteger index;
   BOOL exists;
@@ -216,7 +215,6 @@
     DDBPath *ddbpath = [NSUnarchiver unarchiveObjectWithData: data];
     NSString *mdpath = [ddbpath mdpath];
       
-    RETAIN (offset);
     [tree deleteKey: offset];
     [vlfile deleteDataAtOffset: offset]; 
     [mdstorage removeEntry: mdpath]; 
@@ -227,7 +225,7 @@
   
   DESTROY (dummyPaths[0]);  
   
-  RELEASE (arp);  
+  } // @autoreleasepool  
   
   [self synchronize];
 }
@@ -236,7 +234,7 @@
              ofType:(NSString *)mdtype
             forPath:(NSString *)apath
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   DDBPath *ddbpath = [self ddbpathForPath: apath];
   NSString *path = [mdstorage basePath];
   id module = [self mdmoduleForMDType: mdtype];
@@ -267,7 +265,7 @@
 	 								    object: apath 
                     userInfo: nil];
 
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 - (id)metadataOfType:(NSString *)mdtype
@@ -289,8 +287,9 @@
 
 - (NSArray *)metadataForPath:(NSString *)apath
 {
-  CREATE_AUTORELEASE_POOL(arp);
   NSMutableArray *alldata = [NSMutableArray array];
+
+@autoreleasepool {
   NSArray *types = [mdmodules allKeys];
   NSUInteger i;
 
@@ -307,9 +306,8 @@
       [alldata addObject: dict];
     }
   }
-  [alldata retain];
-  RELEASE (arp);
-  return [alldata autorelease];
+  } // @autoreleasepool
+  return alldata;
 }
 
 - (NSTimeInterval)timestampOfPath:(NSString *)path
@@ -325,7 +323,7 @@
 
 - (void)metadataDidChangeForPath:(DDBPath *)ddbpath
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   DBKBTreeNode *node; 
   NSUInteger index;
   BOOL exists;  
@@ -348,7 +346,7 @@
   
   [tree end];
   
-  RELEASE (arp);  
+  } // @autoreleasepool  
 }
 
 - (void)duplicateDataOfPath:(NSString *)srcpath
@@ -377,7 +375,7 @@
   NSUInteger i, j;
 
   for (i = 0; i < [srcpaths count]; i++) {
-    CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
     NSString *srcpath = [srcpaths objectAtIndex: i];
     NSString *dstpath = [dstpaths objectAtIndex: i];
     NSDictionary *attrs = [fm fileAttributesAtPath: dstpath traverseLink: NO];
@@ -402,14 +400,15 @@
       }
     }
     
-    RELEASE (arp);
+  } // @autoreleasepool
   }
 }
 
 - (NSArray *)subpathsFromPath:(NSString *)path
 {
-  CREATE_AUTORELEASE_POOL(pool);
   NSMutableArray *paths = [NSMutableArray array];
+
+@autoreleasepool {
   NSMutableArray *toremove = [NSMutableArray array];
   NSArray *keys = nil;
   NSString *dmstr[2];
@@ -435,7 +434,7 @@
   
   if (keys) {
     for (i = 0; i < [keys count]; i++) {
-      CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
       NSData *data = [vlfile dataAtOffset: [keys objectAtIndex: i]];
       DDBPath *ddbpath = [NSUnarchiver unarchiveObjectWithData: data];
 
@@ -445,7 +444,7 @@
         [toremove addObject: [ddbpath path]];
       }
 
-      RELEASE(arp);
+  } // @autoreleasepool
     }  
   }
   
@@ -453,10 +452,9 @@
     [self removePath: [toremove objectAtIndex: i]];
   }
   
-  RETAIN (paths);
-  RELEASE(pool);
-  
-  return [paths autorelease];
+  } // @autoreleasepool
+
+  return paths;
 }
                                         
 - (id)mdmoduleForMDType:(NSString *)type
@@ -516,13 +514,14 @@
   return data;  
 }
 
-- (NSComparisonResult)compareNodeKey:(id)akey 
+- (NSComparisonResult)compareNodeKey:(id)akey
                              withKey:(id)bkey
 {
-  CREATE_AUTORELEASE_POOL(arp);
+  NSComparisonResult result = NSOrderedSame;
+
+@autoreleasepool {
   DDBPath *apath;
   DDBPath *bpath;
-  NSComparisonResult result;
   
   if ([akey isEqual: dummyOffsets[0]]) {
     apath = RETAIN (dummyPaths[0]);
@@ -542,7 +541,7 @@
 
   result = [apath compare: bpath];
   
-  RELEASE (arp);
+  } // @autoreleasepool
   
   return result;  
 }
@@ -557,7 +556,6 @@
   RELEASE (path);
   RELEASE (mdpath);
       
-  [super dealloc];
 }
 
 - (id)initForPath:(NSString *)apath

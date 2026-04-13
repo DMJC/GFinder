@@ -49,7 +49,6 @@ static NSImage *branchImage;
 {
   RELEASE (components);
   
-  [super dealloc];
 }
 
 - (id)initWithFrame:(NSRect)frameRect
@@ -66,111 +65,108 @@ static NSImage *branchImage;
 
 - (void)showComponentsOfSelection:(NSArray *)selection
 {
-  CREATE_AUTORELEASE_POOL(arp);
-  NSMutableArray *allComponents = [NSMutableArray array];
-  NSArray *firstComponents; 
-  NSString *commonPath = path_separator();
-  unsigned index = 0;
-  BOOL common = YES;
-  unsigned maxLength = 0;
-  NSArray *newSelection;
-  unsigned selcount;
-  FSNode *node;
-  FSNPathComponentView *component;
-  unsigned i;
+  @autoreleasepool {
+    NSMutableArray *allComponents = [NSMutableArray array];
+    NSArray *firstComponents;
+    NSString *commonPath = path_separator();
+    unsigned index = 0;
+    BOOL common = YES;
+    unsigned maxLength = 0;
+    NSArray *newSelection;
+    unsigned selcount;
+    FSNode *node;
+    FSNPathComponentView *component;
+    unsigned i;
 
-  for (i = 0; i < [components count]; i++) {
-    [[components objectAtIndex: i] removeFromSuperview];
-  }
-
-  [components removeAllObjects];
-  lastComponent = nil;
-  openComponent = nil;  
-  
-  if ((selection == nil) || ([selection count] == 0)) {
-    [self tile];
-    RELEASE (arp);
-    return;
-  }
-  
-  for (i = 0; i < [selection count]; i++) {
-    FSNode *fn = [selection objectAtIndex: i];
-    [allComponents addObject: [FSNode pathComponentsToNode: fn]];
-  }
-
-  for (i = 0; i < [allComponents count]; i++) {
-    unsigned count = [[allComponents objectAtIndex: i] count];
-    
-    if (maxLength < count) {
-      maxLength = count;
+    for (i = 0; i < [components count]; i++) {
+      [[components objectAtIndex: i] removeFromSuperview];
     }
-  }
-  
-  firstComponents = [allComponents objectAtIndex: 0];
-  
-  while (index < [firstComponents count]) {
-    NSString *p1 = [firstComponents objectAtIndex: index];
-  
+
+    [components removeAllObjects];
+    lastComponent = nil;
+    openComponent = nil;
+
+    if ((selection == nil) || ([selection count] == 0)) {
+      [self tile];
+      return;
+    }
+
+    for (i = 0; i < [selection count]; i++) {
+      FSNode *fn = [selection objectAtIndex: i];
+      [allComponents addObject: [FSNode pathComponentsToNode: fn]];
+    }
+
     for (i = 0; i < [allComponents count]; i++) {
-      NSArray *cmps2 = [allComponents objectAtIndex: i];
-  
-      if (index < [cmps2 count]) {
-        NSString *p2 = [cmps2 objectAtIndex: index];
-        
-        if ([p1 isEqual: p2] == NO) {
+      unsigned count = [[allComponents objectAtIndex: i] count];
+
+      if (maxLength < count) {
+        maxLength = count;
+      }
+    }
+
+    firstComponents = [allComponents objectAtIndex: 0];
+
+    while (index < [firstComponents count]) {
+      NSString *p1 = [firstComponents objectAtIndex: index];
+
+      for (i = 0; i < [allComponents count]; i++) {
+        NSArray *cmps2 = [allComponents objectAtIndex: i];
+
+        if (index < [cmps2 count]) {
+          NSString *p2 = [cmps2 objectAtIndex: index];
+
+          if ([p1 isEqual: p2] == NO) {
+            common = NO;
+            break;
+          }
+
+        } else {
           common = NO;
           break;
         }
-        
+      }
+
+      if (common) {
+        if ([p1 isEqual: path_separator()] == NO) {
+          commonPath = [commonPath stringByAppendingPathComponent: p1];
+        }
+
       } else {
-        common = NO;  
         break;
       }
+
+      index++;
     }
-  
-    if (common) {
-      if ([p1 isEqual: path_separator()] == NO) {
-        commonPath = [commonPath stringByAppendingPathComponent: p1];
+
+    newSelection = [commonPath pathComponents];
+
+    selcount = [newSelection count];
+
+    node = nil;
+    for (i = 0; i < selcount; i++) {
+      FSNode *pn = nil;
+
+      if (i != 0) {
+        pn = node;
       }
 
-    } else {
-      break;
-    }
-  
-    index++;
-  }
-    
-  newSelection = [commonPath pathComponents];
-  
-  selcount = [newSelection count]; 
-  
-  node = nil;
-  for (i = 0; i < selcount; i++) {   
-    FSNode *pn = nil;
-    
-    if (i != 0) {
-      pn = node;
-    }
-    
-    node = [FSNode nodeWithRelativePath: [newSelection objectAtIndex: i] 
-                                 parent: pn];
-                                 
-    component = [[FSNPathComponentView alloc] initForNode: node
-                                                 iconSize: ICN_SIZE];
+      node = [FSNode nodeWithRelativePath: [newSelection objectAtIndex: i]
+                                   parent: pn];
 
-    [self addSubview: component];
-    [components addObject: component];
-    
-    if (i == (selcount -1)) {
-      lastComponent = component;
-      [lastComponent setLeaf: ([selection count] == 1)];
+      component = [[FSNPathComponentView alloc] initForNode: node
+                                                   iconSize: ICN_SIZE];
+
+      [self addSubview: component];
+      [components addObject: component];
+
+      if (i == (selcount - 1)) {
+        lastComponent = component;
+        [lastComponent setLeaf: ([selection count] == 1)];
+      }
     }
-    
-    RELEASE (component);
-  }
-    
-  [self tile];
-  RELEASE (arp);
+
+    [self tile];
+  } // @autoreleasepool
 }
 
 - (void)mouseMovedOnComponent:(FSNPathComponentView *)component
@@ -256,7 +252,6 @@ static NSImage *branchImage;
   RELEASE (label);
   RELEASE (fontAttr);
   
-  [super dealloc];  
 }
 
 + (void)initialize

@@ -52,7 +52,6 @@ static NSString *nibName = @"LSFEditor";
   RELEASE (modules);
   RELEASE (fmviews);
 
-	[super dealloc];
 }
 
 - (id)initForFolder:(id)fldr
@@ -94,7 +93,7 @@ static NSString *nibName = @"LSFEditor";
 
     placesMatrix = [[NSMatrix alloc] initWithFrame: NSMakeRect(0, 0, 100, 100)
 				            	              mode: NSListModeMatrix 
-                               prototype: [[SearchPlacesCell new] autorelease]
+                               prototype: [SearchPlacesCell new]
 			       							  numberOfRows: 0 
                          numberOfColumns: 0];
     [placesMatrix setIntercellSpacing: NSZeroSize];
@@ -144,7 +143,7 @@ static NSString *nibName = @"LSFEditor";
 
 - (void)setModules
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSArray *fmods = [finder modules];
   NSDictionary *searchCriteria = [folder searchCriteria];
   NSArray *names = [searchCriteria allKeys];
@@ -194,7 +193,7 @@ static NSString *nibName = @"LSFEditor";
     RELEASE (fmview);
   }
 
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 - (void)activate

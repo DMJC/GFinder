@@ -38,7 +38,6 @@ static NSString *fix_path(NSString *s, const char *c)
 
   if (mgr == nil) {
     mgr = [NSFileManager defaultManager];
-    RETAIN (mgr);
   }
   
   if (ptr == 0) {

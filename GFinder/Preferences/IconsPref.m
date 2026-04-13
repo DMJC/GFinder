@@ -36,7 +36,6 @@ static NSString *nibName = @"IconsPref";
 - (void)dealloc
 {
   RELEASE (prefbox);
-  [super dealloc];
 }
 
 - (id)init
@@ -50,7 +49,6 @@ static NSString *nibName = @"IconsPref";
     } else {  
       NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults]; 
 
-      RETAIN (prefbox);
       RELEASE (win); 
      
       gw = [GFinder gfinder];

@@ -37,7 +37,6 @@
   RELEASE (cacheDict);
   RELEASE (offsets);
     
-  [super dealloc];
 }
 
 - (id)initWithPath:(NSString *)apath
@@ -90,7 +89,6 @@
 {
   if (handle == nil) {
     handle = [NSFileHandle fileHandleForUpdatingAtPath: path];
-    RETAIN (handle);
   }
   
   [handle seekToEndOfFile];
@@ -126,7 +124,7 @@
 
 - (void)flush
 {
-  CREATE_AUTORELEASE_POOL (arp);
+@autoreleasepool {
   int i;
 
   for (i = 0; i < [offsets count]; i++) {
@@ -147,7 +145,7 @@
   [cacheDict removeAllObjects];
   [offsets removeAllObjects];
     
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 - (NSData *)dataOfLength:(unsigned)length
@@ -181,43 +179,41 @@
 
 - (int)insertionIndexForOffset:(NSNumber *)offset
 {
-  CREATE_AUTORELEASE_POOL(arp);
-  unsigned count = [offsets count]; 
   int ins = 0;
-  
-  if (count) {
-    NSNumber *ofst = nil;
-    int first = 0;
-    int last = count;
-    int pos = 0; 
-    NSComparisonResult result;
 
-    while (1) {
-      if (first == last) {
-        ins = first;
-        break;
+  @autoreleasepool {
+    unsigned count = [offsets count];
+
+    if (count) {
+      NSNumber *ofst = nil;
+      int first = 0;
+      int last = count;
+      int pos = 0;
+      NSComparisonResult result;
+
+      while (1) {
+        if (first == last) {
+          ins = first;
+          break;
+        }
+
+        pos = (first + last) / 2;
+        ofst = [offsets objectAtIndex: pos];
+
+        result = [ofst compare: offset];
+
+        if (result == NSOrderedSame) {
+          return -1;
+        } else if (result == NSOrderedAscending) {
+          first = pos + 1;
+        } else {
+          last = pos;
+        }
       }
+    }
+  } // @autoreleasepool
 
-      pos = (first + last) / 2;
-      ofst = [offsets objectAtIndex: pos];
-      
-      result = [ofst compare: offset];
-
-      if (result == NSOrderedSame) {
-        RELEASE (arp);
-        return -1;
-        
-      } else if (result == NSOrderedAscending) { 
-        first = pos + 1;
-      } else {
-        last = pos;	
-      }
-    } 
-  } 
-  
-  RELEASE (arp);
-    
-  return ins;  
+  return ins;
 }
 
 - (NSNumber *)offsetForNewData

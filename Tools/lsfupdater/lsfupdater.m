@@ -169,7 +169,6 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
   RELEASE (foundPaths);
   RELEASE (directories);
   
-  [super dealloc];
 }
 
 - (id)initWithConnectionName:(NSString *)cname
@@ -218,7 +217,6 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
     anObject = [conn rootProxy];
     [anObject setProtocolForProxy: @protocol(LSFolderProtocol)];
     lsfolder = (id <LSFolderProtocol>)anObject;
-    RETAIN (lsfolder);
 
     [lsfolder setUpdater: self];
   }
@@ -266,7 +264,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
 
 - (void)loadModules
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSEnumerator *enumerator;
   NSString *bundlesDir;
   BOOL isdir;
@@ -320,7 +318,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
     }
   }
 
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 - (NSArray *)bundlesWithExtension:(NSString *)extension 
@@ -405,7 +403,6 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
                              selector: @selector(searchInNextDirectory:) 
                              userInfo: nil 
                               repeats: YES];
-    RETAIN (autoupdateTmr);
   } 
 }
 
@@ -435,7 +432,6 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
                              selector: @selector(searchInNextDirectory:) 
                              userInfo: nil 
                               repeats: YES];
-    RETAIN (autoupdateTmr);
   }
 }
 
@@ -573,7 +569,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
 
 - (void)updateSearchPath:(NSString *)srcpath
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSArray *paths;
   
   GWDebugLog(@"getting directories from the db...");
@@ -595,7 +591,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
     GWDebugLog(@"updating in %@", srcpath);    
     
     for (i = 0; i <= count; i++) {
-      CREATE_AUTORELEASE_POOL(arp1);
+@autoreleasepool {
       NSString *dbpath = [paths objectAtIndex: i];
       NSDictionary *attributes = [fm fileAttributesAtPath: dbpath traverseLink: NO];
       NSDate *moddate = [attributes fileModificationDate];
@@ -625,7 +621,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
         contents = [fm directoryContentsAtPath: dbpath];
         
         for (j = 0; j < [contents count]; j++) {
-          CREATE_AUTORELEASE_POOL(arp2);
+@autoreleasepool {
           NSString *fname = [contents objectAtIndex: j];
           NSString *fpath = [dbpath stringByAppendingPathComponent: fname];
           NSDictionary *attr = [fm fileAttributesAtPath: fpath traverseLink: NO];
@@ -657,11 +653,11 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
             [self insertShorterPath: fpath inArray: toinsert];
           }
 
-          RELEASE (arp2);
+  } // @autoreleasepool
         }
       }
       
-      RELEASE (arp1);
+  } // @autoreleasepool
     }
      
     if ([toinsert count] && (norecursion == NO)) {
@@ -693,7 +689,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
   
   GWDebugLog(@"searching done.");
   
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 - (BOOL)saveResults
@@ -724,39 +720,36 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
 
 - (NSArray *)fullSearchInDirectory:(NSString *)dirpath
 {
-  CREATE_AUTORELEASE_POOL(arp);
   NSMutableArray *founds = [NSMutableArray array];
-  NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: dirpath];
-  IMP nxtImp = [enumerator methodForSelector: @selector(nextObject)];    
 
-  while (1) {
-    CREATE_AUTORELEASE_POOL(arp1); 
-    NSString *path = (*nxtImp)(enumerator, @selector(nextObject));
+  @autoreleasepool {
+    NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: dirpath];
+    IMP nxtImp = [enumerator methodForSelector: @selector(nextObject)];
 
-    if (path) {
-      NSString *fullPath = [dirpath stringByAppendingPathComponent: path];
-      NSDictionary *attrs = [enumerator fileAttributes];
+    while (1) {
+      @autoreleasepool {
+        NSString *path = (*nxtImp)(enumerator, @selector(nextObject));
 
-      if ([self checkPath: fullPath attributes: attrs]) {    
-        [founds addObject: fullPath];
+        if (path) {
+          NSString *fullPath = [dirpath stringByAppendingPathComponent: path];
+          NSDictionary *attrs = [enumerator fileAttributes];
+
+          if ([self checkPath: fullPath attributes: attrs]) {
+            [founds addObject: fullPath];
+          }
+
+          if (([attrs fileType] == NSFileTypeDirectory) && norecursion) {
+            [enumerator skipDescendents];
+          }
+
+        } else {
+          break;
+        }
       }
-
-      if (([attrs fileType] == NSFileTypeDirectory) && norecursion) {
-        [enumerator skipDescendents];
-      }
-
-    } else {
-      RELEASE (arp1);
-      break;
     }
-    
-    RELEASE (arp1); 
-  }
-  
-  RETAIN (founds);
-  RELEASE (arp);
-      
-  return AUTORELEASE (founds);
+  } // @autoreleasepool
+
+  return founds;
 }
 
 - (BOOL)checkPath:(NSString *)path
@@ -859,7 +852,6 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
     }
     
     if (ddbd) {
-      RETAIN (ddbd);
       [ddbd setProtocolForProxy: @protocol(DDBd)];
     
 	    [[NSNotificationCenter defaultCenter] addObserver: self
@@ -1066,7 +1058,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
   }
   
   if (directories) {
-    CREATE_AUTORELEASE_POOL(arp1);
+@autoreleasepool {
     NSMutableArray *toinsert = [NSMutableArray array];
     NSString *directory = [directories objectAtIndex: dirindex];
     NSDictionary *attributes = [fm fileAttributesAtPath: directory traverseLink: NO];
@@ -1097,7 +1089,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
       
       if (contents) {
         for (j = 0; j < [contents count]; j++) {
-          CREATE_AUTORELEASE_POOL(arp2);
+@autoreleasepool {
           NSString *fname = [contents objectAtIndex: j];
           NSString *fpath = [directory stringByAppendingPathComponent: fname];
           NSDictionary *attr = [fm fileAttributesAtPath: fpath traverseLink: NO];
@@ -1128,7 +1120,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
             [self insertShorterPath: fpath inArray: toinsert];
           } 
 
-          RELEASE (arp2);
+  } // @autoreleasepool
         }  
       }  
     }
@@ -1147,7 +1139,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
       [self resetTimer];
     }
     
-    RELEASE (arp1);
+  } // @autoreleasepool
   }
 }
 
@@ -1205,7 +1197,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
 
 int main(int argc, char** argv)
 {
-  CREATE_AUTORELEASE_POOL (pool);
+@autoreleasepool {
   
   if (argc > 1) {
     NSString *conname = [NSString stringWithCString: argv[1]];
@@ -1218,7 +1210,7 @@ int main(int argc, char** argv)
     NSLog(@"no connection name.");
   }
   
-  RELEASE (pool);  
+  } // @autoreleasepool  
   exit(0);
 }
 

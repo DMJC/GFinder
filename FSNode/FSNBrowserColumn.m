@@ -55,7 +55,6 @@ static id <DesktopApplication> desktopApp = nil;
   RELEASE (extInfoType);
   RELEASE (backColor);
 
-  [super dealloc];
 }
 
 + (void)initialize
@@ -227,7 +226,6 @@ static id <DesktopApplication> desktopApp = nil;
       savedSelection = [self selectedNodes];
 
       if (savedSelection) {
-	RETAIN (savedSelection);
       }
 
       [matrix visibleCellsNodes: &vnodes scrollTuneSpace: &scrollTune];
@@ -306,7 +304,6 @@ static id <DesktopApplication> desktopApp = nil;
 
 - (void)createRowsInMatrix
 {
-  NSAutoreleasePool *pool;
   NSArray *subNodes = [shownNode subNodes];
   NSUInteger count = [subNodes count];
   SEL compSel = [fsnodeRep compareSelectorForDirectory: [shownNode path]];
@@ -322,7 +319,7 @@ static id <DesktopApplication> desktopApp = nil;
       return;
     }
 
-  pool = [[NSAutoreleasePool alloc] init];
+  @autoreleasepool {
 
   [matrix addColumn];
 
@@ -358,7 +355,8 @@ static id <DesktopApplication> desktopApp = nil;
     }
 
   [matrix sortUsingSelector: compSel];
-  RELEASE (pool);
+
+  } // @autoreleasepool
 }
 
 - (void)addCellsWithNames:(NSArray *)names
@@ -367,7 +365,7 @@ static id <DesktopApplication> desktopApp = nil;
 
   if ([subNodes count])
     {
-      CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
       NSArray *selectedNodes = [self selectedNodes];
       SEL compSel = [fsnodeRep compareSelectorForDirectory: [shownNode path]];
       NSUInteger i;
@@ -423,13 +421,13 @@ static id <DesktopApplication> desktopApp = nil;
 	[self selectCellsOfNodes: selectedNodes sendAction: NO];
 
       [matrix setNeedsDisplay: YES];
-      RELEASE (arp);
+  } // @autoreleasepool
     }
 }
 
 - (void)removeCellsWithNames:(NSArray *)names
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSArray *selcells = nil;
   NSMutableArray *selectedCells = nil;
   NSArray *vnodes = nil;
@@ -516,7 +514,7 @@ static id <DesktopApplication> desktopApp = nil;
 
   RELEASE (selectedCells); 
   RELEASE (visibleNodes);
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 - (NSArray *)selectedCells
@@ -1588,35 +1586,31 @@ static id <DesktopApplication> desktopApp = nil;
   prePath = [NSString stringWithString: nodePath];
 
   while (1) {
-    CREATE_AUTORELEASE_POOL(arp);
-
-    if ([sourcePaths containsObject: prePath])
-      {
-	RELEASE (arp);
-	return NSDragOperationNone;
-      }
-    if ([prePath isEqual: path_separator()])
-      {
-	RELEASE (arp);
-	break;
-      }
-    prePath = [prePath stringByDeletingLastPathComponent];
-    RELEASE (arp);
+    @autoreleasepool {
+      if ([sourcePaths containsObject: prePath])
+        {
+          return NSDragOperationNone;
+        }
+      if ([prePath isEqual: path_separator()])
+        {
+          break;
+        }
+      prePath = [prePath stringByDeletingLastPathComponent];
+    } // @autoreleasepool
   }
 
   if ([node isApplication])
     {
       for (i = 0; i < count; i++)
 	{
-	  CREATE_AUTORELEASE_POOL(arp);
-	  FSNode *nd = [FSNode nodeWithPath: [sourcePaths objectAtIndex: i]];
+	  @autoreleasepool {
+	    FSNode *nd = [FSNode nodeWithPath: [sourcePaths objectAtIndex: i]];
 
-	  if (([nd isPlain] == NO) && ([nd isPackage] == NO))
-	    {
-	      RELEASE (arp);
-	      return NSDragOperationNone;
-	    }
-	  RELEASE (arp);
+	    if (([nd isPlain] == NO) && ([nd isPackage] == NO))
+	      {
+		return NSDragOperationNone;
+	      }
+	  } // @autoreleasepool
 	}
     }
 

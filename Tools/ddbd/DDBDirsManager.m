@@ -38,7 +38,6 @@
   RELEASE (dummyOffsets[0]);
   RELEASE (dummyOffsets[1]);
       
-  [super dealloc];
 }
 
 - (id)initWithBasePath:(NSString *)bpath
@@ -77,7 +76,7 @@
 
 - (void)addDirectory:(NSString *)dir
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   DBKBTreeNode *node;
   
   DESTROY (dummyPaths[1]);  
@@ -95,7 +94,7 @@
   
   [tree end];
   
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 - (void)removeDirectory:(NSString *)dir
@@ -113,7 +112,6 @@
   if (exists) {
     NSNumber *offset = [node keyAtIndex: index];
     
-    RETAIN (offset);
     [tree deleteKey: offset];
     [vlfile deleteDataAtOffset: offset]; 
     RELEASE (offset);
@@ -127,37 +125,34 @@
   NSUInteger i;
 
   for (i = 0; i < [paths count]; i++) {
-    CREATE_AUTORELEASE_POOL(arp);
-    NSString *base = [paths objectAtIndex: i];  
-    NSDictionary *attributes = [fm fileAttributesAtPath: base traverseLink: NO];
-    NSString *type = [attributes fileType];
+    @autoreleasepool {
+      NSString *base = [paths objectAtIndex: i];
+      NSDictionary *attributes = [fm fileAttributesAtPath: base traverseLink: NO];
+      NSString *type = [attributes fileType];
 
-    if (type == NSFileTypeDirectory) {
-      NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: base];
-      IMP nxtImp = [enumerator methodForSelector: @selector(nextObject)];  
-        
-      while (1) {  
-        CREATE_AUTORELEASE_POOL(arp1);  
-        NSString *path = (*nxtImp)(enumerator, @selector(nextObject));
-        
-        if (path) {
-          if ([[enumerator fileAttributes] fileType] == NSFileTypeDirectory) {
-            [self addDirectory: [base stringByAppendingPathComponent: path]];
+      if (type == NSFileTypeDirectory) {
+        NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: base];
+        IMP nxtImp = [enumerator methodForSelector: @selector(nextObject)];
+
+        while (1) {
+          @autoreleasepool {
+            NSString *path = (*nxtImp)(enumerator, @selector(nextObject));
+
+            if (path) {
+              if ([[enumerator fileAttributes] fileType] == NSFileTypeDirectory) {
+                [self addDirectory: [base stringByAppendingPathComponent: path]];
+              }
+            } else {
+              break;
+            }
           }
-        } else {
-          RELEASE (arp1);
-          break;
         }
-        
-        RELEASE (arp1);  
+
+        [self addDirectory: base];
       }
-      
-      [self addDirectory: base];
     }
-    
-    DESTROY (arp); 
   }
-  
+
   [self synchronize];
 }
 
@@ -166,7 +161,7 @@
   NSUInteger i, j;
   
   for (i = 0; i < [paths count]; i++) {  
-    CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
     NSString *base = [paths objectAtIndex: i];
     NSArray *treepaths = [self dirsFromPath: base];
     int count = [treepaths count];
@@ -177,7 +172,7 @@
       }
     }
 
-    RELEASE (arp);
+  } // @autoreleasepool
   }
   
   [self synchronize];
@@ -185,8 +180,9 @@
 
 - (NSArray *)dirsFromPath:(NSString *)path
 {
-  CREATE_AUTORELEASE_POOL(pool);
   NSMutableArray *paths = [NSMutableArray array];
+
+@autoreleasepool {
   NSMutableArray *toremove = [NSMutableArray array];
   NSArray *keys = nil;
   NSUInteger i;
@@ -208,7 +204,7 @@
   
   if (keys) {
     for (i = 0; i < [keys count]; i++) {
-      CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
       NSData *data = [vlfile dataAtOffset: [keys objectAtIndex: i]];
       NSString *path = [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
       BOOL isdir;
@@ -220,7 +216,7 @@
       }
 
       RELEASE (path);
-      RELEASE(arp);
+  } // @autoreleasepool
     }  
   }
 
@@ -228,10 +224,9 @@
     [self removeDirectory: [toremove objectAtIndex: i]];
   }
   
-  RETAIN (paths);
-  RELEASE(pool);
+  } // @autoreleasepool
   
-  return [paths autorelease];
+  return paths;
 }
 
 
@@ -286,13 +281,14 @@
   return data;  
 }
 
-- (NSComparisonResult)compareNodeKey:(id)akey 
+- (NSComparisonResult)compareNodeKey:(id)akey
                              withKey:(id)bkey
 {
-  CREATE_AUTORELEASE_POOL(arp);
+  NSComparisonResult result = NSOrderedSame;
+
+@autoreleasepool {
   NSString *astr;
   NSString *bstr;
-  NSComparisonResult result;
   
   if ([akey isEqual: dummyOffsets[0]]) {
     astr = RETAIN (dummyPaths[0]);
@@ -316,7 +312,7 @@
   
   RELEASE (astr);
   RELEASE (bstr);
-  RELEASE (arp);
+  } // @autoreleasepool
   
   return result;  
 }

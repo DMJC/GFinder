@@ -37,11 +37,8 @@
 
 + (void)connectWithPorts:(NSArray *)portArray
 {
-  NSAutoreleasePool *pool;
   ImageResizer *serverObject;
   NSConnection *serverConnection;
-
-  pool = [[NSAutoreleasePool alloc] init];
 
   serverConnection = [NSConnection connectionWithReceivePort: [portArray objectAtIndex:0]
                                                     sendPort: [portArray objectAtIndex:1]];
@@ -50,17 +47,14 @@
   if (serverObject)
     {
       [(id)[serverConnection rootProxy] setResizer:serverObject];
-      [serverObject release];
       [[NSRunLoop currentRunLoop] run];
     }
-  [pool release];
   [NSThread exit];
 }
 
 
 - (void)dealloc
 {
-  [super dealloc];
 }
 
 
@@ -72,7 +66,7 @@
 - (void)readImageAtPath:(NSString *)path
                 setSize:(NSSize)imsize
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSMutableDictionary *info = nil;
   NSImage *srcImage;
 
@@ -237,7 +231,7 @@
       NSLog(@"No image or not valid for %@", path);
     }
   [imageViewerProxy imageReady: info];
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 

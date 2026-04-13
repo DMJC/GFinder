@@ -44,7 +44,6 @@
   RELEASE (namelabel);
   RELEASE (icon);
   RELEASE (highlightPath);
-  [super dealloc];
 }
 
 - (id)init

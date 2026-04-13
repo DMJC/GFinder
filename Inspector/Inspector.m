@@ -51,7 +51,6 @@ static NSString *nibName = @"InspectorWin";
   RELEASE (inspectors);
   RELEASE (win);
    
-  [super dealloc];
 }
 
 - (id)init
@@ -336,7 +335,7 @@ static NSString *nibName = @"InspectorWin";
 - (void)concludeDragOperation:(id <NSDraggingInfo>)sender 
                    inIconView:(IconView *)iview
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSPasteboard *pb = [sender draggingPasteboard];  
   NSImage *image = [[NSImage alloc] initWithPasteboard: pb];
   NSData *data = nil;
@@ -386,7 +385,6 @@ static NSString *nibName = @"InspectorWin";
     
   } 
 
-  [image release];
 
   if (data) {  
     NSString *dirpath = [currentPaths objectAtIndex: 0];
@@ -407,7 +405,7 @@ static NSString *nibName = @"InspectorWin";
 
   [iview setDndTarget: NO];
 
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 @end

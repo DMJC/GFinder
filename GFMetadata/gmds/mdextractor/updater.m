@@ -157,7 +157,7 @@ do { \
       NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: path];
       
       while (1) {
-        CREATE_AUTORELEASE_POOL(arp); 
+@autoreleasepool { 
         NSString *entry = [enumerator nextObject];
         NSDate *date = [NSDate dateWithTimeIntervalSinceNow: 0.001];
         BOOL skip = NO;
@@ -234,7 +234,7 @@ do { \
           }
           
         } else {
-          RELEASE (arp);
+  } // @autoreleasepool
           break;
         }
         
@@ -476,14 +476,12 @@ do { \
                                    selector: @selector(processPendingChanges:) 
 																   userInfo: nil 
                                     repeats: YES];
-  RETAIN (fswupdateTimer);     
           
   lostPathsTimer = [NSTimer scheduledTimerWithTimeInterval: LOST_PATHS_CHECK
 						                         target: self 
                                    selector: @selector(checkLostPaths:) 
 																   userInfo: nil 
                                     repeats: YES];
-  RETAIN (lostPathsTimer);     
      
   fswatcher = nil;
   [self connectFSWatcher: nil];
@@ -492,7 +490,7 @@ do { \
 - (oneway void)globalWatchedPathDidChange:(NSDictionary *)info
 {
   if (extracting == NO) {
-    CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];  
     NSString *path = [info objectForKey: @"path"];
     NSString *event = [info objectForKey: @"event"];
@@ -550,14 +548,14 @@ do { \
       }
     }
 
-    RELEASE (arp);     
+  } // @autoreleasepool     
   }                  
 }
 
 - (void)processPendingChanges:(id)sender
 {
   if (extracting == NO) {
-    CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
 
     while ([fswupdatePaths count] > 0) {
       NSDictionary *dict = [fswupdatePaths lastObject];
@@ -671,7 +669,6 @@ do { \
       NSDate *now = [NSDate date];
       unsigned i;
 
-      RETAIN (skipPaths);
 
       for (i = 0; i < [skipPaths count]; i++) {
         NSString *path = [skipPaths objectAtIndex: i];
@@ -686,7 +683,7 @@ do { \
       RELEASE (skipPaths);
     }  
 
-    RELEASE (arp);  
+  } // @autoreleasepool  
   }
 }
 
@@ -723,7 +720,6 @@ do { \
     
     if (fswatcher)
     {
-      RETAIN (fswatcher);
       [fswatcher setProtocolForProxy: @protocol(FSWatcherProtocol)];
     
 	    [[NSNotificationCenter defaultCenter] addObserver: self
@@ -806,7 +802,6 @@ do { \
     }
     
     if (ddbd) {
-      RETAIN (ddbd);
       [ddbd setProtocolForProxy: @protocol(DDBdProtocol)];
     
 	    [[NSNotificationCenter defaultCenter] addObserver: self
@@ -866,7 +861,7 @@ do { \
   NSArray *lines;
   NSUInteger i;
 
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   query = @"SELECT path FROM paths WHERE is_directory = 1";
   lines = [sqlite resultsOfQuery: query];
 
@@ -883,15 +878,14 @@ do { \
                                            selector: @selector(checkNextDir:) 
 																           userInfo: nil 
                                             repeats: YES];
-  RETAIN (schedupdateTimer);     
   
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 - (void)checkNextDir:(id)sender
 {
   if (extracting == NO) {
-    CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
     NSUInteger count = [directories count];
     NSString *dir;
     NSDictionary *attributes;
@@ -900,7 +894,7 @@ do { \
   
     if (count == 0)
       {
-	RELEASE(arp);
+  } // @autoreleasepool
 	return;
       }
 
@@ -980,7 +974,6 @@ do { \
     } else {  
       [self removePath: dir];
       
-      RETAIN (dir);
       GWDebugLog(@"schedule-remove %@", dir);
       [directories removeObjectAtIndex: dirpos];
       count--;
@@ -1012,7 +1005,7 @@ do { \
       dirpos = 0;
     }
     
-    RELEASE (arp);
+  } // @autoreleasepool
   }
 }
 
@@ -1030,13 +1023,12 @@ do { \
                                            selector: @selector(notifyUpdates:) 
 																           userInfo: nil 
                                             repeats: YES];
-  RETAIN (notificationsTimer);     
 }
 
 - (void)notifyUpdates:(id)sender
 {
   if (extracting == NO) {
-    CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
     NSMutableArray *removed = [NSMutableArray array];
     NSTimeInterval lastStamp;
     NSString *query;
@@ -1072,7 +1064,7 @@ do { \
                        object: nil 
                      userInfo: info];
 
-    RELEASE (arp);
+  } // @autoreleasepool
   }
 }
 

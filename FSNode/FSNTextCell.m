@@ -36,7 +36,6 @@
   RELEASE (fontAttr);
   RELEASE (dots);
   RELEASE (icon);  
-  [super dealloc];
 }
 
 - (id)init
@@ -71,7 +70,6 @@
     c->uncutTitle = nil;
   }
 
-  RETAIN (icon);
 
   return c;
 }

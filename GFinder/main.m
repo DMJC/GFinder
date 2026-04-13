@@ -30,13 +30,13 @@
   
 int main(int argc, char **argv, char **env)
 {
-	CREATE_AUTORELEASE_POOL (pool);
+@autoreleasepool {
   GFinder *gw = [GFinder gfinder];
 	NSApplication *app = [NSApplication sharedApplication];
   
   [app setDelegate: gw];    
 	[app run];
-	RELEASE (pool);
+  } // @autoreleasepool
   
   return 0;
 }

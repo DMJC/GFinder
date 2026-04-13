@@ -83,7 +83,7 @@ BOOL createTables(sqlite3 *db, NSString *schema)
 
 NSArray *performQuery(sqlite3 *db, NSString *query)
 {
-  CREATE_AUTORELEASE_POOL(pool);
+@autoreleasepool {
   NSMutableArray *queryResult = [NSMutableArray array];
 	char **results;
 	int cols;
@@ -132,8 +132,7 @@ NSArray *performQuery(sqlite3 *db, NSString *query)
     sqlite3_free_table(results);
   }
   
-  RETAIN (queryResult);
-  RELEASE (pool);
+  } // @autoreleasepool
   
   return AUTORELEASE (queryResult);
 }
@@ -159,12 +158,12 @@ BOOL performWriteQuery(sqlite3 *db, NSString *query)
       break;
       
     } else if (err == SQLITE_BUSY) {
-      CREATE_AUTORELEASE_POOL(arp); 
+@autoreleasepool { 
       NSDate *when = [NSDate dateWithTimeIntervalSinceNow: 0.1];
 
       [NSThread sleepUntilDate: when];
       NSLog(@"retry %i", retry);
-      RELEASE (arp);
+  } // @autoreleasepool
 
       if (retry++ > MAX_RETRY) {
         NSLog(@"%s", sqlite3_errmsg(db));
@@ -200,14 +199,14 @@ char **resultsForQuery(sqlite3 *db, NSString *query, int *rows, int *cols)
       break;
 
     } else if ((err == SQLITE_BUSY) || (err == SQLITE_LOCKED)) {
-      CREATE_AUTORELEASE_POOL(arp); 
+@autoreleasepool { 
       NSDate *when = [NSDate dateWithTimeIntervalSinceNow: 0.1];
 
       sqlite3_free_table(results);
       results = NULL;
       [NSThread sleepUntilDate: when];
       NSLog(@"retry %i", retry);
-      RELEASE (arp);
+  } // @autoreleasepool
 
       if (retry++ > MAX_RETRY) {
         NSLog(@"error %i", err);

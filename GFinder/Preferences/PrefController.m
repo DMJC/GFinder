@@ -47,7 +47,6 @@ static NSString *nibName = @"PrefWindow";
 {
   RELEASE (preferences);
   RELEASE (win);
-  [super dealloc];
 }
 
 - (id)init

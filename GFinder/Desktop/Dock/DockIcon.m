@@ -45,7 +45,6 @@
   RELEASE (trashFullIcon);
   RELEASE (dragIcon);
   
-  [super dealloc];
 }
 
 - (id)initForNode:(FSNode *)anode
@@ -340,8 +339,9 @@
     NSString *appPath = [ws fullPathForApplication: appName];
     
     if (appPath) {
-      CREATE_AUTORELEASE_POOL(arp);
-      NSMenu *menu = [[NSMenu alloc] initWithTitle: appName];
+      NSMenu *menu = nil;
+@autoreleasepool {
+      menu = [[NSMenu alloc] initWithTitle: appName];
       NSMenuItem *item;
       GWLaunchedApp *app;
       
@@ -379,9 +379,9 @@
         RELEASE (item);
       } 
       
-      RELEASE (arp);
+  } // @autoreleasepool
 
-      return AUTORELEASE (menu);
+      return menu;
     }
   }
   

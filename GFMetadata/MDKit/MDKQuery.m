@@ -133,7 +133,6 @@ enum {
   TEST_RELEASE (groupedResults);
   TEST_RELEASE (fsfilters);
   
-  [super dealloc];
 }
 
 + (void)initialize
@@ -310,7 +309,7 @@ enum {
                 inDirectories:(NSArray *)searchdirs
 {
   MDKQuery *query = [self query];  
-  NSMutableString *mqstr = [[qstr mutableCopy] autorelease];
+  NSMutableString *mqstr = [qstr mutableCopy];
   MDKQueryScanner *scanner;
 
   [query setSearchPaths: searchdirs];
@@ -418,7 +417,7 @@ enum {
 		            format: @"%@ is not built.", [self description]];       
   
   } else {
-    CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
     BOOL written;
     
@@ -428,7 +427,7 @@ enum {
     }
     written = [dict writeToFile: path atomically: flag];
 
-    RELEASE (arp);
+  } // @autoreleasepool
       
     return written;
   }
@@ -721,7 +720,7 @@ enum {
 - (void)appendSubqueriesFromString:(NSString *)qstr
 {
   if ([self isRoot]) {
-    NSMutableString *mqstr = [[qstr mutableCopy] autorelease];
+    NSMutableString *mqstr = [qstr mutableCopy];
     MDKQueryScanner *scanner;
   
     [mqstr replaceOccurrencesOfString: @"(" 
@@ -822,7 +821,7 @@ enum {
                    checkExisting:(BOOL)check
 {
   if ([self isRoot]) {
-    CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
     NSMutableString *sqlUpdatesStr = [sqlstr mutableCopy];
     NSMutableArray *sqlpre = [sqlDescription objectForKey: @"pre"];  
 
@@ -842,7 +841,7 @@ enum {
     }
 
     RELEASE (sqlUpdatesStr);
-    RELEASE (arp);
+  } // @autoreleasepool
     
   } else {
     [NSException raise: NSInternalInconsistencyException
@@ -854,7 +853,7 @@ enum {
                     checkExisting:(BOOL)check
 {
   if ([self isRoot]) {
-    CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
     NSMutableString *sqlUpdatesStr = [sqlstr mutableCopy];    
     NSMutableArray *sqlpost = [sqlDescription objectForKey: @"post"];  
 
@@ -874,7 +873,7 @@ enum {
     }
 
     RELEASE (sqlUpdatesStr);
-    RELEASE (arp);
+  } // @autoreleasepool
 
   } else {
     [NSException raise: NSInternalInconsistencyException
@@ -925,7 +924,6 @@ enum {
 
 - (void)dealloc
 {  
-	[super dealloc];
 }
 
 - (id)initForAttribute:(NSString *)attr
@@ -1280,7 +1278,7 @@ enum {
   }
 
   if (txtype) {
-    NSMutableString *mvalue = [[searchValue mutableCopy] autorelease];
+    NSMutableString *mvalue = [searchValue mutableCopy];
   
     [mvalue replaceOccurrencesOfString: @"%" 
                             withString: @"*" 
@@ -1310,7 +1308,6 @@ enum {
 
 - (void)dealloc
 {  
-	[super dealloc];
 }
 
 - (id)initForAttribute:(NSString *)attr
@@ -1518,7 +1515,7 @@ enum {
 - (NSString *)description
 {
   NSMutableString *descr = [NSMutableString string];
-  NSMutableString *mvalue = [[searchValue mutableCopy] autorelease];
+  NSMutableString *mvalue = [searchValue mutableCopy];
   
   [descr appendString: attribute];
   
@@ -1702,7 +1699,7 @@ enum {
       [delegate appendRawResults: lines];
     }
   } else {
-    CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
     NSMutableArray *catnames = [NSMutableArray array];
     BOOL sort = [self isUpdating];
     unsigned i;  
@@ -1738,7 +1735,7 @@ enum {
       [delegate queryDidUpdateResults: self forCategories: catnames];
     }
     
-    RELEASE (arp);
+  } // @autoreleasepool
   }
 }
 
@@ -1802,7 +1799,7 @@ enum {
 
 - (void)removePaths:(NSArray *)paths
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSMutableArray *catnames = [NSMutableArray array];
   NSUInteger index;    
   NSUInteger i;
@@ -1856,7 +1853,7 @@ enum {
     [delegate queryDidUpdateResults: self forCategories: catnames];
   }
   
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 - (void)removeNode:(FSNode *)node
@@ -2193,7 +2190,6 @@ static NSString *path_sep(void)
       separator = @"/";	
     #endif
 
-    RETAIN (separator);
   }
 
   return separator;

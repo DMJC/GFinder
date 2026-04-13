@@ -54,7 +54,6 @@ if (sz.height < 0) sz.height = 0
   RELEASE (rightMatrix); 
   RELEASE (dirsMatrix); 
   RELEASE (cellPrototipe); 
-  [super dealloc];
 }
 
 - (id)init
@@ -70,7 +69,6 @@ if (sz.height < 0) sz.height = 0
       FSNode *node;
       NSImage *icon;
       
-      RETAIN (prefbox);
       RELEASE (win); 
 
       gw = [GFinder gfinder];    

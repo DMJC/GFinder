@@ -70,7 +70,6 @@ static Recycler *recycler = nil;
   RELEASE (preferences);
   RELEASE (startAppWin);
     
-	[super dealloc];
 }
 
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
@@ -240,7 +239,6 @@ static Recycler *recycler = nil;
     
     if (workspaceApplication) {
       [workspaceApplication setProtocolForProxy: @protocol(workspaceAppProtocol)];
-      RETAIN (workspaceApplication);
     
 	    [nc addObserver: self
 	           selector: @selector(workspaceAppConnectionDidDie:)
@@ -304,7 +302,6 @@ static Recycler *recycler = nil;
     }
     
     if (fswatcher) {
-      RETAIN (fswatcher);
       [fswatcher setProtocolForProxy: @protocol(FSWatcherProtocol)];
     
 	    [[NSNotificationCenter defaultCenter] addObserver: self
@@ -466,7 +463,7 @@ static Recycler *recycler = nil;
 //
 - (void)emptyTrashFromMenu:(id)sender
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   FSNode *node = [FSNode nodeWithPath: trashPath];
   NSMutableArray *subNodes = [[node subNodes] mutableCopy];
   int count = [subNodes count];
@@ -496,7 +493,7 @@ static Recycler *recycler = nil;
   }
 
   RELEASE (subNodes);
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 - (void)paste:(id)sender

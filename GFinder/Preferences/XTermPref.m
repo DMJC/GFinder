@@ -38,7 +38,6 @@ static NSString *nibName = @"XTermPref";
   RELEASE (prefbox);
   RELEASE (xterm);
   RELEASE (xtermArgs);
-  [super dealloc];
 }
 
 - (id)init
@@ -56,7 +55,6 @@ static NSString *nibName = @"XTermPref";
 	  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];      
 	  id entry;
       
-	  RETAIN (prefbox);
 	  RELEASE (win);
 
 	  useService = [defaults boolForKey: @"terminal_services"];

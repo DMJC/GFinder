@@ -31,7 +31,6 @@
 {
   RELEASE (diskInfoField);
   RELEASE (fileCountField);
-  [super dealloc];
 }
 
 - (id)initWithFrame:(NSRect)frameRect

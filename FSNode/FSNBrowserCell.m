@@ -49,7 +49,6 @@ static NSString *dots = @"...";
   RELEASE (icon); 
   RELEASE (selectedicon); 
   
-  [super dealloc];
 }
 
 + (void)initialize
@@ -714,7 +713,6 @@ static NSString *dots = @"...";
 - (void)dealloc
 {
   RELEASE (node);
-  [super dealloc];
 }
 
 - (void)setNode:(FSNode *)anode 

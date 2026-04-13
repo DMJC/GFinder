@@ -43,7 +43,6 @@ static NSString *nibName = @"BrowserViewerPref";
 - (void)dealloc
 {
   RELEASE (arrow);
-  [super dealloc];
 }
 
 - (id)initForController:(id)acontroller
@@ -74,7 +73,6 @@ static NSString *nibName = @"BrowserViewerPref";
 {
   RELEASE (colExample);
   RELEASE (prefbox);
-  [super dealloc];
 }
 
 - (id)init
@@ -92,7 +90,6 @@ static NSString *nibName = @"BrowserViewerPref";
           NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
           NSString *widthStr = [defaults objectForKey: @"browserColsWidth"];
       
-          RETAIN (prefbox);
           RELEASE (win);
 
           if (widthStr)

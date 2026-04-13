@@ -70,7 +70,6 @@ static NSImage *branchImage;
   RELEASE (label);
   RELEASE (infolabel);
   RELEASE (labelFrameColor);
-  [super dealloc];
 }
 
 + (void)initialize
@@ -346,7 +345,6 @@ static NSImage *branchImage;
 	  labelFrameColor = [labelFrameColor colorUsingColorSpaceName:NSCalibratedRGBColorSpace];
 	  labelFrameColor = [labelFrameColor colorWithAlphaComponent:0.5];
 	}
-      [labelFrameColor retain];
 
       drawLabelBackground = NO;
     }
@@ -1580,15 +1578,14 @@ static NSImage *branchImage;
 	{
 	  for (i = 0; i < count; i++)
 	    {
-	      CREATE_AUTORELEASE_POOL(arp);
-	      FSNode *nd = [FSNode nodeWithPath: [sourcePaths objectAtIndex: i]];
+	      @autoreleasepool {
+		FSNode *nd = [FSNode nodeWithPath: [sourcePaths objectAtIndex: i]];
 
-	      if (([nd isPlain] == NO) && ([nd isPackage] == NO))
-		{
-		  RELEASE (arp);
-		  return NSDragOperationNone;
-		}
-	      RELEASE (arp);
+		if (([nd isPlain] == NO) && ([nd isPackage] == NO))
+		  {
+		    return NSDragOperationNone;
+		  }
+	      }
 	    }
 	}
       else if ([node isEqual: [container baseNode]] == NO)
@@ -1870,7 +1867,6 @@ static NSImage *branchImage;
 - (void)dealloc
 {
   RELEASE (node);
-  [super dealloc];
 }
 
 - (void)setNode:(FSNode *)anode

@@ -38,7 +38,6 @@
 - (void)dealloc
 {
   TEST_RELEASE (currentPath);
-  [super dealloc];
 }
 
 - (id)initWithFrame:(NSRect)frameRect

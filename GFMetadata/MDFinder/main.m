@@ -28,12 +28,12 @@
   
 int main(int argc, char **argv, char **env)
 {
-	CREATE_AUTORELEASE_POOL (pool);
+@autoreleasepool {
 	NSApplication *app = [NSApplication sharedApplication];
   	
   [app setDelegate: [MDFinder mdfinder]];    
 	[app run];
-	RELEASE (pool);
+  } // @autoreleasepool
   
   return 0;
 }

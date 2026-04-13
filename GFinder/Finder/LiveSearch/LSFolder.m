@@ -75,7 +75,6 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   RELEASE (elementsStr);
   DESTROY (conn);
    
-  [super dealloc];
 }
 
 - (id)initForFinder:(id)fndr
@@ -294,7 +293,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   NSData *info = [NSArchiver archivedDataWithRootObject: lsfinfo];
     
   [anObject setProtocolForProxy: @protocol(LSFUpdaterProtocol)];
-  updater = (id <LSFUpdaterProtocol>)[anObject retain];
+  updater = (id <LSFUpdaterProtocol>)anObject;
   [updater setFolderInfo: info];   
   [updater setAutoupdate: autoupdate];
   
@@ -344,7 +343,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 
 - (void)addFoundPath:(NSString *)path 
 {
-  CREATE_AUTORELEASE_POOL(pool);
+@autoreleasepool {
   FSNode *nd = [FSNode nodeWithPath: path];
   
   if ([foundObjects containsObject: nd] == NO) {
@@ -358,18 +357,18 @@ BOOL isPathInResults(NSString *path, NSArray *results);
                                              (unsigned long)[foundObjects count], elementsStr]];
   } 
 
-  RELEASE (pool);
+  } // @autoreleasepool
 }
 
 - (void)removeFoundPath:(NSString *)path
 {
-  CREATE_AUTORELEASE_POOL(pool);
+@autoreleasepool {
   [foundObjects removeObject: [FSNode nodeWithPath: path]];
   [elementsLabel setStringValue: [NSString stringWithFormat: @"%lu %@", 
                                            (unsigned long)[foundObjects count], elementsStr]];
   [resultsView noteNumberOfRowsChanged];
   [pathViewer showComponentsOfSelection: [self selectedObjects]];
-  RELEASE (pool);
+  } // @autoreleasepool
 }
 
 - (void)clearFoundPaths
@@ -1100,7 +1099,6 @@ shouldMakeNewConnection:(NSConnection*)newConn
 - (void)dealloc
 {
   RELEASE (images);
-  [super dealloc];
 }
 
 - (id)initWithFrame:(NSRect)frameRect 

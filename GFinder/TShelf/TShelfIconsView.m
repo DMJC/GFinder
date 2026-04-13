@@ -58,7 +58,6 @@
   RELEASE (watchedPaths);
   RELEASE (dragImage);
   RELEASE (focusedIconLabel);
-  [super dealloc];
 }
 
 - (id)initWithIconsDescription:(NSArray *)idescr 
@@ -339,7 +338,6 @@
 	    {
 	      NSString *dataPath = [icon dataPath];
 	      
-	      RETAIN (dataPath);
 	      [self removeIcon: icon];
 	      [fm removeFileAtPath: dataPath handler: nil];
 	      RELEASE (dataPath);
@@ -588,7 +586,7 @@
 
 - (void)fileSystemWillChange:(NSNotification *)notification
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSDictionary *dict = [notification object];
   NSString *operation = [dict objectForKey: @"operation"];
   NSString *source = [dict objectForKey: @"source"];	  
@@ -638,12 +636,12 @@
 	}
     }
 
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 - (void)fileSystemDidChange:(NSNotification *)notification
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSDictionary *dict = [notification object];
   NSString *operation = [dict objectForKey: @"operation"];
   NSString *source = [dict objectForKey: @"source"];
@@ -711,12 +709,12 @@
 	}
     }
   
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 - (void)watcherNotification:(NSNotification *)notification
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSDictionary *notifdict = (NSDictionary *)[notification object];
   NSString *path = [notifdict objectForKey: @"path"];
   NSString *event = [notifdict objectForKey: @"event"];
@@ -758,7 +756,7 @@
     {
       if ([event isEqual: @"GWFileCreatedInWatchedDirectory"])
 	{
-	  RELEASE (arp);
+  } // @autoreleasepool
 	  return;
 	}
 
@@ -796,7 +794,7 @@
 		  }
 	      }
 
-	    RELEASE (arp);
+  } // @autoreleasepool
 	    return;
 	  }
 
@@ -886,7 +884,7 @@
       }
     }
 
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 - (void)setWatchers
@@ -1137,7 +1135,6 @@
     {
       NSString *dataPath = [icon dataPath];
   
-      RETAIN (dataPath);
       [self doCopy];
       [self removeIcon: icon];
       [fm removeFileAtPath: dataPath handler: nil];

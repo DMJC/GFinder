@@ -97,7 +97,6 @@ static NSString *nibName = @"MDKWindow";
   DESTROY (resultCategories);
   DESTROY (savepath);
   
-	[super dealloc];
 }
 
 - (id)initWithContentsOfFile:(NSString *)path
@@ -308,7 +307,6 @@ static NSString *nibName = @"MDKWindow";
   NSRect r;
   
   onImage = [NSImage imageNamed: @"common_2DCheckMark"];
-  RETAIN (onImage);
 
   ttstr = NSLocalizedString(@"Restrict the search to chosen places.", @"");
   [placesPopUp setTitle: NSLocalizedString(@"Search in...", @"")];
@@ -1159,7 +1157,7 @@ static NSString *nibName = @"MDKWindow";
 
 - (void)newQuery
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSArray *words;
   MDKCompoundOperator operator;
   BOOL casesens;
@@ -1265,7 +1263,7 @@ static NSString *nibName = @"MDKWindow";
     // 
   }
   
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 - (void)prepareResultCategories
@@ -1649,7 +1647,6 @@ static NSString *nibName = @"MDKWindow";
 - (void)dealloc
 {
   RELEASE (images);
-  [super dealloc];
 }
 
 - (id)initWithFrame:(NSRect)frameRect 
@@ -1757,7 +1754,6 @@ NSString *pathSeparator(void)
       separator = @"/";	
     #endif
 
-    RETAIN (separator);
   }
 
   return separator;

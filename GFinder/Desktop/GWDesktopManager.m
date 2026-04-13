@@ -59,7 +59,6 @@ static GWDesktopManager *desktopManager = nil;
   RELEASE (dock);
   RELEASE (mpointWatcher);
 
-  [super dealloc];
 }
 
 - (id)init
@@ -96,7 +95,6 @@ static GWDesktopManager *desktopManager = nil;
 
     if (usexbundle) {
       window = [self loadXWinBundle];
-      [window retain];
     }
 
     if (window == nil) {
@@ -231,7 +229,6 @@ static GWDesktopManager *desktopManager = nil;
     }
     
     if (changed) {
-      RETAIN (desktopView);
       [desktopView removeFromSuperview];
 
       [win close];
@@ -273,7 +270,6 @@ static GWDesktopManager *desktopManager = nil;
         id pC;
 
         pC = [[[bundle principalClass] alloc] init];
-        [pC autorelease];
 	return pC;
       }
     }
@@ -406,12 +402,14 @@ static GWDesktopManager *desktopManager = nil;
 
 - (void)mouseEnteredTShelfActivateFrame
 {
-  [[gfinder tabbedShelf] animateShowing];
+  if ([gfinder respondsToSelector: @selector(tabbedShelf)])
+    [[gfinder performSelector: @selector(tabbedShelf)] performSelector: @selector(animateShowing)];
 }
 
 - (void)mouseExitedTShelfActiveFrame
 {
-  [[gfinder tabbedShelf] animateHiding];
+  if ([gfinder respondsToSelector: @selector(tabbedShelf)])
+    [[gfinder performSelector: @selector(tabbedShelf)] performSelector: @selector(animateHiding)];
 }
 
 - (void)deselectAllIcons
@@ -484,7 +482,6 @@ inFileViewerRootedAtPath:(NSString *)rootFullpath
       
       t = [Thumbnailer sharedThumbnailer];
       [t makeThumbnails:path];
-      [t release];
     }
 }
 
@@ -500,7 +497,6 @@ inFileViewerRootedAtPath:(NSString *)rootFullpath
       
       t = [Thumbnailer sharedThumbnailer];
       [t removeThumbnails:path];
-      [t release];
     }
 }
 
@@ -903,7 +899,6 @@ inFileViewerRootedAtPath:(NSString *)rootFullpath
     }
 
   RELEASE (mountedRemovableVolumes);
-  [super dealloc];
 }
 
 - (id)initForManager:(GWDesktopManager *)mngr
@@ -928,16 +923,13 @@ inFileViewerRootedAtPath:(NSString *)rootFullpath
 
 - (void)startWatching
 {
-  [mountedRemovableVolumes release];
   mountedRemovableVolumes = [[NSWorkspace sharedWorkspace] mountedRemovableMedia];
-  [mountedRemovableVolumes retain];
   active = YES;
 }
 
 - (void)stopWatching
 {
   active = NO;
-  [mountedRemovableVolumes release];
   mountedRemovableVolumes = nil;
 }
 
@@ -971,9 +963,7 @@ inFileViewerRootedAtPath:(NSString *)rootFullpath
       if (added || removed)
 	[manager mountedVolumesDidChange];
 
-      [mountedRemovableVolumes release];
       mountedRemovableVolumes = newVolumes;
-      [mountedRemovableVolumes retain];
     }
 }
 
@@ -984,9 +974,9 @@ inFileViewerRootedAtPath:(NSString *)rootFullpath
 
 + (void)mountRemovableMedia
 {
-  CREATE_AUTORELEASE_POOL(pool);
+@autoreleasepool {
   [[NSWorkspace sharedWorkspace] mountNewRemovableMedia];
-  RELEASE (pool);  
+  } // @autoreleasepool  
 }
 
 @end

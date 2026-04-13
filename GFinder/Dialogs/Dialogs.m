@@ -63,7 +63,6 @@
 
 - (void)dealloc
 {
-  [super dealloc];
 }
 
 - (id)initWithTitle:(NSString *)title 

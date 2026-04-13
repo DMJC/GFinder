@@ -97,12 +97,9 @@ static FSNodeRep *shared = nil;
  */
 - (void)cacheIcons
 {
-  [multipleSelIcon release];
-  multipleSelIcon = [[NSImage imageNamed:NSImageNameMultipleDocuments] retain];
-  [trashIcon release];
-  trashIcon = [[NSImage imageNamed:NSImageNameTrashEmpty] retain];
-  [trashFullIcon retain];
-  trashFullIcon = [[NSImage imageNamed:NSImageNameTrashFull] retain];
+  multipleSelIcon = [NSImage imageNamed:NSImageNameMultipleDocuments];
+  trashIcon = [NSImage imageNamed:NSImageNameTrashEmpty];
+  trashFullIcon = [NSImage imageNamed:NSImageNameTrashFull];
 }
 
 - (id)initSharedInstance
@@ -134,7 +131,6 @@ static FSNodeRep *shared = nil;
     
     iconsCache = [NSMutableDictionary new];
     rootPath = path_separator();
-    RETAIN (rootPath);
     
     libraryDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
     if (([fm fileExistsAtPath: libraryDir isDirectory: &isdir] && isdir) == NO)
@@ -146,7 +142,6 @@ static FSNodeRep *shared = nil;
           }
       }
     thumbnailDir = [libraryDir stringByAppendingPathComponent: @"Thumbnails"];
-    RETAIN (thumbnailDir);
     
     if (([fm fileExistsAtPath: thumbnailDir isDirectory: &isdir] && isdir) == NO) {
       if ([fm createDirectoryAtPath: thumbnailDir attributes: nil] == NO) {
@@ -203,7 +198,7 @@ static FSNodeRep *shared = nil;
 			Class principalClass = [bundle principalClass];
 
 			if ([principalClass conformsToProtocol: @protocol(ExtendedInfo)]) {	
-	      CREATE_AUTORELEASE_POOL (pool);
+@autoreleasepool {
         id module = [[principalClass alloc] init];
 	  		NSString *name = [module menuName];
         BOOL exists = NO;	
@@ -222,7 +217,7 @@ static FSNodeRep *shared = nil;
         }
 
 	  		RELEASE ((id)module);			
-        RELEASE (pool);		
+  } // @autoreleasepool		
 			}
     }
   }
@@ -282,7 +277,6 @@ static FSNodeRep *shared = nil;
   RELEASE (trashIcon);
   RELEASE (trashFullIcon);
         
-  [super dealloc];
 }
 
 + (FSNodeRep *)sharedInstance

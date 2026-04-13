@@ -33,7 +33,6 @@
   RELEASE (keys);
   RELEASE (subnodes);
   
-  [super dealloc];
 }
 
 - (id)initInTree:(DBKBTree *)atree
@@ -104,7 +103,7 @@
 
 - (void)setNodeData:(NSData *)ndata
 {
-  CREATE_AUTORELEASE_POOL (pool);
+@autoreleasepool {
   NSRange range;
   unsigned datalen;
   unsigned offscount;
@@ -139,7 +138,7 @@
   
   loaded = YES;
   
-  RELEASE (pool);  
+  } // @autoreleasepool  
 }
 
 - (NSData *)nodeData
@@ -195,91 +194,87 @@
   [self save];
 }
 
-- (BOOL)insertKey:(id)key 
+- (BOOL)insertKey:(id)key
 {
-  CREATE_AUTORELEASE_POOL(arp);
-  unsigned count = [keys count]; 
-  int ins = 0;
+  @autoreleasepool {
+    unsigned count = [keys count];
+    int ins = 0;
 
-  if (count) {
-    NSUInteger first = 0;
-    NSUInteger last = count;
-    NSUInteger pos = 0; 
-    id k;
-    NSComparisonResult result;
+    if (count) {
+      NSUInteger first = 0;
+      NSUInteger last = count;
+      NSUInteger pos = 0;
+      id k;
+      NSComparisonResult result;
 
-    while (1) {
-      if (first == last) {
-        ins = first;
-        break;
+      while (1) {
+        if (first == last) {
+          ins = first;
+          break;
+        }
+
+        pos = (first + last) / 2;
+        k = [keys objectAtIndex: pos];
+        result = [tree compareNodeKey: k withKey: key];
+
+        if (result == NSOrderedSame) {
+          /* the key exists */
+          return NO;
+        } else if (result == NSOrderedAscending) {
+          first = pos + 1;
+        } else {
+          last = pos;
+        }
       }
+    }
 
-      pos = (first + last) / 2;
-      k = [keys objectAtIndex: pos];
-      result = [tree compareNodeKey: k withKey: key];
+    [keys insertObject: key atIndex: ins];
+    [self save];
 
-      if (result == NSOrderedSame) {
-        /* the key exists */
-        RELEASE (arp);
-        return NO;
-        
-      } else if (result == NSOrderedAscending) { 
-        first = pos + 1;
-      } else {
-        last = pos;	
-      }
-    } 
-  } 
-  
-  [keys insertObject: key atIndex: ins];
-  [self save];
-  
-  RELEASE (arp);
-  
-  return YES;
+    return YES;
+  }
 }
 
 - (NSUInteger)indexForKey:(id)key
           existing:(BOOL *)exists
 {
-  CREATE_AUTORELEASE_POOL(arp);
-  NSUInteger count = [keys count]; 
   NSUInteger ins = 0;
 
-  if (count) {
-    NSUInteger first = 0;
-    NSUInteger last = count;
-    NSUInteger pos = 0; 
-    id k;
-    NSComparisonResult result;
+  @autoreleasepool {
+    NSUInteger count = [keys count];
 
-    while (1) {
-      if (first == last) {
-        ins = first;
-        break;
+    if (count) {
+      NSUInteger first = 0;
+      NSUInteger last = count;
+      NSUInteger pos = 0;
+      id k;
+      NSComparisonResult result;
+
+      while (1) {
+        if (first == last) {
+          ins = first;
+          break;
+        }
+
+        pos = (first + last) / 2;
+        k = [keys objectAtIndex: pos];
+        result = [tree compareNodeKey: k withKey: key];
+
+        if (result == NSOrderedSame) {
+          *exists = YES;
+          return pos;
+        } else if (result == NSOrderedAscending) {
+          first = pos + 1;
+        } else {
+          last = pos;
+        }
       }
+    }
 
-      pos = (first + last) / 2;
-      k = [keys objectAtIndex: pos];
-      result = [tree compareNodeKey: k withKey: key];
+    *exists = NO;
+  } // @autoreleasepool
 
-      if (result == NSOrderedSame) {
-        *exists = YES;
-        RELEASE (arp);
-        return pos;
-        
-      } else if (result == NSOrderedAscending) { 
-        first = pos + 1;
-      } else {
-        last = pos;	
-      }
-    } 
-  } 
-  
-  *exists = NO;  
-  RELEASE (arp);
-    
-  return ins;  
+  return ins;
 }
 
 - (NSUInteger)indexOfKey:(id)key
@@ -653,7 +648,7 @@
   NSArray *akeys;
   id key;
   NSArray *bkeys;
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
 
   subnode = [subnodes objectAtIndex: index];
 
@@ -671,7 +666,6 @@
   key = [subkeys objectAtIndex: order - 1];
   bkeys = [subkeys subarrayWithRange: NSMakeRange(order, order - 1)];
 
-  RETAIN (key);
   [subnode setKeys: akeys];
   [newnode setKeys: bkeys];
 
@@ -693,13 +687,13 @@
   
   RELEASE (key);  
   RELEASE (newnode);  
-  RELEASE (arp);  
+  } // @autoreleasepool  
 }
 
 - (BOOL)mergeWithBestSibling
 {
   if (parent) {
-    CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
     DBKBTreeNode *lftnd;
     unsigned lcount = 0;
     DBKBTreeNode *rgtnd;
@@ -773,7 +767,7 @@
     [parent save];
     [self save];
     
-    RELEASE (arp);
+  } // @autoreleasepool
     
     return YES;
   }
@@ -783,7 +777,7 @@
 
 - (void)borrowFromRightSibling:(DBKBTreeNode *)sibling  
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSUInteger index = [parent indexOfSubnode: self];
 
   if ([sibling isLoaded] == NO) {
@@ -806,12 +800,12 @@
   [sibling save];
   [parent save];
 
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 - (void)borrowFromLeftSibling:(DBKBTreeNode *)sibling 
 {  
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSUInteger index;
   NSArray *lftkeys;
   unsigned lftkcount;
@@ -844,7 +838,7 @@
   [sibling save];
   [parent save];
 
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 - (void)setRoot

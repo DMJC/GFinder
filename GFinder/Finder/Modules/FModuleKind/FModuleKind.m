@@ -61,7 +61,6 @@ static NSString *nibName = @"FModuleKind";
 - (void)dealloc
 {
   RELEASE (controlsBox);
-  [super dealloc];
 }
 
 - (id)initInterface
@@ -75,7 +74,6 @@ static NSString *nibName = @"FModuleKind";
       return self;
     }
 
-    RETAIN (controlsBox);
     RELEASE (win);
 
     used = NO;
@@ -190,7 +188,7 @@ static NSString *nibName = @"FModuleKind";
       found = (kind == PLAIN);
     }
   } else if (fileType == NSFileTypeDirectory) {
-    CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
 	  NSString *defApp = nil, *type = nil;
 		
 	  [ws getInfoForFile: path application: &defApp type: &type];  
@@ -202,7 +200,7 @@ static NSString *nibName = @"FModuleKind";
     } else {
       found = (kind == DIR);  
 	  }
-    RELEASE (arp);
+  } // @autoreleasepool
   } else if (fileType == NSFileTypeSymbolicLink) {
     found = (kind == LINK);  
   } else {

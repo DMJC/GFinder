@@ -39,7 +39,6 @@
   RELEASE (colorsView);
   RELEASE (errLabel);
   
-  [super dealloc];
 }
 
 - (id)initWithFrame:(NSRect)frameRect
@@ -234,7 +233,6 @@
 
 - (void)dealloc
 {
-  [super dealloc];
 }
 
 - (id)initWithFrame:(NSRect)frameRect

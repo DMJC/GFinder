@@ -34,7 +34,6 @@
   RELEASE (explField);
   RELEASE (errLabel);
   TEST_RELEASE (currentPath);
-  [super dealloc];
 }
 
 - (id)initWithFrame:(NSRect)frameRect

@@ -30,7 +30,6 @@
 
 - (void)dealloc
 {
-  [super dealloc];
 }
 
 - (id)initWithFrame:(NSRect)frameRect

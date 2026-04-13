@@ -37,7 +37,6 @@
   RELEASE (extensions);
   RELEASE (skipSet);
 
-	[super dealloc];
 }
 
 - (id)initForExtractor:(id)extr
@@ -98,7 +97,7 @@
                        withID:(int)path_id
                    attributes:(NSDictionary *)attributes
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSMutableDictionary *mddict = [NSMutableDictionary dictionary];  
   PDFDocument *doc = [PDFDocument documentFromFile: path];  
   BOOL success = NO;
@@ -185,7 +184,7 @@
   
   success = [extractor setMetadata: mddict forPath: path withID: path_id];  
   
-  RELEASE (arp);
+  } // @autoreleasepool
     
   return success;
 }

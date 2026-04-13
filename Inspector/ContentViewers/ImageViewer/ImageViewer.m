@@ -41,7 +41,6 @@
   RELEASE (errLabel);
   RELEASE (progView);
   DESTROY (conn);
-  [super dealloc];
 }
 
 - (id)initWithFrame:(NSRect)frameRect
@@ -183,7 +182,6 @@
     imsize.height -= 4;
     [anObject setProtocolForProxy: @protocol(ImageResizerProtocol)];
     resizer = (ImageResizer *)anObject;
-    RETAIN (resizer);
     [resizer setProxy: self];
     [self addSubview: progView]; 
     [progView start];    
@@ -386,7 +384,6 @@
 - (void)dealloc
 {
   RELEASE (images);
-  [super dealloc];
 }
 
 - (id)initWithFrame:(NSRect)frameRect 

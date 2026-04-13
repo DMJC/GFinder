@@ -51,7 +51,6 @@
   RELEASE (group);
   RELEASE (groupId);
 
-  [super dealloc];
 }
 
 + (FSNode *)nodeWithPath:(NSString *)apath
@@ -79,7 +78,7 @@
 
       parent = aparent;
       ASSIGN (relativePath, rpath);
-      lastPathComponent = [[relativePath lastPathComponent] retain];
+      lastPathComponent = [relativePath lastPathComponent];
       name = nil;
     
       if (parent)
@@ -129,7 +128,6 @@
       application = nil;
                                       
       attributes = [fm fileAttributesAtPath: path traverseLink: NO];
-      RETAIN (attributes);
 
       /* we localize only directories which could be special */
       if ([self isDirectory])
@@ -166,26 +164,25 @@
   return [path isEqualToString: [anode path]];
 }
 
-- (NSArray *)subNodes 
+- (NSArray *)subNodes
 {
-  CREATE_AUTORELEASE_POOL(arp);
-  NSMutableArray *nodes = [NSMutableArray array];
-  NSArray *fnames = [fsnodeRep directoryContentsAtPath: path];
-  NSUInteger i;
+  NSMutableArray *nodes;
+  @autoreleasepool {
+    nodes = [NSMutableArray array];
+    NSArray *fnames = [fsnodeRep directoryContentsAtPath: path];
+    NSUInteger i;
 
-  for (i = 0; i < [fnames count]; i++)
-    {
-      NSString *fname = [fnames objectAtIndex: i];
-      FSNode *node = [[FSNode alloc] initWithRelativePath: fname parent: self];
+    for (i = 0; i < [fnames count]; i++)
+      {
+        NSString *fname = [fnames objectAtIndex: i];
+        FSNode *node = [[FSNode alloc] initWithRelativePath: fname parent: self];
 
-      [nodes addObject: node];
-      RELEASE (node);
-    }
+        [nodes addObject: node];
+        RELEASE (node);
+      }
+  } // @autoreleasepool
 
-  RETAIN (nodes);
-  RELEASE (arp);
-    
-  return [[nodes autorelease] makeImmutableCopyOnFail: NO];
+  return [nodes makeImmutableCopyOnFail: NO];
 }
 
 - (NSArray *)subNodeNames 
@@ -195,28 +192,27 @@
 
 - (NSArray *)subNodesOfParent
 {
-  CREATE_AUTORELEASE_POOL(arp);
-  NSMutableArray *nodes = [NSMutableArray array];
-  NSArray *fnames = [fsnodeRep directoryContentsAtPath: [self parentPath]];
-  FSNode *pnd = nil;
-  NSUInteger i;
-  
-  if (parent != nil) {
-    pnd = [parent parent];
-  }
-  
-  for (i = 0; i < [fnames count]; i++) {
-    NSString *fname = [fnames objectAtIndex: i];
-    FSNode *node = [[FSNode alloc] initWithRelativePath: fname parent: pnd];
+  NSMutableArray *nodes;
+  @autoreleasepool {
+    nodes = [NSMutableArray array];
+    NSArray *fnames = [fsnodeRep directoryContentsAtPath: [self parentPath]];
+    FSNode *pnd = nil;
+    NSUInteger i;
 
-    [nodes addObject: node];
-    RELEASE (node);
-  }
-  
-  RETAIN (nodes);
-  RELEASE (arp);
-    
-  return [[nodes autorelease] makeImmutableCopyOnFail: NO];
+    if (parent != nil) {
+      pnd = [parent parent];
+    }
+
+    for (i = 0; i < [fnames count]; i++) {
+      NSString *fname = [fnames objectAtIndex: i];
+      FSNode *node = [[FSNode alloc] initWithRelativePath: fname parent: pnd];
+
+      [nodes addObject: node];
+      RELEASE (node);
+    }
+  } // @autoreleasepool
+
+  return [nodes makeImmutableCopyOnFail: NO];
 }
 
 - (NSArray *)subNodeNamesOfParent
@@ -226,23 +222,22 @@
 
 + (NSArray *)nodeComponentsToNode:(FSNode *)anode
 {
-  CREATE_AUTORELEASE_POOL(arp);
-  NSArray *pcomps = [self pathComponentsToNode: anode];
-  NSMutableArray *components = [NSMutableArray array];
-  NSUInteger i;
-  
-  for (i = 0; i < [pcomps count]; i++) {
-    NSString *pcomp = [pcomps objectAtIndex: i];
-    FSNode *pnode = (i == 0) ? nil : [components objectAtIndex: (i-1)];
-    FSNode *node = [self nodeWithRelativePath: pcomp parent: pnode];
-    
-    [components insertObject: node atIndex: [components count]];
-  }
-  
-  RETAIN (components);
-  RELEASE (arp);
-  
-  return [[components autorelease] makeImmutableCopyOnFail: NO];
+  NSMutableArray *components;
+  @autoreleasepool {
+    NSArray *pcomps = [self pathComponentsToNode: anode];
+    components = [NSMutableArray array];
+    NSUInteger i;
+
+    for (i = 0; i < [pcomps count]; i++) {
+      NSString *pcomp = [pcomps objectAtIndex: i];
+      FSNode *pnode = (i == 0) ? nil : [components objectAtIndex: (i-1)];
+      FSNode *node = [self nodeWithRelativePath: pcomp parent: pnode];
+
+      [components insertObject: node atIndex: [components count]];
+    }
+  } // @autoreleasepool
+
+  return [components makeImmutableCopyOnFail: NO];
 }
 
 + (NSArray *)pathComponentsToNode:(FSNode *)anode
@@ -255,31 +250,30 @@
 {
   if ([secondNode isSubnodeOfNode: firstNode])
     {
-      CREATE_AUTORELEASE_POOL(arp);
-      NSString *p1 = [firstNode path];
-      NSString *p2 = [secondNode path];
-      NSUInteger index = ([p1 isEqual: path_separator()]) ? [p1 length] : ([p1 length] +1);
-      NSArray *pcomps = [[p2 substringFromIndex: index] pathComponents];
-      NSMutableArray *components = [NSMutableArray array];
-      FSNode *node;
-      NSUInteger i;
-    
-      node = [self nodeWithPath: p1];
-      [components addObject: node];
-    
-      for (i = 0; i < [pcomps count]; i++)
-        {
-          FSNode *pnode = [components objectAtIndex: i];
-          NSString *rpath = [pcomps objectAtIndex: i];
-      
-          node = [self nodeWithRelativePath: rpath parent: pnode];
-          [components insertObject: node atIndex: [components count]];
-        }
-    
-      RETAIN (components);
-      RELEASE (arp);
-    
-      return [[components autorelease] makeImmutableCopyOnFail: NO];
+      NSMutableArray *components;
+      @autoreleasepool {
+        NSString *p1 = [firstNode path];
+        NSString *p2 = [secondNode path];
+        NSUInteger index = ([p1 isEqual: path_separator()]) ? [p1 length] : ([p1 length] +1);
+        NSArray *pcomps = [[p2 substringFromIndex: index] pathComponents];
+        components = [NSMutableArray array];
+        FSNode *node;
+        NSUInteger i;
+
+        node = [self nodeWithPath: p1];
+        [components addObject: node];
+
+        for (i = 0; i < [pcomps count]; i++)
+          {
+            FSNode *pnode = [components objectAtIndex: i];
+            NSString *rpath = [pcomps objectAtIndex: i];
+
+            node = [self nodeWithRelativePath: rpath parent: pnode];
+            [components insertObject: node atIndex: [components count]];
+          }
+      } // @autoreleasepool
+
+      return [components makeImmutableCopyOnFail: NO];
     }
   else if ([secondNode isEqual: firstNode])
     {
@@ -310,18 +304,17 @@
 
 + (NSArray *)pathsOfNodes:(NSArray *)nodes
 {
-  CREATE_AUTORELEASE_POOL(arp);
-  NSMutableArray *paths = [NSMutableArray array];
-  NSUInteger i;
-  
-  for (i = 0; i < [nodes count]; i++) {
-    [paths addObject: [[nodes objectAtIndex: i] path]];
-  }
-  
-  RETAIN (paths);
-  RELEASE (arp);
-  
-  return [[paths autorelease] makeImmutableCopyOnFail: NO];
+  NSMutableArray *paths;
+  @autoreleasepool {
+    paths = [NSMutableArray array];
+    NSUInteger i;
+
+    for (i = 0; i < [nodes count]; i++) {
+      [paths addObject: [[nodes objectAtIndex: i] path]];
+    }
+  } // @autoreleasepool
+
+  return [paths makeImmutableCopyOnFail: NO];
 }
 
 + (NSUInteger)indexOfNode:(FSNode *)anode 
@@ -1043,12 +1036,9 @@
 
 - (NSComparisonResult)compareAccordingToParent:(FSNode *)aNode
 {
-  CREATE_AUTORELEASE_POOL(pool);
   NSString *p1 = [self parentPath];
   NSString *p2 = [aNode parentPath];
-  NSComparisonResult result = [p1 compare: p2];
-  RELEASE (pool);
-  return result;
+  return [p1 compare: p2];
 }
 
 - (NSComparisonResult)compareAccordingToKind:(FSNode *)aNode

@@ -39,7 +39,6 @@
 {
   RELEASE (win);
   RELEASE (pathsArr);
-  [super dealloc];
 }
 
 - (instancetype)initWithNibName:(NSString *)nibName
@@ -51,7 +50,6 @@
       if ([NSBundle loadNibNamed: nibName owner: self] == NO)
         {
           NSLog(@"failed to load %@!", nibName);
-          [self release];
           return nil;
         }
       else

@@ -59,7 +59,6 @@
   RELEASE (charBuffer);
   RELEASE (backColor);
 
-  [super dealloc];
 }
 
 - (id)initWithBaseNode:(FSNode *)bsnode
@@ -445,21 +444,22 @@
 
 - (FSNBrowserColumn *)createEmptyColumn
 {
-  CREATE_AUTORELEASE_POOL(arp);
-  int count = [columns count];
-  FSNBrowserColumn *bc = [[FSNBrowserColumn alloc] initInBrowser: self
-                                       atIndex: count
-                                 cellPrototype: cellPrototype
-                                     cellsIcon: cellsIcon
-                                  nodeInfoType: infoType
-                                  extendedType: extInfoType
-                               backgroundColor: backColor];
-                                     
-  [columns insertObject: bc atIndex: count];
-  [self addSubview: bc]; 
-  RELEASE(bc);
-  RELEASE (arp);
-  	
+  FSNBrowserColumn *bc;
+  @autoreleasepool {
+    int count = [columns count];
+    bc = [[FSNBrowserColumn alloc] initInBrowser: self
+                                         atIndex: count
+                                   cellPrototype: cellPrototype
+                                       cellsIcon: cellsIcon
+                                    nodeInfoType: infoType
+                                    extendedType: extInfoType
+                                 backgroundColor: backColor];
+
+    [columns insertObject: bc atIndex: count];
+    [self addSubview: bc];
+    RELEASE(bc);
+  } // @autoreleasepool
+
   return bc;
 }
 
@@ -582,7 +582,7 @@
 
 - (void)reloadFromColumn:(FSNBrowserColumn *)col
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSInteger index = [col index];
   NSInteger i = 0;
 
@@ -669,7 +669,7 @@
 
   updateViewsLock--;
   [self tile];
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 - (void)reloadFromColumnWithNode:(FSNode *)anode
@@ -1553,8 +1553,8 @@
 
 - (NSMutableDictionary *)updateNodeInfo:(BOOL)ondisk
 {
-  CREATE_AUTORELEASE_POOL(arp);
   NSMutableDictionary *updatedInfo = nil;
+  @autoreleasepool {
 
   if ([baseNode isValid]) {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	      
@@ -1599,9 +1599,9 @@
     }
   }
       
-  RELEASE (arp);
-  
-  return (AUTORELEASE (updatedInfo));
+  } // @autoreleasepool
+
+  return updatedInfo;
 }
 
 - (void)reloadContents

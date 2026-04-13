@@ -77,7 +77,6 @@ static NSString *defaultColumns = @"{ \
   RELEASE (nameEditor);
   RELEASE (lastSelection);
 
-  [super dealloc];
 }
 
 - (id)initForListView:(FSNListView *)aview
@@ -728,9 +727,10 @@ shouldEditTableColumn:(NSTableColumn *)aTableColumn
 
 - (NSMutableDictionary *)updateNodeInfo:(BOOL)ondisk
 {
-  CREATE_AUTORELEASE_POOL(arp);
-  FSNode *infoNode = [self infoNode];
   NSMutableDictionary *updatedInfo = nil;
+
+@autoreleasepool {
+  FSNode *infoNode = [self infoNode];
 
   if ([infoNode isValid])
     {
@@ -789,14 +789,14 @@ shouldEditTableColumn:(NSTableColumn *)aTableColumn
 	}
     }
 
-  RELEASE (arp);
+  } // @autoreleasepool
 
-  return (AUTORELEASE (updatedInfo));
+  return updatedInfo;
 }
 
 - (void)reloadContents
 {
-  CREATE_AUTORELEASE_POOL (pool);
+@autoreleasepool {
   NSMutableArray *selection = [[self selectedNodes] mutableCopy];
   NSMutableArray *opennodes = [NSMutableArray array];
   NSUInteger i, count;
@@ -811,7 +811,6 @@ shouldEditTableColumn:(NSTableColumn *)aTableColumn
 	}
     }
 
-  RETAIN (opennodes);
 
   [self showContentsOfNode: node];
 
@@ -855,7 +854,7 @@ shouldEditTableColumn:(NSTableColumn *)aTableColumn
   RELEASE (selection);
   [self selectionDidChange];
 
-  RELEASE (pool);
+  } // @autoreleasepool
 }
 
 - (void)reloadFromNode:(FSNode *)anode
@@ -2039,7 +2038,6 @@ shouldEditTableColumn:(NSTableColumn *)aTableColumn
   RELEASE (lockedicon);
   RELEASE (spopenicon);
   RELEASE (extInfoStr);
-  [super dealloc];
 }
 
 - (id)initForNode:(FSNode *)anode
@@ -2603,7 +2601,6 @@ NSComparisonResult sortSubviews(id view1, id view2, void *context)
 - (void)dealloc
 {
   RELEASE (node);
-  [super dealloc];
 }
 
 - (void)setNode:(FSNode *)anode
@@ -2657,7 +2654,6 @@ NSComparisonResult sortSubviews(id view1, id view2, void *context)
 {
   RELEASE (charBuffer);
   RELEASE (dsource);
-  [super dealloc];
 }
 
 - (id)initWithFrame:(NSRect)frameRect
@@ -2720,7 +2716,6 @@ NSComparisonResult sortSubviews(id view1, id view2, void *context)
       [dsource setEditorAtRow: row withMouseDownEvent: theEvent];
     }
 
-  [clickTimer release];
   clickTimer = nil;
 }
 
@@ -2729,7 +2724,6 @@ NSComparisonResult sortSubviews(id view1, id view2, void *context)
   if (clickTimer != nil)
     {
       [clickTimer invalidate];
-      [clickTimer release];
       clickTimer = nil;
     }
 

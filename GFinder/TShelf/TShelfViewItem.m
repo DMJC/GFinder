@@ -49,7 +49,6 @@
   RELEASE (color);
   RELEASE (labfont);
   
-  [super dealloc];
 }
 
 - (void)setLabel:(NSString *)labstr

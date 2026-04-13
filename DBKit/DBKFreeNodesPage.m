@@ -34,7 +34,6 @@
   RELEASE (pageData);
   RELEASE (file);
   
-  [super dealloc];
 }
 
 - (id)initInTree:(DBKBTree *)atree
@@ -65,7 +64,7 @@
 
 - (void)gotoLastValidPage
 {
-  CREATE_AUTORELEASE_POOL (pool);
+@autoreleasepool {
   NSData *data;
   unsigned long count;
     
@@ -95,7 +94,7 @@
   count = (nodesCount > 0) ? (nodesCount - 1) : nodesCount;
   lastNodeRange = NSMakeRange(headlen + (count * llen), llen);
 
-  RELEASE (pool);  
+  } // @autoreleasepool  
 }
 
 - (NSData *)dataOfPageAtOffset:(unsigned long)offset
@@ -114,19 +113,19 @@
 
 - (void)writeCurrentPage
 {
-  CREATE_AUTORELEASE_POOL (pool);
+@autoreleasepool {
   NSData *data = [pageData copy];
 
   [file writeData: data
          atOffset: [NSNumber numberWithUnsignedLong: currOffset]];
   
   RELEASE (data);
-  RELEASE (pool);
+  } // @autoreleasepool
 }
 
 - (void)addFreeOffset:(unsigned long)offset
 {
-  CREATE_AUTORELEASE_POOL (arp);
+@autoreleasepool {
   unsigned long nodeofs;
   
   [pageData getBytes: &nodeofs range: lastNodeRange];
@@ -160,7 +159,7 @@
   [pageData replaceBytesInRange: NSMakeRange(llen * 3, llen) 
                       withBytes: &nodesCount];
                       
-  RELEASE (arp);                      
+  } // @autoreleasepool                      
 }
 
 - (unsigned long)getFreeOffset
@@ -168,7 +167,7 @@
   unsigned long offset = 0;
   
   if (nodesCount > 0) {
-    CREATE_AUTORELEASE_POOL (arp);
+@autoreleasepool {
   
     [pageData getBytes: &offset range: lastNodeRange];
     [pageData resetBytesInRange: lastNodeRange];
@@ -200,7 +199,7 @@
       }
     } 
     
-    RELEASE (arp); 
+  } // @autoreleasepool 
   }
     
   return offset;

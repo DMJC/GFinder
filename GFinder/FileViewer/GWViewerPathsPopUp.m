@@ -76,7 +76,6 @@
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-  RETAIN (self);
 
   closeViewer = (([theEvent modifierFlags] == NSAlternateKeyMask)
 		 || ([theEvent modifierFlags] == NSControlKeyMask));

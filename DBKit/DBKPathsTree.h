@@ -31,7 +31,7 @@
 
 typedef struct _pcomp
 {
-  id name;
+  __unsafe_unretained id name;
   struct _pcomp **subcomps;
   unsigned sub_count;
   unsigned capacity;

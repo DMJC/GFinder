@@ -57,7 +57,6 @@ static NSString *nibName = @"FModuleName";
 {
   RELEASE (controlsBox);
   RELEASE (searchStr);
-  [super dealloc];
 }
 
 - (id)initInterface
@@ -73,7 +72,6 @@ static NSString *nibName = @"FModuleName";
 	  return self;
 	}
 
-      RETAIN (controlsBox);
       RELEASE (win);
 
       used = NO;
@@ -180,12 +178,13 @@ static NSString *nibName = @"FModuleName";
   return nil;
 }
 
-- (BOOL)checkPath:(NSString *)path 
+- (BOOL)checkPath:(NSString *)path
    withAttributes:(NSDictionary *)attributes
 {
-  CREATE_AUTORELEASE_POOL(pool);
-  NSString *fname = [path lastPathComponent];
   BOOL pathok = NO;
+
+@autoreleasepool {
+  NSString *fname = [path lastPathComponent];
   
   switch(how) {
     case IS:
@@ -209,7 +208,7 @@ static NSString *nibName = @"FModuleName";
       break;
   }
   
-  RELEASE (pool);
+  } // @autoreleasepool
   
   return pathok;
 }

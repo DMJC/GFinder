@@ -134,7 +134,6 @@ static NSMutableCharacterSet *skipSet = nil;
   RELEASE (editorBox);
   RELEASE (editorInfo);
     
-  [super dealloc];
 }
 
 - (id)initForAttribute:(MDKAttribute *)attr
@@ -156,12 +155,8 @@ static NSMutableCharacterSet *skipSet = nil;
     int editmode = [[info objectForKey: @"value_edit"] intValue];
     unsigned i;
     
-    RETAIN (editorBox);
-    RETAIN (valueBox);
-    RETAIN (firstValueBox);
     [firstValueBox removeFromSuperview];
     [firstValueBox setFrameOrigin: VAL_ORIG];    
-    RETAIN (secondValueBox);
     [secondValueBox removeFromSuperview];
     [secondValueBox setFrameOrigin: VAL_ORIG];
     RELEASE (win);
@@ -444,7 +439,6 @@ static NSMutableCharacterSet *skipSet = nil;
 
 - (void)dealloc
 {    
-  [super dealloc];
 }
 
 - (id)initForAttribute:(MDKAttribute *)attr
@@ -639,7 +633,7 @@ static NSMutableCharacterSet *skipSet = nil;
                              options: NSLiteralSearch
                                range: NSMakeRange(0, [mstr length])];
   
-    return [mstr autorelease];
+    return mstr;
   }
   
   return nil;
@@ -652,7 +646,6 @@ static NSMutableCharacterSet *skipSet = nil;
 
 - (void)dealloc
 {
-  [super dealloc];
 }
 
 - (id)initForAttribute:(MDKAttribute *)attr
@@ -761,7 +754,6 @@ static NSMutableCharacterSet *skipSet = nil;
 
 - (void)dealloc
 {
-  [super dealloc];
 }
 
 - (id)initForAttribute:(MDKAttribute *)attr
@@ -915,7 +907,6 @@ static NSString *calformat = @"%m %d %Y";
 
 - (void)dealloc
 {
-  [super dealloc];
 }
 
 - (id)initForAttribute:(MDKAttribute *)attr
@@ -1185,7 +1176,6 @@ static NSString *calformat = @"%m %d %Y";
   RELEASE (textContentWords);
   RELEASE (skipSet);
   
-  [super dealloc];
 }
 
 - (id)initWithSearchField:(NSTextField *)field
@@ -1236,7 +1226,7 @@ static NSString *calformat = @"%m %d %Y";
   wordsChanged = NO;
     
   if ([str length]) {
-    CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
     NSScanner *scanner = [NSScanner scannerWithString: str];
     NSMutableArray *words = [NSMutableArray array];
         
@@ -1261,7 +1251,7 @@ static NSString *calformat = @"%m %d %Y";
       wordsChanged = YES;
     }      
     
-    RELEASE (arp);
+  } // @autoreleasepool
     
   } else {
     ASSIGN (textContentWords, [NSArray array]);

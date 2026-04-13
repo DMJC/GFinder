@@ -38,7 +38,6 @@ static NSString *nibName = @"MDKAttributeView";
   RELEASE (mainBox);
   RELEASE (usedAttributesNames);
   RELEASE (otherstr);
-  [super dealloc];
 }
   
 - (id)initInWindow:(MDKWindow *)awindow
@@ -58,7 +57,6 @@ static NSString *nibName = @"MDKAttributeView";
       return self;
     }
 
-    RETAIN (mainBox);
     RELEASE (win);
 
     impath = [bundle pathForResource: @"add" ofType: @"tiff"];

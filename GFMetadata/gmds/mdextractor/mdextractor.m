@@ -207,7 +207,6 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
   TEST_RELEASE (notificationsTimer);
   RELEASE (notifDate);
     
-  [super dealloc];
 }
 
 - (id)init
@@ -233,7 +232,6 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
     errpath = [dbdir stringByAppendingPathComponent: @"error.log"];
         
     dbdir = [dbdir stringByAppendingPathComponent: db_version];
-    RETAIN (dbdir);
     ASSIGN (dbpath, [dbdir stringByAppendingPathComponent: @"contents.db"]);    
     
     sqlite = [SQLite new];
@@ -254,7 +252,6 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
       [fm createFileAtPath: errpath contents: nil attributes: nil];
     }
     errHandle = [NSFileHandle fileHandleForWritingAtPath: errpath];
-    RETAIN (errHandle);
 
 
     conn = [NSConnection defaultConnection];
@@ -346,7 +343,7 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
 
 - (void)indexedDirectoriesChanged:(NSNotification *)notification
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSDictionary *info = [notification userInfo];
   NSArray *indexable = [info objectForKey: @"GSMetadataIndexablePaths"];
   NSArray *excluded = [info objectForKey: @"GSMetadataExcludedPaths"];
@@ -439,7 +436,7 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
     [self stopExtracting];
   }
     
-  RELEASE (arp);    
+  } // @autoreleasepool    
 }
 
 - (BOOL)synchronizePathsStatus:(BOOL)onstart
@@ -578,7 +575,7 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
 - (void)writePathsStatus:(id)sender
 {
   if (indexedStatusPath) {
-    CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
     NSMutableArray *status = [NSMutableArray array];
     unsigned i;
     
@@ -608,7 +605,7 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
 
       if (sleeps >= 10) {
         NSLog(@"Unable to obtain lock %@", indexedStatusLock);
-        RELEASE (arp);
+  } // @autoreleasepool
         return;
 	    }
     }
@@ -622,7 +619,7 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
     
     GWDebugLog(@"paths status updated"); 
     
-    RELEASE (arp);
+  } // @autoreleasepool
   }
 }
 
@@ -740,7 +737,6 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
                                    selector: @selector(writePathsStatus:) 
 																   userInfo: nil 
                                     repeats: YES];
-  RETAIN (statusTimer);
     
   while (1) {  
     if (index < [indexablePaths count]) {
@@ -748,7 +744,6 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
       NSArray *subpaths = [indpath subpaths];
       BOOL indexed = [indpath indexed];
       
-      RETAIN (indpath);
       
       if (indexed == NO) {
         if ([self extractFromPath: indpath] == NO) {
@@ -764,7 +759,6 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
         for (i = 0; i < [subpaths count]; i++) {
           GMDSIndexablePath *subpath = [subpaths objectAtIndex: i];
           
-          RETAIN (subpath);
           
           if ([subpath indexed] == NO) {
             if ([self extractFromPath: subpath] == NO) {
@@ -866,7 +860,7 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
     enumerator = [fm enumeratorAtPath: path];
 
     while (1) {
-      CREATE_AUTORELEASE_POOL(arp); 
+@autoreleasepool { 
       NSString *entry = [enumerator nextObject];
       NSDate *date = [NSDate dateWithTimeIntervalSinceNow: 0.001];
       BOOL skip = NO;
@@ -955,13 +949,13 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
         }
 
       } else {
-        RELEASE (arp);
+  } // @autoreleasepool
         break;
       }
 
       if (extracting == NO) {
         GWDebugLog(@"stopped"); 
-        RELEASE (arp);
+  } // @autoreleasepool
         break;
       }
 
@@ -1434,7 +1428,6 @@ do { \
   RELEASE (subpaths);
   TEST_RELEASE (ancestor);
   
-  [super dealloc];
 }
 
 - (id)initWithPath:(NSString *)apath
@@ -1618,7 +1611,7 @@ do { \
 
 int main(int argc, char** argv)
 {
-  CREATE_AUTORELEASE_POOL(pool);
+@autoreleasepool {
   NSProcessInfo *info = [NSProcessInfo processInfo];
   NSMutableArray *args = AUTORELEASE ([[info arguments] mutableCopy]);
   BOOL subtask = YES;
@@ -1650,20 +1643,20 @@ int main(int argc, char** argv)
     exit(EXIT_FAILURE);
   }
   
-  RELEASE(pool);
+  } // @autoreleasepool
 
   {
-    CREATE_AUTORELEASE_POOL (pool);
+@autoreleasepool {
 	  GMDSExtractor *extractor;
     
     [NSApplication sharedApplication];
     extractor = [GMDSExtractor new];
-    RELEASE (pool);
+  } // @autoreleasepool
 
     if (extractor != nil) {
-	    CREATE_AUTORELEASE_POOL (pool);
+@autoreleasepool {
       [[NSRunLoop currentRunLoop] run];
-  	  RELEASE (pool);
+  } // @autoreleasepool
     }
   }
     
@@ -1726,7 +1719,6 @@ NSString *path_separator(void)
       separator = @"/";	
     #endif
 
-    RETAIN (separator);
   }
 
   return separator;

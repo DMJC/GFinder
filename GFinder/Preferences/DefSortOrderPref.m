@@ -38,7 +38,6 @@ static NSString *nibName = @"DefSortOrderPref";
 - (void)dealloc
 {
   RELEASE (prefbox);
-  [super dealloc];
 }
 
 - (id)init
@@ -48,7 +47,6 @@ static NSString *nibName = @"DefSortOrderPref";
 		if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
       NSLog(@"failed to load %@!", nibName);
     } else {
-      RETAIN (prefbox);
       RELEASE (win);
 
 		  sortType = [[FSNodeRep sharedInstance] defaultSortOrder];

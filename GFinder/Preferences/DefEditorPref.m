@@ -47,7 +47,6 @@ static NSString *nibName = @"DefEditorPref";
   RELEASE (ednode);
   RELEASE (noEditorStr);
   RELEASE (font);
-  [super dealloc];
 }
 
 - (id)init
@@ -64,7 +63,6 @@ static NSString *nibName = @"DefEditorPref";
 	    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];   
       NSString *editor = [defaults stringForKey: @"defaulteditor"];
       
-      RETAIN (prefbox);
       iconBoxWidth = [iconbox bounds].size.width;
       labelHeight = [nameLabel frame].size.height;
       labelOrigin = [nameLabel frame].origin;      

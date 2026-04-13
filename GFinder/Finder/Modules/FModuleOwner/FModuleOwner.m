@@ -55,7 +55,6 @@ static NSString *nibName = @"FModuleOwner";
 {
   RELEASE (controlsBox);
   RELEASE (owner);
-  [super dealloc];
 }
 
 - (id)initInterface
@@ -69,7 +68,6 @@ static NSString *nibName = @"FModuleOwner";
       return self;
     }
 
-    RETAIN (controlsBox);
     RELEASE (win);
 
     used = NO;

@@ -51,7 +51,6 @@ BOOL isDotFile(NSString *path);
   TEST_RELEASE (errorLogPath);
   TEST_RELEASE (errorWindow);
   
-  [super dealloc];
 }
 
 - (void)mainViewDidLoad
@@ -122,7 +121,7 @@ BOOL isDotFile(NSString *path);
 
     excludedMatrix = [[NSMatrix alloc] initWithFrame: NSMakeRect(0, 0, 100, 100)
                                                 mode: NSRadioModeMatrix 
-                                           prototype: [[NSBrowserCell new] autorelease]
+                                           prototype: [NSBrowserCell new]
                                         numberOfRows: 0 
                                      numberOfColumns: 0];
     [excludedMatrix setIntercellSpacing: NSZeroSize];
@@ -155,7 +154,7 @@ BOOL isDotFile(NSString *path);
 
     suffixMatrix = [[NSMatrix alloc] initWithFrame: NSMakeRect(0, 0, 100, 100)
                                               mode: NSRadioModeMatrix 
-                                         prototype: [[NSBrowserCell new] autorelease]
+                                         prototype: [NSBrowserCell new]
                                       numberOfRows: 0 
                                    numberOfColumns: 0];
     [suffixMatrix setIntercellSpacing: NSZeroSize];
@@ -788,7 +787,6 @@ return; \
     
     if (mdextractor) {
       [mdextractor setProtocolForProxy: @protocol(MDExtractorProtocol)];
-      RETAIN (mdextractor);
     
 	    [[NSNotificationCenter defaultCenter] addObserver: self
 	                   selector: @selector(mdextractorConnectionDidDie:)
@@ -845,7 +843,6 @@ return; \
                                      selector: @selector(readIndexedPathsStatus:) 
 																     userInfo: nil 
                                       repeats: YES];
-    RETAIN (statusTimer);
   }
 }
 
@@ -875,7 +872,7 @@ return; \
 
 - (void)readIndexedPathsStatus:(id)sender
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
 
   if (indexedStatusPath && [fm isReadableFileAtPath: indexedStatusPath]) {
     NSArray *status = nil;
@@ -906,7 +903,7 @@ return; \
 
       if (sleeps >= 10) {
         NSLog(@"Unable to obtain lock %@", indexedStatusLock);
-        RELEASE (arp);
+  } // @autoreleasepool
         return;
 	    }
     }
@@ -976,7 +973,7 @@ return; \
     }
   }
   
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 - (void)windowWillClose:(NSNotification *)aNotification
@@ -1058,7 +1055,7 @@ return; \
 
 - (void)applyChanges
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSUserDefaults *defaults;
   NSMutableDictionary *domain;
   NSMutableDictionary *info;
@@ -1089,7 +1086,7 @@ return; \
 	 								   object: nil 
                    userInfo: info];
 
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 //

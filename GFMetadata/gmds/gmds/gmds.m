@@ -217,7 +217,6 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
   RELEASE (dbdir);
   RELEASE (touchQueries);
   
-  [super dealloc];
 }
 
 - (id)init
@@ -260,7 +259,6 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
       }
     }
     
-    RETAIN (dbdir);
     ASSIGN (dbpath, [dbdir stringByAppendingPathComponent: @"contents.db"]);    
     db = NULL;
 
@@ -309,7 +307,7 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
             shouldMakeNewConnection:(NSConnection *)newConnnection
 {
   if ([clientInfo objectForKey: @"connection"] == nil) {
-    CREATE_AUTORELEASE_POOL(pool); 
+@autoreleasepool { 
     NSProcessInfo *info = [NSProcessInfo processInfo];
     NSMutableArray *args = [[info arguments] mutableCopy];
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -349,7 +347,7 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
     [task launch];
     RELEASE (task);
 
-    RELEASE (pool);
+  } // @autoreleasepool
     
     [clientInfo setObject: newConnnection forKey: @"connection"];
     
@@ -408,7 +406,7 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
 
 - (BOOL)performSubquery:(NSString *)query
 {
-  CREATE_AUTORELEASE_POOL(pool); 
+@autoreleasepool { 
   const char *qbuff = [query UTF8String];
   struct sqlite3_stmt *stmt;
   int err;
@@ -423,12 +421,12 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
         break;
 
       } else if (err == SQLITE_BUSY) {
-        CREATE_AUTORELEASE_POOL(arp); 
+@autoreleasepool { 
         NSDate *when = [NSDate dateWithTimeIntervalSinceNow: 0.1];
 
         [NSThread sleepUntilDate: when];
         GWDebugLog(@"retry %i", retry);
-        RELEASE (arp);
+  } // @autoreleasepool
 
         if (retry++ > MAX_RETRY) {
           NSLog(@"%s", sqlite3_errmsg(db));
@@ -444,7 +442,7 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
     sqlite3_finalize(stmt);
   }
   
-  RELEASE (pool);
+  } // @autoreleasepool
     
   return (err == SQLITE_DONE);
 }
@@ -486,7 +484,7 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
 
 - (oneway void)performQuery:(NSDictionary *)queryInfo
 {
-  CREATE_AUTORELEASE_POOL(pool); 
+@autoreleasepool { 
   NSArray *prequeries = [queryInfo objectForKey: @"pre"];
   BOOL prepared = YES;
   NSString *query = [queryInfo objectForKey: @"join"];
@@ -560,12 +558,12 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
           break;
 
         } else if (err == SQLITE_BUSY) {
-          CREATE_AUTORELEASE_POOL(arp); 
+@autoreleasepool { 
           NSDate *when = [NSDate dateWithTimeIntervalSinceNow: 0.1];
 
           [NSThread sleepUntilDate: when];
           GWDebugLog(@"retry %i", retry);
-          RELEASE (arp);
+  } // @autoreleasepool
 
           if (retry++ > MAX_RETRY) {
             NSLog(@"%s", sqlite3_errmsg(db));
@@ -591,13 +589,13 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
   
   [self endOfQueryWithNumber: queryNumber];
   
-  RELEASE (pool);
+  } // @autoreleasepool
 }
 
 - (BOOL)sendResults:(NSArray *)lines
            forQueryWithNumber:(NSNumber *)qnum
 {
-  CREATE_AUTORELEASE_POOL(arp); 
+@autoreleasepool { 
   id client = [clientInfo objectForKey: @"client"];
   NSDictionary *results;
   BOOL accepted;
@@ -605,7 +603,7 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
   results = [NSDictionary dictionaryWithObjectsAndKeys: qnum, @"qnumber",
                                                         lines, @"lines", nil];  
   accepted = [client queryResults: [NSArchiver archivedDataWithRootObject: results]];    
-  RELEASE (arp);
+  } // @autoreleasepool
   
   return accepted;
 }
@@ -672,7 +670,7 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
 - (void)touchTables:(id)sender
 {
   if ([self isBaseServer]) {
-    CREATE_AUTORELEASE_POOL(pool);   
+@autoreleasepool {   
     const char *query = [[touchQueries objectAtIndex: touchind] UTF8String];
     NSDate *date = [NSDate date];
     char *err;
@@ -696,7 +694,7 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
       touchind = 0;
     }
 
-    RELEASE (pool);
+  } // @autoreleasepool
   }
 }
 
@@ -731,7 +729,7 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
 
 int main(int argc, char** argv)
 {
-  CREATE_AUTORELEASE_POOL(pool);
+@autoreleasepool {
   NSProcessInfo *info = [NSProcessInfo processInfo];
   NSMutableArray *args = AUTORELEASE ([[info arguments] mutableCopy]);
 
@@ -764,18 +762,18 @@ int main(int argc, char** argv)
         exit(EXIT_FAILURE);
     }
     
-  RELEASE(pool);
+  } // @autoreleasepool
 
   {
-    CREATE_AUTORELEASE_POOL (pool);
+@autoreleasepool {
     GMDS *gmds = [[GMDS alloc] init];
-    RELEASE (pool);
+  } // @autoreleasepool
   
     if (gmds != nil)
       {
-        CREATE_AUTORELEASE_POOL (pool);
+@autoreleasepool {
         [[NSRunLoop currentRunLoop] run];
-        RELEASE (pool);
+  } // @autoreleasepool
       }
   }
     

@@ -56,7 +56,7 @@
   self = [super initWithFrame: aFrame];
   if (self)
     {
-      cell =  [[[FSNTextCell alloc] init] autorelease];
+      cell =  [[FSNTextCell alloc] init];
       [cell setDrawsBackground: YES];
       [self setCell: cell];
     }
@@ -84,7 +84,6 @@
   RELEASE (textColor);
   RELEASE (disabledTextColor);
 
-  [super dealloc];
 }
 
 - (id)initWithFrame:(NSRect)frameRect

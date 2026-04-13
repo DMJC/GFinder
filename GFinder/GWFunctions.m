@@ -76,7 +76,6 @@ NSString *systemRoot()
       root = @"/";	
     #endif
 
-    RETAIN (root);
   }
 
   return root;

@@ -69,7 +69,6 @@
   RELEASE (imagePath);
   RELEASE (dragIcon);
 
-  [super dealloc];
 }
 
 - (id)initForManager:(id)mngr
@@ -482,7 +481,6 @@
 
 - (NSImage *)tshelfBackground
 {
-  CREATE_AUTORELEASE_POOL (pool);
   NSSize size = NSMakeSize([self frame].size.width, 112);
   NSImage *image = [[NSImage alloc] initWithSize: size];
 
@@ -492,11 +490,7 @@
 	     NSMakePoint(0.0, 0.0));
   [image unlockFocus];
 
-  RETAIN (image);
-  RELEASE (image);
-  RELEASE (pool);
-
-  return AUTORELEASE(image);
+  return image;
 }
 
 - (void)getDesktopInfo
@@ -528,7 +522,7 @@
       entry = [dskinfo objectForKey: @"imagepath"];
       if (entry)
 	{
-	  CREATE_AUTORELEASE_POOL (pool);
+@autoreleasepool {
 	  NSImage *image = [[NSImage alloc] initWithContentsOfFile: entry];
 
 	  if (image)
@@ -538,7 +532,7 @@
 	      RELEASE (image);
 	    }
 
-	  RELEASE (pool);
+  } // @autoreleasepool
 	}
 
       entry = [dskinfo objectForKey: @"usebackimage"];
@@ -841,7 +835,7 @@ static void GWHighlightFrameRect(NSRect aRect)
 
   while ([theEvent type] != NSLeftMouseUp)
     {
-      CREATE_AUTORELEASE_POOL (arp);
+@autoreleasepool {
 
       theEvent = [[self window] nextEventMatchingMask: eventMask];
 
@@ -886,7 +880,7 @@ static void GWHighlightFrameRect(NSRect aRect)
       [[self window] flushWindow];
       [[self window] disableFlushWindow];
 
-      DESTROY (arp);
+      } // @autoreleasepool
     }
 
   [self unlockFocus];
@@ -1070,7 +1064,7 @@ static void GWHighlightFrameRect(NSRect aRect)
 
 - (void)showContentsOfNode:(FSNode *)anode
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSArray *subNodes = [anode subNodes];
   NSMutableArray *unsorted = [NSMutableArray array];
   NSDictionary *indexes = [desktopInfo objectForKey: @"indexes"];
@@ -1154,7 +1148,7 @@ static void GWHighlightFrameRect(NSRect aRect)
 
   [self tile];
   [self setNeedsDisplay: YES];
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 - (void)nodeContentsDidChange:(NSDictionary *)info
@@ -1419,7 +1413,6 @@ static void GWHighlightFrameRect(NSRect aRect)
 
 - (id)addRepForSubnode:(FSNode *)anode
 {
-  CREATE_AUTORELEASE_POOL(arp);
   GWDesktopIcon *icon = [[GWDesktopIcon alloc] initForNode: anode
                                         nodeInfoType: infoType
                                         extendedType: extInfoType
@@ -1435,9 +1428,6 @@ static void GWHighlightFrameRect(NSRect aRect)
   [icon setGridIndex: [self firstFreeGridIndex]];
   [icons addObject: icon];
   [self addSubview: icon];
-  RELEASE (icon);
-  RELEASE (arp);
-
   return icon;
 }
 
@@ -1845,7 +1835,7 @@ static void GWHighlightFrameRect(NSRect aRect)
 
 NSComparisonResult sortDragged(id icn1, id icn2, void *context)
 {
-  NSArray *indexes = (NSArray *)context;
+  NSArray *indexes = (__bridge NSArray *)context;
   NSUInteger pos1 = [icn1 gridIndex];
   NSUInteger pos2 = [icn2 gridIndex];
   NSUInteger i;
@@ -2093,7 +2083,7 @@ NSComparisonResult sortDragged(id icn1, id icn2, void *context)
 
 - (void)setBackImageAtPath:(NSString *)impath
 {
-  CREATE_AUTORELEASE_POOL (pool);
+@autoreleasepool {
   NSImage *image = [[NSImage alloc] initWithContentsOfFile: impath];
 
   if (image)
@@ -2103,7 +2093,7 @@ NSComparisonResult sortDragged(id icn1, id icn2, void *context)
       RELEASE (image);
       [self setNeedsDisplay: YES];
     }
-  RELEASE (pool);
+  } // @autoreleasepool
 }
 
 - (BOOL)useBackImage

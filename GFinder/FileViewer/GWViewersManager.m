@@ -52,7 +52,6 @@ static GWViewersManager *vwrsmanager = nil;
   RELEASE (viewers);
   RELEASE (bviewerHelp);
     
-  [super dealloc];
 }
 
 - (id)init

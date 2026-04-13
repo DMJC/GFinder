@@ -31,7 +31,6 @@
 - (void)dealloc
 {
   RELEASE (extensions);
-	[super dealloc];
 }
 
 - (id)initForExtractor:(id)extr
@@ -63,7 +62,7 @@
                        withID:(int)path_id
                    attributes:(NSDictionary *)attributes
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSMutableDictionary *mddict = [NSMutableDictionary dictionary];
   NSMutableDictionary *imageInfo = [NSMutableDictionary dictionary];
   BOOL success = YES;
@@ -79,7 +78,7 @@
       /* mdextractor needs this empty "words" dictionary to let 
          a trigger to fire when updating a path. (see dbschema.h) */
       NSMutableDictionary *wordsDict = [NSMutableDictionary dictionary];
-      NSCountedSet *wordset = [[[NSCountedSet alloc] initWithCapacity: 1] autorelease];
+      NSCountedSet *wordset = [[NSCountedSet alloc] initWithCapacity: 1];
 
       [wordsDict setObject: wordset forKey: @"wset"];
       [wordsDict setObject: [NSNumber numberWithUnsignedLong: 0L] 
@@ -91,7 +90,7 @@
     success = [extractor setMetadata: mddict forPath: path withID: path_id];
   }
   
-  RELEASE (arp);
+  } // @autoreleasepool
   
   return success;
 }

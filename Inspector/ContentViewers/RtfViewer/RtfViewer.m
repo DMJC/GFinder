@@ -35,7 +35,6 @@
   RELEASE (scrollView);
   RELEASE (errLabel);
   TEST_RELEASE (editPath);	
-  [super dealloc];
 }
 
 - (id)initWithFrame:(NSRect)frameRect
@@ -127,7 +126,7 @@
 
 - (void)displayPath:(NSString *)path
 {
-  CREATE_AUTORELEASE_POOL (pool);
+@autoreleasepool {
   NSString *ext = [[path pathExtension] lowercaseString];
   NSData *data = nil;
   NSString *s = nil;
@@ -210,7 +209,7 @@
 	}
     }
   
-  RELEASE (pool);
+  } // @autoreleasepool
 }
 
 - (void)displayData:(NSData *)data 

@@ -40,7 +40,6 @@
   RELEASE (cacheDict);
   RELEASE (offsets);
             
-  [super dealloc];
 }
 
 - (id)initWithPath:(NSString *)path
@@ -100,7 +99,6 @@
       llen = sizeof(unsigned long);
 
       handle = [NSFileHandle fileHandleForUpdatingAtPath: recordsPath];
-      RETAIN (handle);
       
       [data setLength: FIRST_OFFSET];
       [handle writeData: data];
@@ -139,7 +137,7 @@
   int i;
 
   for (i = 0; i < [offsets count]; i++) {
-    CREATE_AUTORELEASE_POOL (arp);
+@autoreleasepool {
     NSNumber *offset = [offsets objectAtIndex: i];
     NSData *dictdata = [cacheDict objectForKey: offset];
     unsigned datalen = [dictdata length];  
@@ -158,7 +156,7 @@
       eof = ofst;
     }
     
-    RELEASE (arp);
+  } // @autoreleasepool
   }
   
   [cacheDict removeAllObjects];
@@ -216,7 +214,7 @@
     [offsets removeObject: offset];
 
   } else {
-    CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
     unsigned long ofst = [offset unsignedLongValue];
     NSData *lndata;
     unsigned datalen;
@@ -232,7 +230,7 @@
     [freeOffsetsTree insertKey: entry];  
     [freeOffsetsTree end];  
         
-    RELEASE (arp);
+  } // @autoreleasepool
   }
 }
 
@@ -259,73 +257,71 @@
 
 - (int)insertionIndexForOffset:(NSNumber *)offset
 {
-  CREATE_AUTORELEASE_POOL(arp);
-  unsigned count = [offsets count]; 
   int ins = 0;
-  
-  if (count) {
-    NSNumber *ofst = nil;
-    int first = 0;
-    int last = count;
-    int pos = 0; 
-    NSComparisonResult result;
 
-    while (1) {
-      if (first == last) {
-        ins = first;
-        break;
+  @autoreleasepool {
+    unsigned count = [offsets count];
+
+    if (count) {
+      NSNumber *ofst = nil;
+      int first = 0;
+      int last = count;
+      int pos = 0;
+      NSComparisonResult result;
+
+      while (1) {
+        if (first == last) {
+          ins = first;
+          break;
+        }
+
+        pos = (first + last) / 2;
+        ofst = [offsets objectAtIndex: pos];
+
+        result = [ofst compare: offset];
+
+        if (result == NSOrderedSame) {
+          return -1;
+        } else if (result == NSOrderedAscending) {
+          first = pos + 1;
+        } else {
+          last = pos;
+        }
       }
+    }
+  } // @autoreleasepool
 
-      pos = (first + last) / 2;
-      ofst = [offsets objectAtIndex: pos];
-      
-      result = [ofst compare: offset];
-
-      if (result == NSOrderedSame) {
-        RELEASE (arp);
-        return -1;
-        
-      } else if (result == NSOrderedAscending) { 
-        first = pos + 1;
-      } else {
-        last = pos;	
-      }
-    } 
-  } 
-  
-  RELEASE (arp);
-    
-  return ins;  
+  return ins;
 }
 
 - (NSNumber *)freeOffsetForData:(NSData *)data
 {
-  CREATE_AUTORELEASE_POOL(arp);
-  DBKBFreeNodeEntry *entry = [DBKBFreeNodeEntry entryWithLength: [data length] atOffset: 0];
-  DBKBFreeNodeEntry *freeEntry = nil;
   NSNumber *offset = nil;
-  DBKBTreeNode *node;
-  BOOL exists;
-  NSUInteger index;
-  
-  [freeOffsetsTree begin];
-    
-  node = [freeOffsetsTree nodeOfKey: entry getIndex: &index didExist: &exists];
-  
-  if (node && [[node keys] count]) {
-    freeEntry = [node successorKeyInNode: &node forKeyAtIndex: index];
-  } 
 
-  if (freeEntry) {
-    offset = RETAIN ([freeEntry offsetNum]);
-    [freeOffsetsTree deleteKey: freeEntry];
-  }
+  @autoreleasepool {
+    DBKBFreeNodeEntry *entry = [DBKBFreeNodeEntry entryWithLength: [data length] atOffset: 0];
+    DBKBFreeNodeEntry *freeEntry = nil;
+    DBKBTreeNode *node;
+    BOOL exists;
+    NSUInteger index;
 
-  [freeOffsetsTree end];
-  
-  RELEASE (arp);
-  
-  return AUTORELEASE (offset);
+    [freeOffsetsTree begin];
+
+    node = [freeOffsetsTree nodeOfKey: entry getIndex: &index didExist: &exists];
+
+    if (node && [[node keys] count]) {
+      freeEntry = [node successorKeyInNode: &node forKeyAtIndex: index];
+    }
+
+    if (freeEntry) {
+      offset = [freeEntry offsetNum];
+      [freeOffsetsTree deleteKey: freeEntry];
+    }
+
+    [freeOffsetsTree end];
+  } // @autoreleasepool
+
+  return offset;
 }
 
 
@@ -352,7 +348,7 @@
   range.length = llen;
 
   for (i = 0; i < kcount; i++) {
-    CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
     DBKBFreeNodeEntry *entry;
     unsigned long length;
     unsigned long offset;
@@ -366,7 +362,7 @@
     [keys addObject: entry];
     RELEASE (entry);
     
-    RELEASE (arp);
+  } // @autoreleasepool
   }
   
   *dlen = range.location;
@@ -376,26 +372,22 @@
 
 - (NSData *)dataFromKeys:(NSArray *)keys
 {
-  CREATE_AUTORELEASE_POOL(arp);
   NSMutableData *data = [NSMutableData dataWithCapacity: 1];
   unsigned kcount = [keys count];
   unsigned i;
-  
+
   [data appendData: [NSData dataWithBytes: &kcount length: ulen]];
-    
+
   for (i = 0; i < kcount; i++) {
     DBKBFreeNodeEntry *entry = [keys objectAtIndex: i];
     unsigned long length = [entry length];
     unsigned long offset = [entry offset];
-  
+
     [data appendData: [NSData dataWithBytes: &length length: llen]];
     [data appendData: [NSData dataWithBytes: &offset length: llen]];
   }
-  
-  RETAIN (data);
-  RELEASE (arp);
-    
-  return [data autorelease];  
+
+  return data;
 }
 
 - (NSComparisonResult)compareNodeKey:(id)akey 
@@ -419,7 +411,6 @@
 {
   RELEASE (lengthNum);
   RELEASE (offsetNum);      
-  [super dealloc];
 }
 
 + (id)entryWithLength:(unsigned long)len

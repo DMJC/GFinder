@@ -31,7 +31,6 @@
 - (void)dealloc
 {
   TEST_RELEASE (icon);  
-  [super dealloc];
 }
 
 - (id)init

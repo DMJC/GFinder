@@ -67,7 +67,6 @@ static NSString *lsfname = @"LiveSearch.lsf";
   RELEASE (elementsStr);
   DESTROY (conn);
         
-  [super dealloc];
 }
 
 - (id)init
@@ -344,13 +343,13 @@ static NSString *lsfname = @"LiveSearch.lsf";
   [progView start];
   
   [tool setProtocolForProxy: @protocol(SearchToolProtocol)];
-  searchtool = (id <SearchToolProtocol>)[tool retain];
+  searchtool = (id <SearchToolProtocol>)tool;
   [searchtool searchWithInfo: info];  
 }
                             
 - (void)nextResult:(NSString *)path
 {
-  CREATE_AUTORELEASE_POOL(pool);
+@autoreleasepool {
   FSNode *node = [FSNode nodeWithPath: path];
 
   [foundObjects addObject: node];
@@ -361,7 +360,7 @@ static NSString *lsfname = @"LiveSearch.lsf";
 
   [elementsLabel setStringValue: [NSString stringWithFormat: @"%lu %@", 
                                            (unsigned long)[foundObjects count], elementsStr]];
-  RELEASE (pool);
+  } // @autoreleasepool
 }
 
 - (void)endOfSearch
@@ -872,7 +871,6 @@ static NSString *lsfname = @"LiveSearch.lsf";
 - (void)dealloc
 {
   RELEASE (images);
-  [super dealloc];
 }
 
 - (id)initWithFrame:(NSRect)frameRect 
@@ -943,7 +941,6 @@ static NSString *lsfname = @"LiveSearch.lsf";
 - (void)dealloc
 {
   RELEASE (icon);
-  [super dealloc];
 }
 
 - (id)initWithFrame:(NSRect)frameRect 

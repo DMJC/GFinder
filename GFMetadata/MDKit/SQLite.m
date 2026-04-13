@@ -47,7 +47,6 @@
   }
   RELEASE (preparedStatements);
   
-  [super dealloc];
 }
 
 + (id)handlerForDbAtPath:(NSString *)path
@@ -216,12 +215,12 @@
       break;
       
     } else if (err == SQLITE_BUSY) {
-      CREATE_AUTORELEASE_POOL(arp); 
+@autoreleasepool { 
       NSDate *when = [NSDate dateWithTimeIntervalSinceNow: 0.1];
 
       [NSThread sleepUntilDate: when];
       GWDebugLog(@"retry %i", retry);
-      RELEASE (arp);
+  } // @autoreleasepool
 
       if (retry++ >= MAX_RETRY) {
         NSLog(@"timeout for query: %@", query);
@@ -297,12 +296,12 @@
           break;
 
         } else if (err == SQLITE_BUSY) {
-          CREATE_AUTORELEASE_POOL(arp); 
+@autoreleasepool { 
           NSDate *when = [NSDate dateWithTimeIntervalSinceNow: 0.1];
 
           [NSThread sleepUntilDate: when];
           GWDebugLog(@"retry %i", retry);
-          RELEASE (arp);
+  } // @autoreleasepool
 
           if (retry++ >= MAX_RETRY) {
             NSLog(@"timeout for query: %@", query);
@@ -478,12 +477,12 @@
         break;
 
       } else if (err == SQLITE_BUSY) {
-        CREATE_AUTORELEASE_POOL(arp); 
+@autoreleasepool { 
         NSDate *when = [NSDate dateWithTimeIntervalSinceNow: 0.1];
 
         [NSThread sleepUntilDate: when];
         GWDebugLog(@"retry %i", retry);
-        RELEASE (arp);
+  } // @autoreleasepool
 
         if (retry++ > MAX_RETRY) {
           NSLog(@"timeout for query: %@", [statement query]);
@@ -562,12 +561,12 @@
           break;
 
         } else if (err == SQLITE_BUSY) {
-          CREATE_AUTORELEASE_POOL(arp); 
+@autoreleasepool { 
           NSDate *when = [NSDate dateWithTimeIntervalSinceNow: 0.1];
 
           [NSThread sleepUntilDate: when];
           GWDebugLog(@"retry %i", retry);
-          RELEASE (arp);
+  } // @autoreleasepool
 
           if (retry++ > MAX_RETRY) {
             NSLog(@"timeout for query: %@", [statement query]);
@@ -644,7 +643,6 @@
     sqlite3_finalize(handle);
   }
   RELEASE (query);
-  [super dealloc];
 }
 
 + (id)statementWithQuery:(NSString *)aquery

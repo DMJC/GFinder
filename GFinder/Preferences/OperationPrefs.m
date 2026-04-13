@@ -43,7 +43,6 @@ static NSString *nibName = @"OperationPrefs";
 - (void)dealloc
 {
   RELEASE (prefbox);
-  [super dealloc];
 }
 
 - (id)init
@@ -62,7 +61,6 @@ static NSString *nibName = @"OperationPrefs";
       return self;
     }
 
-    RETAIN (prefbox);
     RELEASE (win); 
   
     statusItem = [tabView tabViewItemAtIndex: 0];

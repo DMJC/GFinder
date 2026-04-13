@@ -56,7 +56,6 @@
   RELEASE (icons);
   RELEASE (backColor);
   
-  [super dealloc];
 }
 
 - (id)initForManager:(id)mngr
@@ -662,7 +661,7 @@
 
 - (void)watchedPathChanged:(NSDictionary *)info
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSString *event = [info objectForKey: @"event"];
   NSString *path = [info objectForKey: @"path"];
     
@@ -757,7 +756,7 @@
 	}
     }
   
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 - (void)unselectOtherReps:(id)arep
@@ -830,7 +829,6 @@
         
     if (dndSourceIcon && ([sender draggingSource] == dndSourceIcon)) {
       if (icon != dndSourceIcon) {
-        RETAIN (dndSourceIcon);
         [icons removeObject: dndSourceIcon];
         [icons insertObject: dndSourceIcon atIndex: index];
         RELEASE (dndSourceIcon);
@@ -922,7 +920,6 @@
 
     if (dndSourceIcon && ([sender draggingSource] == dndSourceIcon)) {
       if ((icon != dndSourceIcon) && ([icon isSpecialIcon] == NO)) {
-        RETAIN (dndSourceIcon);
         [icons removeObject: dndSourceIcon];
         [icons insertObject: dndSourceIcon atIndex: index];
         RELEASE (dndSourceIcon);
@@ -1033,7 +1030,6 @@
 
               if ([[icon node] isEqual: node] 
                           && [[icon appName] isEqual: appName]) {
-                RETAIN (icon);
                 [icons removeObject: icon];
                 [icons insertObject: icon atIndex: targetIndex];
                 RELEASE (icon);

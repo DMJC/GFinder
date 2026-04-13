@@ -93,7 +93,6 @@ static NSString *nibName = @"FModuleCrDate";
   RELEASE (dateField);
   RELEASE (dateStepper); 
   RELEASE (date);
-  [super dealloc];
 }
 
 - (id)initInterface
@@ -110,7 +109,6 @@ static NSString *nibName = @"FModuleCrDate";
       return self;
     }
 
-    RETAIN (controlsBox);
     RELEASE (win);
 
     used = NO;
@@ -133,9 +131,6 @@ static NSString *nibName = @"FModuleCrDate";
     stepperValue = MONTH3_TI;
     [dateStepper setDoubleValue: stepperValue];
     
-    RETAIN (whenPopUp);
-    RETAIN (dateField);
-    RETAIN (dateStepper);
     
     [whenPopUp removeFromSuperview];
     

@@ -512,8 +512,9 @@
   id application;
   BOOL active;
   BOOL hidden;
-  
-  GFinder *gw;   
+  BOOL terminated;
+
+  GFinder *gw;
   NSNotificationCenter *nc;
 }
 
@@ -571,6 +572,8 @@
 - (void)terminateTask;
 
 - (void)connectApplication:(BOOL)showProgress;
+
+- (void)taskDidTerminate:(NSNotification *)notif;
 
 - (void)connectionDidDie:(NSNotification *)notif;
 

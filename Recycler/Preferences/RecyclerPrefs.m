@@ -40,7 +40,6 @@ static NSString *nibName = @"PreferencesWin";
 - (void)dealloc
 {
   RELEASE (win);
-  [super dealloc];
 }
 
 - (id)init

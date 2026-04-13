@@ -39,7 +39,6 @@ static NSString *nibName = @"MDKAttributeChooser";
 {
   RELEASE (win);
   RELEASE (mdkattributes);    
-  [super dealloc];
 }
 
 - (id)initForWindow:(MDKWindow *)awindow

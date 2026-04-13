@@ -47,7 +47,6 @@ static NSString *nibName = @"Annotations";
   RELEASE (mainBox);
   RELEASE (toolsBox);
       
-  [super dealloc];
 }
 
 - (instancetype)initForInspector:(id)insp
@@ -65,8 +64,6 @@ static NSString *nibName = @"Annotations";
           return nil;
         } 
 
-      RETAIN (mainBox);
-      RETAIN (toolsBox);
       RELEASE (win);
     
       inspector = insp;

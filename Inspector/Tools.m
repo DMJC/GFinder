@@ -47,7 +47,6 @@ static NSString *nibName = @"Tools";
   RELEASE (extensions);
   RELEASE (currentApp);
   
-  [super dealloc];
 }
 
 - (instancetype)initForInspector:(id)insp
@@ -66,8 +65,6 @@ static NSString *nibName = @"Tools";
           return self;
         } 
     
-      RETAIN (mainBox);
-      RETAIN (toolsBox);
       RELEASE (win); 
 
       inspector = insp;
@@ -236,7 +233,6 @@ static NSString *nibName = @"Tools";
     NSString *ext = [extensions objectAtIndex: 0];
     commonApps = [NSMutableArray arrayWithArray: [extensionsAndApps objectForKey: ext]];    
     currentApp = [ws getBestAppInRole: nil forExtension: ext];
-    RETAIN (currentApp);			
 		
   }
   else
@@ -311,7 +307,6 @@ static NSString *nibName = @"Tools";
 
           if ((iscommapp == YES) && (currentApp != nil) && appsforext)
             {
-              RETAIN (currentApp);		
             }
           else
             {

@@ -1,5 +1,5 @@
 /*
- *  wopen.m: Implementation of the wopen tool 
+ *  wopen.m: Implementation of the wopen tool
  *  for the GNUstep GFinder application
  *
  *  Copyright (C) 2002-2025 Free Software Foundation, Inc.
@@ -28,59 +28,55 @@
 
 int main(int argc, char** argv, char **env_c)
 {
-  NSAutoreleasePool *pool;
-  NSArray *arguments = nil;
-  NSFileManager *fm = nil;
-  NSString *basePath = nil;
-  NSString *fpath = nil;
-  NSString *fullPath = nil;
-  BOOL isDir = NO;
-  id gfinder = nil;
-   
-  pool = [NSAutoreleasePool new];
-  fm = [NSFileManager defaultManager];
-  
-  if (argc < 2)
-    {
-      NSLog(@"no arguments supplied. exiting now.");
-      [pool release];
-      exit(0);
-    }
-  else
-    {
-      basePath = [fm currentDirectoryPath];
-      arguments = [[NSProcessInfo processInfo] arguments];
-      fpath = [arguments objectAtIndex: 1];
-        
-      if ([fpath isAbsolutePath] && [fm fileExistsAtPath: fpath isDirectory: &isDir])
-        {
-          fullPath = fpath;
-        }
-      else
-        {
-          fullPath = [basePath stringByAppendingPathComponent: fpath];
-          fullPath = [fullPath stringByStandardizingPath];
+  @autoreleasepool {
+    NSArray *arguments = nil;
+    NSFileManager *fm = nil;
+    NSString *basePath = nil;
+    NSString *fpath = nil;
+    NSString *fullPath = nil;
+    BOOL isDir = NO;
+    id gfinder = nil;
 
-          if ([fm fileExistsAtPath: fullPath isDirectory: &isDir] == NO)
-            {
-              NSLog(@"%@ doesn't exist. exiting now.", fpath);
-              [pool release];
-              exit(0);
-            }
-        }
+    fm = [NSFileManager defaultManager];
 
-      gfinder = [NSConnection rootProxyForConnectionWithRegisteredName: @"GFinder"
-                                                                     host: @""];
-      if (gfinder == nil)
-        {
-          NSLog(@"can't contact GFinder via %@. exiting now.", fpath);
-          [pool release];
-          exit(0);
-        }
+    if (argc < 2)
+      {
+        NSLog(@"no arguments supplied. exiting now.");
+        exit(0);
+      }
+    else
+      {
+        basePath = [fm currentDirectoryPath];
+        arguments = [[NSProcessInfo processInfo] arguments];
+        fpath = [arguments objectAtIndex: 1];
 
-      [gfinder application: gfinder openFile: fullPath];
-    }
+        if ([fpath isAbsolutePath] && [fm fileExistsAtPath: fpath isDirectory: &isDir])
+          {
+            fullPath = fpath;
+          }
+        else
+          {
+            fullPath = [basePath stringByAppendingPathComponent: fpath];
+            fullPath = [fullPath stringByStandardizingPath];
 
-  [pool release];
+            if ([fm fileExistsAtPath: fullPath isDirectory: &isDir] == NO)
+              {
+                NSLog(@"%@ doesn't exist. exiting now.", fpath);
+                exit(0);
+              }
+          }
+
+        gfinder = [NSConnection rootProxyForConnectionWithRegisteredName: @"GFinder"
+                                                                       host: @""];
+        if (gfinder == nil)
+          {
+            NSLog(@"can't contact GFinder via %@. exiting now.", fpath);
+            exit(0);
+          }
+
+        [gfinder application: gfinder openFile: fullPath];
+      }
+  }
+
   exit(0);
 }

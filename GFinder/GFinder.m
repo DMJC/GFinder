@@ -143,7 +143,6 @@ static GFinder *gfinder = nil;
   RELEASE (storedAppinfoPath);
   RELEASE (storedAppinfoLock);
     
-  [super dealloc];
 }
 
 - (void)createMenu
@@ -192,15 +191,12 @@ static GFinder *gfinder = nil;
   [mainMenu setSubmenu: menu forItem: menuItem];
   menuItem = [[NSMenuItem alloc] initWithTitle:_(@"Browser") action:@selector(setViewerType:) keyEquivalent:@"b"];
   [menuItem setTag:GWViewTypeBrowser];
-  [menuItem autorelease];
   [menu addItem:menuItem];
   menuItem = [[NSMenuItem alloc] initWithTitle:_(@"Icon") action:@selector(setViewerType:) keyEquivalent:@"i"];
   [menuItem setTag:GWViewTypeIcon];
-  [menuItem autorelease];
   [menu addItem:menuItem];
   menuItem = [[NSMenuItem alloc] initWithTitle:_(@"List") action:@selector(setViewerType:) keyEquivalent:@"l"];
   [menuItem setTag:GWViewTypeList];
-  [menuItem autorelease];
   [menu addItem:menuItem];
 	
   menuItem = [menu addItemWithTitle:_(@"Show") action:NULL keyEquivalent:@""];
@@ -508,7 +504,6 @@ static GFinder *gfinder = nil;
   [self setContextHelp];
   
   storedAppinfoPath = [NSTemporaryDirectory() stringByAppendingPathComponent: @"GSLaunchedApplications"];
-  RETAIN (storedAppinfoPath); 
   lockpath = [storedAppinfoPath stringByAppendingPathExtension: @"lock"];   
   storedAppinfoLock = [[NSDistributedLock alloc] initWithPath: lockpath];
 
@@ -995,7 +990,7 @@ static GFinder *gfinder = nil;
   NSDictionary *info = (NSDictionary *)[notif object];
   
   if (info) { 
-    CREATE_AUTORELEASE_POOL(arp);   
+@autoreleasepool {   
     NSString *source = [info objectForKey: @"source"];
     NSString *destination = [info objectForKey: @"destination"];
   
@@ -1007,7 +1002,7 @@ static GFinder *gfinder = nil;
       [ddbd fileSystemDidChange: [NSArchiver archivedDataWithRootObject: info]];
     }
     
-    RELEASE (arp);
+  } // @autoreleasepool
   } 
 }
 
@@ -1028,7 +1023,7 @@ static GFinder *gfinder = nil;
         }
       
       /* we extract from the selection only valid directories */
-      onlyDirPaths = [[NSMutableArray arrayWithCapacity:1] retain];
+      onlyDirPaths = [NSMutableArray arrayWithCapacity:1];
       fileMgr = [NSFileManager defaultManager];
       for (i = 0; i < [paths count]; i++)
         {
@@ -1041,7 +1036,6 @@ static GFinder *gfinder = nil;
         }
       if ([onlyDirPaths count] > 0)
         [finder setCurrentSelection: onlyDirPaths];
-      [onlyDirPaths release];
     
       [[NSNotificationCenter defaultCenter]
  				 postNotificationName: @"GWCurrentSelectionChangedNotification"
@@ -1622,7 +1616,6 @@ static GFinder *gfinder = nil;
     
     if (fswatcher)
     {
-      RETAIN (fswatcher);
       [fswatcher setProtocolForProxy: @protocol(FSWatcherProtocol)];
     
 	    [[NSNotificationCenter defaultCenter] addObserver: self
@@ -1689,7 +1682,7 @@ static GFinder *gfinder = nil;
 
 - (oneway void)watchedPathDidChange:(NSData *)dirinfo
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSDictionary *info = [NSUnarchiver unarchiveObjectWithData: dirinfo];
   NSString *event = [info objectForKey: @"event"];
 
@@ -1705,7 +1698,7 @@ static GFinder *gfinder = nil;
 	[[NSNotificationCenter defaultCenter]
  				 postNotificationName: @"GWFileWatcherFileDidChangeNotification"
 	 								     object: info];  
-  RELEASE (arp);                       
+  } // @autoreleasepool                       
 }
 
 - (oneway void)globalWatchedPathDidChange:(NSDictionary *)dirinfo
@@ -1756,7 +1749,6 @@ static GFinder *gfinder = nil;
             [item setTitle: NSLocalizedString(@"Hide Recycler", @"")];
           }
     
-          RETAIN (recyclerApp);
           [recyclerApp setProtocolForProxy: @protocol(RecyclerAppProtocol)];
     
           [[NSNotificationCenter defaultCenter] addObserver: self
@@ -1851,7 +1843,6 @@ static GFinder *gfinder = nil;
     
       if (ddbd)
 	{
-	  RETAIN (ddbd);
 	  [ddbd setProtocolForProxy: @protocol(DDBdProtocol)];
     
 	  [[NSNotificationCenter defaultCenter] addObserver: self
@@ -1963,7 +1954,6 @@ static GFinder *gfinder = nil;
     
     if (mdextractor) {
       [mdextractor setProtocolForProxy: @protocol(MDExtractorProtocol)];
-      RETAIN (mdextractor);
     
 	    [[NSNotificationCenter defaultCenter] addObserver: self
 	                   selector: @selector(mdextractorConnectionDidDie:)
@@ -2387,7 +2377,7 @@ static GFinder *gfinder = nil;
 
 - (void)emptyRecycler:(id)sender
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   FSNode *node = [FSNode nodeWithPath: trashPath];
   NSMutableArray *subNodes = [[node subNodes] mutableCopy];
   int count = [subNodes count];
@@ -2424,7 +2414,7 @@ static GFinder *gfinder = nil;
     }
 
   RELEASE (subNodes);
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 
@@ -2592,7 +2582,6 @@ static GFinder *gfinder = nil;
   
   if (tpath == nil) {
     tpath = [NSHomeDirectory() stringByAppendingPathComponent: @".Trash"]; 
-    RETAIN (tpath);
   }
   
   return tpath;

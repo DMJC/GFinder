@@ -84,7 +84,6 @@
   RELEASE (hightile);
   RELEASE (icon);
   RELEASE (namelabel);
-  [super dealloc];
 }
 
 - (id)initWithPosX:(int)px
@@ -233,7 +232,6 @@
   dissFraction = 0.2;
   dissTimer = [NSTimer scheduledTimerWithTimeInterval: 0.1 target: self
 					     selector: @selector(display) userInfo: nil repeats: YES];
-  RETAIN (dissTimer);
 }
 
 - (BOOL)dissolveAndReturnWhenDone

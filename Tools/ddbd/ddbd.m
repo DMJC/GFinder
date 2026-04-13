@@ -64,7 +64,6 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
 
   RELEASE (dbdir);
             
-  [super dealloc];
 }
 
 - (id)init
@@ -341,18 +340,17 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
 - (void)dealloc
 {
   RELEASE (updinfo);
-  [super dealloc];
 }
 
 + (void)updaterForTask:(NSDictionary *)info
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   DBUpdater *updater = [[DBUpdater alloc] init];
   
   [updater setUpdaterTask: info];
 
   RELEASE (updater);
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 - (void)setUpdaterTask:(NSDictionary *)info
@@ -408,7 +406,7 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
                 || [operation isEqual: NSWorkspaceCopyOperation]
                 || [operation isEqual: NSWorkspaceDuplicateOperation]
                 || [operation isEqual: @"GFinderRenameOperation"]) {
-    CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
     NSString *source = [updinfo objectForKey: @"source"];
     NSString *destination = [updinfo objectForKey: @"destination"];
     NSArray *files = [updinfo objectForKey: @"files"];
@@ -441,7 +439,7 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
     [pathsManager duplicateDataOfPaths: srcpaths forPaths: dstpaths];
     [pathslock unlock];
     
-    RELEASE (arp);
+  } // @autoreleasepool
   }
 }
 
@@ -475,7 +473,6 @@ NSString *pathsep(void)
       separator = @"/";	
     #endif
 
-    RETAIN (separator);
   }
 
   return separator;
@@ -493,7 +490,7 @@ NSString *removePrefix(NSString *path, NSString *prefix)
 
 int main(int argc, char** argv)
 {
-  CREATE_AUTORELEASE_POOL(pool);
+@autoreleasepool {
   NSProcessInfo *info = [NSProcessInfo processInfo];
   NSMutableArray *args = AUTORELEASE ([[info arguments] mutableCopy]);
   BOOL subtask = YES;
@@ -531,17 +528,15 @@ int main(int argc, char** argv)
     exit(EXIT_FAILURE);
   }
   
-  RELEASE(pool);
+  } // @autoreleasepool
 
   {
-    CREATE_AUTORELEASE_POOL (pool);
-	  DDBd *ddbd = [[DDBd alloc] init];
-    RELEASE (pool);
+    DDBd *ddbd = [[DDBd alloc] init];
 
     if (ddbd != nil) {
-	    CREATE_AUTORELEASE_POOL (pool);
-      [[NSRunLoop currentRunLoop] run];
-  	  RELEASE (pool);
+      @autoreleasepool {
+        [[NSRunLoop currentRunLoop] run];
+      }
     }
   }
     

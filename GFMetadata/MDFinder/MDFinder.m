@@ -48,7 +48,6 @@ static MDFinder *mdfinder = nil;
   RELEASE (lastSaveDir);
   TEST_RELEASE (startAppWin);  
   
-	[super dealloc];
 }
 
 - (id)init
@@ -137,7 +136,6 @@ static MDFinder *mdfinder = nil;
   lastSaveDir = [defaults stringForKey: @"last_save_dir"];
 
   if (lastSaveDir && [fm fileExistsAtPath: lastSaveDir isDirectory: &isdir] && isdir) {
-    RETAIN (lastSaveDir);
   } else {
     ASSIGN (lastSaveDir, NSHomeDirectory());
   }
@@ -305,7 +303,6 @@ static MDFinder *mdfinder = nil;
     }
     
     if (workspaceApp) {
-      RETAIN (workspaceApp);
       [workspaceApp setProtocolForProxy: @protocol(WorkspaceAppProtocol)];
     
 	    [nc addObserver: self
@@ -529,7 +526,6 @@ static MDFinder *mdfinder = nil;
 - (void)dealloc
 {
   TEST_RELEASE (win);
-  [super dealloc];
 }
 
 - (id)init

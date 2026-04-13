@@ -43,7 +43,6 @@
   RELEASE (paths);
   RELEASE (hostname);
   RELEASE (node);
-  [super dealloc];
 }
 
 - (id)initForPaths:(NSArray *)fpaths
@@ -499,15 +498,15 @@
     {
       for (i = 0; i < count; i++)
 	{
-	  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
 	  FSNode *nd = [FSNode nodeWithPath: [sourcePaths objectAtIndex: i]];
 
 	  if (([nd isPlain] == NO) && ([nd isPackage] == NO))
 	    {
-	      RELEASE (arp);
+  } // @autoreleasepool
 	      return NSDragOperationNone;
 	    }
-	  RELEASE (arp);
+  } // @autoreleasepool
 	}
     }
 

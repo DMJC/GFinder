@@ -36,7 +36,6 @@
   RELEASE (categories);
   RELEASE (catviews);
 
-  [super dealloc];
 }
 
 - (id)initWithFrame:(NSRect)rect
@@ -114,7 +113,6 @@
   id dummy = [NSString string];
   int i;
   
-  RETAIN (view);  
   [catviews replaceObjectAtIndex: srcind withObject: dummy];  
   [catviews insertObject: view atIndex: dstind];
   [catviews removeObject: dummy];

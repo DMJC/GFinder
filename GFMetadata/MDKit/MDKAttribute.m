@@ -41,7 +41,6 @@
   TEST_RELEASE (fsfilter);
   TEST_RELEASE (editor);
   
-  [super dealloc];
 }
 
 - (id)initWithAttributeInfo:(NSDictionary *)info

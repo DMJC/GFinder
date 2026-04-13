@@ -56,7 +56,6 @@ static NSString *nibName = @"FModuleSize";
 - (void)dealloc
 {
   RELEASE (controlsBox);
-  [super dealloc];
 }
 
 - (id)initInterface
@@ -70,7 +69,6 @@ static NSString *nibName = @"FModuleSize";
       return self;
     }
 
-    RETAIN (controlsBox);
     RELEASE (win);
 
     used = NO;

@@ -37,7 +37,6 @@
 {
   RELEASE (fileOperations);
     
-  [super dealloc];
 }
 
 - (id)init

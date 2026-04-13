@@ -78,7 +78,6 @@ static NSImage *whiteArrowDown = nil;
   RELEASE (headView);
   RELEASE (footView);
 
-  [super dealloc];
 }
 
 - (id)initWithCategoryName:(NSString *)cname
@@ -347,7 +346,6 @@ static NSImage *whiteArrowDown = nil;
 - (void)dealloc
 {
   RELEASE (backColor);    
-  [super dealloc];
 }
 
 - (id)initWithFrame:(NSRect)rect

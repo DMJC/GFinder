@@ -58,7 +58,6 @@ static NSString *nibName = @"FModuleAnnotations";
 {
   RELEASE (controlsBox);
   RELEASE (contentsStr);
-  [super dealloc];
 }
 
 - (id)initInterface
@@ -72,7 +71,6 @@ static NSString *nibName = @"FModuleAnnotations";
       return self;
     }
 
-    RETAIN (controlsBox);
     RELEASE (win);
 
     used = NO;
@@ -178,13 +176,14 @@ static NSString *nibName = @"FModuleAnnotations";
   return nil;
 }
 
-- (BOOL)checkPath:(NSString *)path 
+- (BOOL)checkPath:(NSString *)path
    withAttributes:(NSDictionary *)attributes
 {
-  CREATE_AUTORELEASE_POOL(pool);
+  BOOL found = NO;
+
+@autoreleasepool {
   NSString *annotations = [searchtool ddbdGetAnnotationsForPath: path];
   NSRange range;
-  BOOL found = NO;
   
   if (annotations) {
     if (how == EXACT_PHRASE) {
@@ -226,7 +225,7 @@ static NSString *nibName = @"FModuleAnnotations";
     }
   }
   
-  RELEASE (pool);
+  } // @autoreleasepool
     
   return found;
 }

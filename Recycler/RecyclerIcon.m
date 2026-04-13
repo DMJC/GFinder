@@ -42,7 +42,6 @@ static id <DesktopApplication> desktopApp = nil;
 - (void)dealloc
 {
   RELEASE (trashFullIcon);
-  [super dealloc];
 }
 
 + (void)initialize

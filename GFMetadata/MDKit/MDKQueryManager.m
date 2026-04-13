@@ -72,7 +72,6 @@ static MDKQueryManager *queryManager = nil;
   RELEASE (queries);
   RELEASE (liveQueries);
   
-  [super dealloc];
 }
 
 - (id)init
@@ -159,7 +158,7 @@ static MDKQueryManager *queryManager = nil;
 
 - (BOOL)queryResults:(NSData *)results
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSDictionary *dict = [NSUnarchiver unarchiveObjectWithData: results];
   NSNumber *qnum = [dict objectForKey: @"qnumber"];
   MDKQuery *query = [self queryWithNumber: qnum];
@@ -170,7 +169,7 @@ static MDKQueryManager *queryManager = nil;
     resok = YES;
   }
 
-  RELEASE (arp);
+  } // @autoreleasepool
 
   return resok;
 }
@@ -270,7 +269,6 @@ static MDKQueryManager *queryManager = nil;
     }
     
     if (gmds) {
-      RETAIN (gmds);
       [gmds setProtocolForProxy: @protocol(GMDSProtocol)];
     
 	    [[NSNotificationCenter defaultCenter] addObserver: self
@@ -313,7 +311,7 @@ static MDKQueryManager *queryManager = nil;
 
 - (void)metadataDidUpdate:(NSNotification *)notif
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSArray *removed = [[notif userInfo] objectForKey: @"removed"];
   unsigned count = [liveQueries count];
   unsigned i;
@@ -346,7 +344,7 @@ static MDKQueryManager *queryManager = nil;
     [gmds performQuery: [query sqlUpdatesDescription]];
   }
 
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 @end

@@ -31,7 +31,6 @@
 
 - (void)dealloc
 {
-  [super dealloc];
 }
 
 - (NSString *)menuName

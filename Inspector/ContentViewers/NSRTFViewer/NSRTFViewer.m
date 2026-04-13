@@ -39,7 +39,6 @@
   RELEASE (textView);
   RELEASE (errLabel);
   
-  [super dealloc];
 }
 
 - (id)initWithFrame:(NSRect)frameRect

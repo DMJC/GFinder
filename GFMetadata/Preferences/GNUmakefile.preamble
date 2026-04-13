@@ -3,10 +3,10 @@
 #ADDITIONAL_CPPFLAGS += 
 
 # Additional flags to pass to the Objective-C compiler
-ADDITIONAL_OBJCFLAGS += -Wall 
+ADDITIONAL_OBJCFLAGS += -Wall  -fobjc-runtime=gnustep-2.0 -fblocks -fobjc-arc
 
 # Additional flags to pass to the C compiler
-ADDITIONAL_CFLAGS += -Wall 
+ADDITIONAL_CFLAGS += -Wall  -fblocks
 
 # Additional include directories the compiler should search
 #ADDITIONAL_INCLUDE_DIRS += 

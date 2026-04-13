@@ -35,7 +35,6 @@
 
 - (void)dealloc
 {
-  [super dealloc];
 }
 
 - (id)initWithCoder: (NSCoder *) coder
@@ -82,7 +81,7 @@ if ([path hasSuffix: pathSeparator] == NO) \
 
   if ([eventstr isEqual: @"\t"] && [str length])
     {
-      CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
       NSString *pathSeparator = path_separator();
       NSArray *components = [str componentsSeparatedByString: pathSeparator];
       NSMutableString *path = [NSMutableString string];
@@ -117,8 +116,6 @@ if ([path hasSuffix: pathSeparator] == NO) \
             }
 
           [self setString: completedAppName];
-          [appBundles release];
-          RELEASE (arp);
           return;
         }
 
@@ -292,7 +289,7 @@ if ([path hasSuffix: pathSeparator] == NO) \
         }
   
     [self setString: path];
-    RELEASE (arp);
+  } // @autoreleasepool
   
   } else if ([eventstr isEqual: @"\r"] && [str length]) {
     [controller completionFieldDidEndLine: self];

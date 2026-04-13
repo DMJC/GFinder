@@ -58,7 +58,6 @@ static NSString *nibName = @"Contents";
   RELEASE (mainBox);
   RELEASE (pboardImage);
       
-  [super dealloc];
 }
 
 - (id)initForInspector:(id)insp
@@ -82,7 +81,6 @@ static NSString *nibName = @"Contents";
           [NSApp terminate: self];
         }
 
-      RETAIN (mainBox);
       RELEASE (win);
 
       inspector = insp;
@@ -122,12 +120,11 @@ static NSString *nibName = @"Contents";
 
                       if ([principalClass conformsToProtocol: @protocol(ContentViewersProtocol)])
                         {
-                          CREATE_AUTORELEASE_POOL (pool);
+@autoreleasepool {
                           id vwr = [[principalClass alloc] initWithFrame: r inspector: self];
 
                           [viewers addObject: vwr];
-                          [vwr release];
-                          RELEASE (pool);
+  } // @autoreleasepool
                         }
                     }
                 }
@@ -430,7 +427,6 @@ static NSString *nibName = @"Contents";
 - (void)dealloc
 {
   RELEASE (editPath);	
-  [super dealloc];
 }
 
 - (id)initWithFrame:(NSRect)frameRect
@@ -514,7 +510,7 @@ static NSString *nibName = @"Contents";
 
 	  if (data)
 	    {
-	      CREATE_AUTORELEASE_POOL (pool);
+@autoreleasepool {
 	      NSString *str = [[NSString alloc] initWithData: data
 						    encoding: [NSString defaultCStringEncoding]];
 	      NSAttributedString *attrstr = [[NSAttributedString alloc] initWithString: str];
@@ -527,7 +523,7 @@ static NSString *nibName = @"Contents";
 	      RELEASE (attrstr);
 	      [editButt setEnabled: YES];
 	      ASSIGN (editPath, path);
-	      RELEASE (pool);
+  } // @autoreleasepool
 
 	      return YES;
 	    }
@@ -597,7 +593,6 @@ static NSString *nibName = @"Contents";
   RELEASE (pipe);
   RELEASE (shComm);
   RELEASE (fileComm);  
-  [super dealloc];
 }
 
 - (id)initWithFrame:(NSRect)frameRect
@@ -644,7 +639,7 @@ static NSString *nibName = @"Contents";
 
   if (shComm && fileComm)
     {
-      CREATE_AUTORELEASE_POOL (pool);
+@autoreleasepool {
       NSString *str;
       NSFileHandle *handle;
 
@@ -672,7 +667,7 @@ static NSString *nibName = @"Contents";
 
           [task launch];   
        
-          RELEASE (pool);   
+  } // @autoreleasepool   
   }
   else
     {  
@@ -682,7 +677,7 @@ static NSString *nibName = @"Contents";
 
 - (void)dataFromTask:(NSNotification *)notif
 {
-  CREATE_AUTORELEASE_POOL (pool);
+@autoreleasepool {
   NSDictionary *userInfo = [notif userInfo];
   NSData *data = [userInfo objectForKey: NSFileHandleNotificationDataItem];
   NSString *str;
@@ -700,12 +695,12 @@ static NSString *nibName = @"Contents";
   [self showString: str];
   
   RELEASE (str);
-  RELEASE (pool);   
+  } // @autoreleasepool   
 }
 
 - (void)showString:(NSString *)str
 {
-  CREATE_AUTORELEASE_POOL (pool);
+@autoreleasepool {
   NSAttributedString *attrstr = [[NSAttributedString alloc] initWithString: str];      
   NSRange range = NSMakeRange(0, [attrstr length]);
   NSTextStorage *storage = [textview textStorage];
@@ -730,7 +725,7 @@ static NSString *nibName = @"Contents";
 
   RELEASE (attrstr);
   RELEASE (style);
-  RELEASE (pool);   
+  } // @autoreleasepool   
 }
 
 @end

@@ -52,7 +52,6 @@ static NSString *nibName = @"FModuleContents";
 {
   RELEASE (controlsBox);
   RELEASE (searchStr);
-  [super dealloc];
 }
 
 - (id)initInterface
@@ -66,7 +65,6 @@ static NSString *nibName = @"FModuleContents";
       return self;
     }
 
-    RETAIN (controlsBox);
     RELEASE (win);
 
     used = NO;
@@ -152,28 +150,26 @@ static NSString *nibName = @"FModuleContents";
 {
   BOOL contains = NO;
   
-  if (([attributes fileSize] < MAXFSIZE) 
+  if (([attributes fileSize] < MAXFSIZE)
             && ([attributes fileType] == NSFileTypeRegular)) {
-    CREATE_AUTORELEASE_POOL(pool);
-    NSData *contents = [NSData dataWithContentsOfFile: path];
-    unsigned length = ((contents != nil) ? [contents length] : 0);
-    
-    if (length) {
-      const char *bytesStr = (const char *)[contents bytes];
-      unsigned testlen = ((length < 256) ? length : 256);
-      unsigned i;
-      
-      for (i = 0; i < testlen; i++) {
-        if (bytesStr[i] == 0x00) {
-          RELEASE (pool);
-          return NO; 
-        } 
+    @autoreleasepool {
+      NSData *contents = [NSData dataWithContentsOfFile: path];
+      unsigned length = ((contents != nil) ? [contents length] : 0);
+
+      if (length) {
+        const char *bytesStr = (const char *)[contents bytes];
+        unsigned testlen = ((length < 256) ? length : 256);
+        unsigned i;
+
+        for (i = 0; i < testlen; i++) {
+          if (bytesStr[i] == 0x00) {
+            return NO;
+          }
+        }
+
+        contains = (strstr(bytesStr, searchPtr) != NULL);
       }
-    
-      contains = (strstr(bytesStr, searchPtr) != NULL);
     }
-    
-    RELEASE (pool);
   }
   
   return contains;

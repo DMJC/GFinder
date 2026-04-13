@@ -34,7 +34,6 @@
   RELEASE (playBox);  
   RELEASE (errLabel);
   RELEASE (indicator);
-  [super dealloc];
 }
 
 - (id)initWithFrame:(NSRect)frameRect

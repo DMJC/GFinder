@@ -31,7 +31,6 @@
 - (void)dealloc
 {
   RELEASE (controlViews);    
-  [super dealloc];
 }
 
 - (id)initWithFrame:(NSRect)rect

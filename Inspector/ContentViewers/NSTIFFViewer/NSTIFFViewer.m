@@ -34,7 +34,6 @@
   RELEASE (imview);
   RELEASE (errLabel);
   
-  [super dealloc];
 }
 
 - (id)initWithFrame:(NSRect)frameRect

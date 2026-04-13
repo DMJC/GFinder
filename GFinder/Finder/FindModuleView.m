@@ -37,7 +37,6 @@ static NSString *nibName = @"FindModuleView";
 {
   RELEASE (mainBox);
   RELEASE (usedModulesNames);
-  [super dealloc];
 }
 
 - (id)initWithDelegate:(id)anobject 
@@ -54,7 +53,6 @@ static NSString *nibName = @"FindModuleView";
       return self;
     }
 
-    RETAIN (mainBox);
     RELEASE (win);
     
     [removeButt setImage: [NSImage imageNamed: @"remove"]];

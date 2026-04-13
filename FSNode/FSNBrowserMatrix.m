@@ -41,7 +41,6 @@
 
 - (void)dealloc
 {
-  [super dealloc];
 }
 
 - (id)initInColumn:(FSNBrowserColumn *)col

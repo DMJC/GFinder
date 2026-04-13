@@ -53,7 +53,6 @@
   RELEASE (dataPath);
   RELEASE (dataType);
 
-  [super dealloc];
 }
 
 - (id)initForPBDataAtPath:(NSString *)dpath

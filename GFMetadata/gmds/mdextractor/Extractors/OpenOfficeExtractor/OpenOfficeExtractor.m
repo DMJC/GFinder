@@ -46,7 +46,6 @@ static char *style = "<xsl:stylesheet "
   RELEASE (unzcomm);
   RELEASE (stylesheet);
 
-	[super dealloc];
 }
 
 - (id)initForExtractor:(id)extr
@@ -64,7 +63,6 @@ static char *style = "<xsl:stylesheet "
 
     tempdir = NSTemporaryDirectory();
     tempdir = [tempdir stringByAppendingPathComponent: @"ooextractor"];
-    RETAIN (tempdir);
     
     if ([fm fileExistsAtPath: tempdir]) {
       [fm removeFileAtPath: tempdir handler: nil];
@@ -112,7 +110,7 @@ static char *style = "<xsl:stylesheet "
                        withID:(int)path_id
                    attributes:(NSDictionary *)attributes
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSMutableDictionary *mddict = [NSMutableDictionary dictionary];  
   NSDictionary *unzpaths = nil;
   NSString *unzpath = nil;
@@ -122,7 +120,7 @@ static char *style = "<xsl:stylesheet "
   unzpaths = [self unzippedPathsForPath: path];
   
   if (unzpaths == nil) {
-    RELEASE (arp);
+  } // @autoreleasepool
     return NO;
   }
 
@@ -137,7 +135,7 @@ static char *style = "<xsl:stylesheet "
     NSString *contents;
 
     if (doc == nil) {
-      RELEASE (arp);
+  } // @autoreleasepool
       return NO;
     }
     
@@ -230,7 +228,7 @@ static char *style = "<xsl:stylesheet "
             
   success = [extractor setMetadata: mddict forPath: path withID: path_id];  
   
-  RELEASE (arp);
+  } // @autoreleasepool
     
   return success;
 }

@@ -37,7 +37,6 @@
 - (void)dealloc
 {
   RELEASE (win);
-  [super dealloc];
 }
 
 - (id)init
@@ -71,7 +70,7 @@
     
     matrix = [[NSMatrix alloc] initWithFrame: NSMakeRect(0, 0, 100, 100)
 				            	                mode: NSRadioModeMatrix 
-                                 prototype: [[NSBrowserCell new] autorelease]
+                                 prototype: [NSBrowserCell new]
 			       						      numberOfRows: 0 
                            numberOfColumns: 0];
     [matrix setTarget: self];

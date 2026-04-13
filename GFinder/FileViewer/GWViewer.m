@@ -101,7 +101,6 @@ static GWViewType GWViewerViewTypeForSegmentIndex(NSInteger segment)
   RELEASE (history);
   RELEASE (folderNameField);
 
-  [super dealloc];
 }
 
 - (id)initForNode:(FSNode *)node
@@ -158,7 +157,7 @@ static GWViewType GWViewerViewTypeForSegmentIndex(NSInteger segment)
 	      }
 	    else
 	      {
-		prefsname = [key retain];
+		prefsname = key;
 	      }
 	  }
       }
@@ -167,7 +166,7 @@ static GWViewType GWViewerViewTypeForSegmentIndex(NSInteger segment)
 	prefsname = [NSString stringWithFormat: @"viewer_at_%@", [node path]];
       }
 
-    defaultsKeyStr = [prefsname retain];
+    defaultsKeyStr = prefsname;
     if ([baseNode isWritable] && (rootViewer == NO)
             && ([[fsnodeRep volumes] containsObject: [baseNode path]] == NO)) {
 		  NSString *dictPath = [[baseNode path] stringByAppendingPathComponent: @".gwdir"];
@@ -1032,7 +1031,6 @@ static GWViewType GWViewerViewTypeForSegmentIndex(NSInteger segment)
 {
   NSRect r = [vwrwin frame];
 
-  RETAIN (nodeView);
   [nodeView removeFromSuperviewWithoutNeedingDisplay];
   [nviewScroll setDocumentView: nil];	
 
@@ -1460,7 +1458,6 @@ constrainMinCoordinate:(CGFloat)proposedMin
       if ([nodeView isSingleNode] && ([selection count] == 0))
         selection = [NSArray arrayWithObject: [nodeView shownNode]];
 
-      RETAIN (selection);
 
       [nviewScroll setDocumentView: nil];
 
@@ -1805,7 +1802,6 @@ constrainMinCoordinate:(CGFloat)proposedMin
       
       t = [Thumbnailer sharedThumbnailer];
       [t makeThumbnails:path];
-      [t release];
     }
 }
 
@@ -1821,7 +1817,6 @@ constrainMinCoordinate:(CGFloat)proposedMin
       
       t = [Thumbnailer sharedThumbnailer];
       [t removeThumbnails:path];
-      [t release];
     }
 }
 

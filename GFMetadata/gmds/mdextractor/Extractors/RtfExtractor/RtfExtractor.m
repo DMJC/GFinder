@@ -35,7 +35,6 @@
   RELEASE (extensions);
   RELEASE (skipSet);
 
-	[super dealloc];
 }
 
 - (id)initForExtractor:(id)extr
@@ -83,7 +82,7 @@
                        withID:(int)path_id
                    attributes:(NSDictionary *)attributes
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSMutableDictionary *mddict = [NSMutableDictionary dictionary];  
   NSString *ext = [[path pathExtension] lowercaseString]; 
   NSAttributedString *attrstr = nil;
@@ -116,13 +115,13 @@
     }
   NS_HANDLER
     {
-  RELEASE (arp);
+  } // @autoreleasepool
   return NO;
     }
   NS_ENDHANDLER
  
   if (attrstr == nil) {
-    RELEASE (arp);
+  } // @autoreleasepool
     return NO;
   } 
  
@@ -133,7 +132,7 @@
     SEL scanSel = @selector(scanUpToCharactersFromSet:intoString:);
     IMP scanImp = [scanner methodForSelector: scanSel];
     NSMutableDictionary *wordsDict = [NSMutableDictionary dictionary];
-    NSCountedSet *wordset = [[[NSCountedSet alloc] initWithCapacity: 1] autorelease];
+    NSCountedSet *wordset = [[NSCountedSet alloc] initWithCapacity: 1];
     unsigned long wcount = 0;
     NSString *word;
 
@@ -162,7 +161,7 @@
               
   success = [extractor setMetadata: mddict forPath: path withID: path_id];  
   
-  RELEASE (arp);
+  } // @autoreleasepool
     
   return success;
 }

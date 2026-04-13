@@ -92,7 +92,6 @@
 {
   RELEASE (tile);
   RELEASE (win);
-  [super dealloc];
 }
 
 - (id)init

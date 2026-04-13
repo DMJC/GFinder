@@ -91,7 +91,6 @@
   [nc removeObserver: self];
   DESTROY (finder);
   DESTROY (ddbd);
-  [super dealloc];
 }
 
 - (id)initWithConnectionName:(NSString *)cname
@@ -120,7 +119,6 @@
     anObject = [conn rootProxy];
     [anObject setProtocolForProxy: @protocol(Finder)];
     finder = (id <Finder>)anObject;
-    RETAIN (finder);
 
     stopped = NO;    
     done = NO;
@@ -147,7 +145,7 @@
 
 - (void)searchWithInfo:(NSData *)srcinfo
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSDictionary *srcdict = [NSUnarchiver unarchiveObjectWithData: srcinfo];
   NSArray *paths = [srcdict objectForKey: @"paths"];
   id recursionObj = [srcdict objectForKey: @"recursion"];
@@ -208,83 +206,77 @@
     NSUInteger j;
     
     if (type == NSFileTypeDirectory) {
-      CREATE_AUTORELEASE_POOL(arp1);
       NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: path];
-      
+
       while (!stopped) {
-        CREATE_AUTORELEASE_POOL(arp2);
-        NSString *currentPath = [enumerator nextObject];
-      
-        if (currentPath) {
-          NSString *fullPath = [path stringByAppendingPathComponent: currentPath];
-          NSDictionary *attrs = [enumerator fileAttributes];
-          BOOL found = YES;
-        
-          for (j = 0; j < [modules count]; j++) {
-            id module = [modules objectAtIndex: j];
+        @autoreleasepool {
+          NSString *currentPath = [enumerator nextObject];
 
-            found = [module checkPath: fullPath withAttributes: attrs];
+          if (currentPath) {
+            NSString *fullPath = [path stringByAppendingPathComponent: currentPath];
+            NSDictionary *attrs = [enumerator fileAttributes];
+            BOOL found = YES;
 
-            if (found == NO) {
-              break;
+            for (j = 0; j < [modules count]; j++) {
+              id module = [modules objectAtIndex: j];
+
+              found = [module checkPath: fullPath withAttributes: attrs];
+
+              if (found == NO) {
+                break;
+              }
+
+              if (stopped) {
+                break;
+              }
+            }
+
+            if (found) {
+              [finder nextResult: fullPath];
             }
 
             if (stopped) {
               break;
             }
-          }
 
-          if (found) {
-            [finder nextResult: fullPath];
-          }
+            if (([attrs fileType] == NSFileTypeDirectory) && !recursion) {
+              [enumerator skipDescendents];
+            }
 
-          if (stopped) {
-            RELEASE (arp2);
+          } else {
             break;
           }
-
-          if (([attrs fileType] == NSFileTypeDirectory) && !recursion) {
-            [enumerator skipDescendents];
-          }
-        
-        } else {
-          RELEASE (arp2);
-          break;
         }
-        
-        RELEASE (arp2);  
       }
-      
-      RELEASE (arp1);
 
     } else {
       BOOL found = YES;
-      
+
       for (j = 0; j < [modules count]; j++) {
         id module = [modules objectAtIndex: j];
-        
+
         found = [module checkPath: path withAttributes: attributes];
 
         if (found == NO) {
           break;
         }
-        
+
         if (stopped) {
           break;
         }
       }
-      
+
       if (found) {
         [finder nextResult: path];
       }
     }
-    
+
     if (stopped) {
       break;
     }
   }
 
-  RELEASE (arp);
+  } // @autoreleasepool
 
   [self done];
 }
@@ -358,7 +350,6 @@
     }
     
     if (ddbd) {
-      RETAIN (ddbd);
       [ddbd setProtocolForProxy: @protocol(DDBd)];
     
       [[NSNotificationCenter defaultCenter] addObserver: self
@@ -400,7 +391,7 @@
 
 int main(int argc, char** argv)
 {
-  CREATE_AUTORELEASE_POOL (pool);
+@autoreleasepool {
   
   if (argc > 1) {
     NSString *conname = [NSString stringWithCString: argv[1]];
@@ -413,7 +404,7 @@ int main(int argc, char** argv)
     NSLog(@"no connection name.");
   }
   
-  RELEASE (pool);  
+  } // @autoreleasepool  
   exit(0);
 }
 

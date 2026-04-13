@@ -46,7 +46,6 @@ const double PDFResolution = 72.0;
   RELEASE (matrix);
   RELEASE (imageView);
   RELEASE (errLabel);
-  [super dealloc];
 }
 
 - (id)initWithFrame:(NSRect)frameRect

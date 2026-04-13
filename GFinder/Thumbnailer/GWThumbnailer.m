@@ -82,7 +82,6 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
       DESTROY (dictLock);
       RELEASE (pathsInProcessing);
       sharedThumbnailerInstance = nil;
-      [super dealloc];
     }
 }
 
@@ -113,7 +112,6 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
     
     thumbnailDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
     thumbnailDir = [thumbnailDir stringByAppendingPathComponent: @"Thumbnails"];
-    RETAIN (thumbnailDir);
 
     if (([fm fileExistsAtPath: thumbnailDir isDirectory: &isdir] && isdir) == NO) {
       if ([fm createDirectoryAtPath: thumbnailDir attributes: nil] == NO) {
@@ -311,9 +309,8 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
   NSMutableArray *added;
   BOOL isdir;
   NSUInteger i;
-  NSAutoreleasePool *arp;
 
-  arp = [NSAutoreleasePool new];
+  @autoreleasepool {
   NSLog(@"_makeThumbnails (%u): %@", (int)countInstances, path);
   added = [NSMutableArray array];
 
@@ -359,7 +356,8 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
 	userInfo: info];
     }
   [pathsInProcessing removeObject:path];
-  [arp drain];
+
+  } // @autoreleasepool
 }
 
 - (void)makeThumbnails:(NSString *)path
@@ -375,9 +373,8 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
   NSMutableArray *deleted;
   BOOL isdir;
   NSUInteger i;
-  NSAutoreleasePool *arp;
 
-  arp = [NSAutoreleasePool new];
+  @autoreleasepool {
 
   
     if ((thumbsDict == nil) || ([thumbsDict count] == 0)) {
@@ -422,7 +419,8 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
       }
 
   [pathsInProcessing removeObject:path];
-  [arp drain];
+
+  } // @autoreleasepool
 }
 
 

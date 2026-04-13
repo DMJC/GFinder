@@ -62,7 +62,6 @@ static NSString *nibName = @"FileOperationWin";
   DESTROY (executor);
   DESTROY (execconn);
   
-  [super dealloc];
 }
 
 + (id)operationOfType:(NSString *)tp
@@ -131,7 +130,7 @@ static NSString *nibName = @"FileOperationWin";
       ASSIGN (type, tp);
       ASSIGN (source, src);
       ASSIGN (destination, dst);
-      files = [[NSMutableArray arrayWithArray:fls] retain];
+      files = [NSMutableArray arrayWithArray:fls];
       procFiles = [[NSMutableArray alloc] init];
     
       dupfiles = [NSMutableArray new];
@@ -552,7 +551,7 @@ static NSString *nibName = @"FileOperationWin";
 
 - (void)sendWillChangeNotification
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSMutableDictionary *dict = [NSMutableDictionary dictionary];	
   NSUInteger i;
 
@@ -574,12 +573,12 @@ static NSString *nibName = @"FileOperationWin";
   [nc postNotificationName: @"GWFileSystemWillChangeNotification" object: dict];
 
   [dnc postNotificationName: @"GWFileSystemWillChangeNotification" object: nil userInfo: dict];
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 - (void)sendDidChangeNotification
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSMutableDictionary *notifObj = [NSMutableDictionary dictionary];		
 
   [notifObj setObject: type forKey: @"operation"];	
@@ -603,7 +602,7 @@ static NSString *nibName = @"FileOperationWin";
   [nc postNotificationName: @"GWFileSystemDidChangeNotification" object: notifObj];
 
   [dnc postNotificationName: @"GWFileSystemDidChangeNotification" object: nil userInfo: notifObj];  
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 - (void)registerExecutor:(id)anObject
@@ -612,7 +611,7 @@ static NSString *nibName = @"FileOperationWin";
   BOOL samename;
 
   [anObject setProtocolForProxy: @protocol(FileOpExecutorProtocol)];
-  executor = (id <FileOpExecutorProtocol>)[anObject retain];
+  executor = (id <FileOpExecutorProtocol>)anObject;
   
   [executor setOperation: opinfo];
 
@@ -772,7 +771,7 @@ shouldMakeNewConnection:(NSConnection*)newConn
 
 + (void)setPorts:(NSArray *)thePorts
 {
-  CREATE_AUTORELEASE_POOL(pool);
+@autoreleasepool {
   NSPort *port[2];
   NSConnection *conn;
   FileOpExecutor *executor;
@@ -788,7 +787,7 @@ shouldMakeNewConnection:(NSConnection*)newConn
   [(id)[conn rootProxy] registerExecutor: executor];
   RELEASE (executor);
   
-  RELEASE (pool);
+  } // @autoreleasepool
 }
 
 - (void)dealloc
@@ -798,7 +797,6 @@ shouldMakeNewConnection:(NSConnection*)newConn
   RELEASE (destination);
   RELEASE (files);
   RELEASE (procfiles);
-  [super dealloc];
 }
 
 - (id)init
@@ -927,62 +925,59 @@ shouldMakeNewConnection:(NSConnection*)newConn
     {
       for (i = 0; i < [files count]; i++)
         {
-          CREATE_AUTORELEASE_POOL (arp);
-          NSDictionary *dict = [files objectAtIndex: i];
-          NSString *name = [dict objectForKey: @"name"]; 
-          NSString *path = [source stringByAppendingPathComponent: name];       
-          BOOL isDir = NO;
-          
-          [fm fileExistsAtPath: path isDirectory: &isDir];
-          
-          if (isDir)
-            {
-              NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: path];
-              
-              while (1)
-                {
-                  CREATE_AUTORELEASE_POOL (arp2);
-                  NSString *dirEntry = [enumerator nextObject];
-                  
-                  if (dirEntry)
-                    {
-                      if (stopped)
+          @autoreleasepool {
+            NSDictionary *dict = [files objectAtIndex: i];
+            NSString *name = [dict objectForKey: @"name"];
+            NSString *path = [source stringByAppendingPathComponent: name];
+            BOOL isDir = NO;
+
+            [fm fileExistsAtPath: path isDirectory: &isDir];
+
+            if (isDir)
+              {
+                NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: path];
+
+                while (1)
+                  {
+                    @autoreleasepool {
+                      NSString *dirEntry = [enumerator nextObject];
+
+                      if (dirEntry)
                         {
-                          RELEASE (arp2);
+                          if (stopped)
+                            {
+                              break;
+                            }
+                          fnum++;
+                        }
+                      else
+                        {
                           break;
                         }
-                      fnum++;
                     }
-                  else
-                    {
-                      RELEASE (arp2);
-                      break;
-                    }
-                  RELEASE (arp2);
-                }
-            }
-          else
-            {
-              fnum++;
-            }
-          
-          if (stopped)
-            {
-              RELEASE (arp);
-              break;
-            }
-          RELEASE (arp);
+                  }
+              }
+            else
+              {
+                fnum++;
+              }
+
+            if (stopped)
+              {
+                break;
+              }
+          }
         }
-      
+
       if (stopped)
         {
           [fileOp endOperation];
           [fileOp cleanUpExecutor];
         }
-      
+
       fcount = 0;
       stepcount = 0;
-      
+
       if (fnum < PROGR_STEPS)
         {
           progstep = 1.0;
@@ -1055,7 +1050,6 @@ if (([files count] == 0) || stopped || paused) break
 
 #define GET_FILENAME \
 fileinfo = [files objectAtIndex: 0]; \
-RETAIN (fileinfo); \
 filename = [fileinfo objectForKey: @"name"];
 
 - (void)doMove

@@ -32,13 +32,12 @@
   RELEASE (basePath);
 
   RELEASE (countpath);
-  NSZoneFree ([self zone], pnum);
+  NSZoneFree (NSDefaultMallocZone(), pnum);
   RELEASE (formstr);
   
   RELEASE (freepath);
   RELEASE (freeEntries);
     
-  [super dealloc];
 }
 
 - (id)initWithPath:(NSString *)apath
@@ -59,7 +58,7 @@
 
     ASSIGN (countpath, [basePath stringByAppendingPathComponent: @"count"]);
 
-    pnum = NSZoneMalloc([self zone], sizeof(int) * depth);
+    pnum = NSZoneMalloc(NSDefaultMallocZone(), sizeof(int) * depth);
 
     str = [[NSNumber numberWithUnsignedInt: (levcount - 1)] stringValue];
     ASSIGN (formstr, ([NSString stringWithFormat: @"%%0%lui", (unsigned long)[str length]]));
@@ -93,7 +92,6 @@
     
     if ([fm fileExistsAtPath: freepath]) {
       freeEntries = [NSMutableArray arrayWithContentsOfFile: freepath];
-      RETAIN (freeEntries);
     } else {
       freeEntries = [NSMutableArray new];
       [freeEntries writeToFile: freepath atomically: YES];
@@ -129,100 +127,98 @@
 
 - (NSString *)nextEntry
 {
-  CREATE_AUTORELEASE_POOL (arp);
-  NSString *fullpath = [NSString stringWithString: basePath];
   NSString *entry = [NSString string];
-  int count = [freeEntries count];
-  int i;
-  
-  if (count > 0) {
-    NSArray *components = [freeEntries objectAtIndex: (count - 1)];
-    
-    for (i = 0; i < depth; i++) {
-      entry = [entry stringByAppendingPathComponent: [components objectAtIndex: i]];
-    
-      if (i < (depth - 1)) {
-        fullpath = [fullpath stringByAppendingPathComponent: [components objectAtIndex: i]];
 
-        if ([fm fileExistsAtPath: fullpath] == NO) {
-          if ([fm createDirectoryAtPath: fullpath attributes: nil] == NO) {
-            [NSException raise: NSInternalInconsistencyException
-		                    format: @"cannot create %@", entry]; 
-          }
-        }
-      }
-    }
+  @autoreleasepool {
+    NSString *fullpath = [NSString stringWithString: basePath];
+    int count = [freeEntries count];
+    int i;
 
-    [freeEntries removeObjectAtIndex: (count - 1)];
-    [freeEntries writeToFile: freepath atomically: YES];
-
-  } else {
-    BOOL full = YES;
-
-    for (i = 0; i < depth; i++) {
-      if (pnum[i] < (levcount - 1)) {
-        full = NO;
-        break;
-      }
-    }
-
-    if (full == NO) {
-      NSMutableString *countStr = [NSMutableString string];
-      int pos = depth - 1;
-
-      while (pos >= 0) {
-        pnum[pos]++;
-
-        if (pnum[pos] == levcount) {
-          if (pos == 0) {
-            pnum[pos]--;
-            [NSException raise: NSInternalInconsistencyException
-		                    format: @"the directory is full!"]; 
-            RELEASE (arp);    
-            return nil;
-          } else {
-            pnum[pos] = 0;  
-            pos--;
-          }
-        } else {
-          break;
-        }
-      }
+    if (count > 0) {
+      NSArray *components = [freeEntries objectAtIndex: (count - 1)];
 
       for (i = 0; i < depth; i++) {
-        NSString *str = [NSString stringWithFormat: formstr, pnum[i]];
+        entry = [entry stringByAppendingPathComponent: [components objectAtIndex: i]];
 
-        fullpath = [fullpath stringByAppendingPathComponent: str];
-        entry = [entry stringByAppendingPathComponent: str];
-        [countStr appendFormat: @"%i ", pnum[i]];
-        
         if (i < (depth - 1)) {
+          fullpath = [fullpath stringByAppendingPathComponent: [components objectAtIndex: i]];
+
           if ([fm fileExistsAtPath: fullpath] == NO) {
             if ([fm createDirectoryAtPath: fullpath attributes: nil] == NO) {
               [NSException raise: NSInternalInconsistencyException
-		                      format: @"cannot create %@", entry]; 
+                          format: @"cannot create %@", entry];
             }
           }
         }
       }
 
-      [countStr writeToFile: countpath atomically: YES];
+      [freeEntries removeObjectAtIndex: (count - 1)];
+      [freeEntries writeToFile: freepath atomically: YES];
 
     } else {
-      [NSException raise: NSInternalInconsistencyException
-  		            format: @"the directory is full!"];     
-    }
-  }
+      BOOL full = YES;
 
-  RETAIN (entry);
-  RELEASE (arp); 
-          
-  return [entry autorelease];
+      for (i = 0; i < depth; i++) {
+        if (pnum[i] < (levcount - 1)) {
+          full = NO;
+          break;
+        }
+      }
+
+      if (full == NO) {
+        NSMutableString *countStr = [NSMutableString string];
+        int pos = depth - 1;
+
+        while (pos >= 0) {
+          pnum[pos]++;
+
+          if (pnum[pos] == levcount) {
+            if (pos == 0) {
+              pnum[pos]--;
+              [NSException raise: NSInternalInconsistencyException
+                          format: @"the directory is full!"];
+              return nil;
+            } else {
+              pnum[pos] = 0;
+              pos--;
+            }
+          } else {
+            break;
+          }
+        }
+
+        for (i = 0; i < depth; i++) {
+          NSString *str = [NSString stringWithFormat: formstr, pnum[i]];
+
+          fullpath = [fullpath stringByAppendingPathComponent: str];
+          entry = [entry stringByAppendingPathComponent: str];
+          [countStr appendFormat: @"%i ", pnum[i]];
+
+          if (i < (depth - 1)) {
+            if ([fm fileExistsAtPath: fullpath] == NO) {
+              if ([fm createDirectoryAtPath: fullpath attributes: nil] == NO) {
+                [NSException raise: NSInternalInconsistencyException
+                            format: @"cannot create %@", entry];
+              }
+            }
+          }
+        }
+
+        [countStr writeToFile: countpath atomically: YES];
+
+      } else {
+        [NSException raise: NSInternalInconsistencyException
+                    format: @"the directory is full!"];
+      }
+    }
+  } // @autoreleasepool
+
+  return entry;
 }
 
 - (void)removeEntry:(NSString *)entry
 {
-  CREATE_AUTORELEASE_POOL (arp);
+@autoreleasepool {
   NSArray *components = [entry pathComponents];
   int count = [components count];
   int i;
@@ -259,12 +255,12 @@
 		            format: @"cannot remove %@", entry];           
   }
   
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 - (void)removePath:(NSString *)path
 {
-  CREATE_AUTORELEASE_POOL (arp);
+@autoreleasepool {
   NSString *fullpath = [basePath stringByAppendingPathComponent: path];
   BOOL exists, isdir;
 
@@ -277,7 +273,7 @@
 		            format: @"cannot remove %@", path];           
   }
   
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 - (NSString *)basePath

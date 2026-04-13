@@ -42,7 +42,6 @@ static NSString *nibName = @"HistoryPref";
 - (void)dealloc
 {
 	RELEASE (prefbox);
-  [super dealloc];
 }
 
 - (id)init
@@ -54,7 +53,6 @@ static NSString *nibName = @"HistoryPref";
     } else {
       int cachemax;
     
-      RETAIN (prefbox);
       RELEASE (win);
 
       gfinder = [GFinder gfinder];

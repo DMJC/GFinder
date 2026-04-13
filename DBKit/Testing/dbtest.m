@@ -83,7 +83,7 @@
 
 int main(int argc, char** argv)
 {
-  CREATE_AUTORELEASE_POOL (pool);
+@autoreleasepool {
   TreeDelegate *delegate = [TreeDelegate new];
   DBKBTree *tree = [[DBKBTree alloc] initWithPath: dbpath order: 3 delegate: delegate];
   NSDate *date = [NSDate date];
@@ -118,7 +118,7 @@ int main(int argc, char** argv)
   RELEASE (tree);
   RELEASE (delegate);
   
-  RELEASE (pool);
+  } // @autoreleasepool
   exit(EXIT_SUCCESS);
 }
 

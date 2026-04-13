@@ -61,7 +61,6 @@
   RELEASE (freePositions);
   RELEASE (tile);
   RELEASE (myWin);
-  [super dealloc];
 }
 
 - (id)init
@@ -148,7 +147,6 @@
 	    }
 	  else
 	    {
-	      RETAIN (currentName);
 	    }
 	}
       else
@@ -250,7 +248,6 @@
   [dialog orderFrontRegardless];
 
   result = [dialog runModal];
-  [dialog release];
 
   if(result != NSAlertDefaultReturn)
     return;
@@ -363,7 +360,6 @@
   [dialog orderFrontRegardless];
 
   result = [dialog runModal];
-  [dialog release];
 
   if(result != NSAlertDefaultReturn)
     return;
@@ -383,7 +379,6 @@
     }
 
   leaves = [layers objectForKey: currentName];
-  RETAIN (leaves);
   [layers removeObjectForKey: currentName];
   ASSIGN (currentName, layerName);
   [layers setObject: leaves forKey: currentName];
@@ -927,7 +922,7 @@
 
 - (void)fileSystemDidChange:(NSNotification *)notification
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSDictionary *dict = [notification object];
   NSString *operation = [dict objectForKey: @"operation"];
   NSString *source = [dict objectForKey: @"source"];
@@ -992,12 +987,12 @@
 	}
     }
 
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 - (void)watcherNotification:(NSNotification *)notification
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSDictionary *notifdict = (NSDictionary *)[notification object];
   NSString *path = [notifdict objectForKey: @"path"];
   NSString *event = [notifdict objectForKey: @"event"];
@@ -1007,7 +1002,6 @@
 
   if ([event isEqual: @"GWFileCreatedInWatchedDirectory"])
     {
-      RELEASE (arp);
       return;
     }
 
@@ -1088,7 +1082,7 @@
 	}
     }
 
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 - (void)updateDefaults

@@ -37,7 +37,6 @@
 
 - (void)dealloc
 {
-  [super dealloc];
 }
 
 - (instancetype)init

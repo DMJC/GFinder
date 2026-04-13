@@ -55,13 +55,11 @@
     if (font == nil) {
       font = [NSFont boldSystemFontOfSize: 0];
     }
-    RETAIN (font);
 
     italicFont = [NSFont fontWithName: @"Helvetica-BoldOblique" size: 12];
     if (italicFont == nil) {
       italicFont = [NSFont boldSystemFontOfSize: 0];
     }
-    RETAIN (italicFont);
     
     r.size = NSMakeSize(BUTTSZ, BUTTSZ);
     r.origin.y = rect.size.height - TAB_H + (int)((TAB_H - BUTTSZ) / 2);
@@ -100,7 +98,6 @@
   RELEASE (font);
   RELEASE (italicFont);
   
-  [super dealloc];
 }
 
 - (void)addTabItem:(TShelfViewItem *)item
@@ -115,7 +112,6 @@
     if (index == [items count]) {
       index--;
     }
-    RETAIN (lastItem);
     [items removeObject: lastItem];
   }
 

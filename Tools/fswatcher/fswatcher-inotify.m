@@ -46,7 +46,6 @@ static NSString *GWWatchedPathRenamed = @"GWWatchedPathRenamed";
   RELEASE (conn);
   RELEASE (client);
   RELEASE (wpaths);
-  [super dealloc];
 }
 
 - (id)init
@@ -152,7 +151,6 @@ static NSString *GWWatchedPathRenamed = @"GWWatchedPathRenamed";
   RELEASE (inotifyHandle);  
   RELEASE (lastMovedPath);
   
-  [super dealloc];
 }
 
 - (id)init
@@ -589,14 +587,13 @@ static NSString *GWWatchedPathRenamed = @"GWWatchedPathRenamed";
 
   GWDebugLog(@"removed watcher for: %@", path); 
   
-  RETAIN (path);
   NSMapRemove(watchers, path);  
   RELEASE (path);
 }
 
 - (void)notifyClients:(NSDictionary *)info
 {
-  CREATE_AUTORELEASE_POOL(pool);
+@autoreleasepool {
   NSString *path = [info objectForKey: @"path"];
   NSData *data = [NSArchiver archivedDataWithRootObject: info];
   NSUInteger i;
@@ -609,7 +606,7 @@ static NSString *GWWatchedPathRenamed = @"GWWatchedPathRenamed";
 		}
   }
 
-  RELEASE (pool);  
+  } // @autoreleasepool  
 }
 
 - (void)notifyGlobalWatchingClients:(NSDictionary *)info
@@ -792,7 +789,6 @@ static inline BOOL isDotFile(NSString *path)
   NSDate *now = [NSDate date];
   int i;
   
-  RETAIN (paths);
   
   for (i = 0; i < [paths count]; i++) {
     NSString *path = [paths objectAtIndex: i];
@@ -873,7 +869,7 @@ static inline BOOL isDotFile(NSString *path)
       Watcher *watcher = [self watcherWithWatchDescriptor: eventp->wd];
       
       if (watcher) {
-        CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
         NSMutableDictionary *notifdict = [NSMutableDictionary dictionary];
         NSString *basepath = [watcher watchedPath];
         NSString *fullpath = basepath;
@@ -992,7 +988,7 @@ static inline BOOL isDotFile(NSString *path)
           }                   
         } 
         
-        RELEASE (arp);
+  } // @autoreleasepool
       }    
     }
     
@@ -1010,7 +1006,6 @@ static inline BOOL isDotFile(NSString *path)
 - (void)dealloc
 { 
   RELEASE (watchedPath);  
-  [super dealloc];
 }
 
 - (id)initWithWatchedPath:(NSString *)path
@@ -1071,7 +1066,7 @@ static inline BOOL isDotFile(NSString *path)
 
 int main(int argc, char** argv)
 {
-  CREATE_AUTORELEASE_POOL(pool);
+@autoreleasepool {
   NSProcessInfo *info = [NSProcessInfo processInfo];
   NSMutableArray *args = AUTORELEASE ([[info arguments] mutableCopy]);
   BOOL subtask = YES;
@@ -1109,17 +1104,17 @@ int main(int argc, char** argv)
     exit(EXIT_FAILURE);
   }
   
-  RELEASE(pool);
+  } // @autoreleasepool
 
   {
-    CREATE_AUTORELEASE_POOL (pool);
+@autoreleasepool {
     FSWatcher *fsw = [[FSWatcher alloc] init];
-    RELEASE (pool);
+  } // @autoreleasepool
   
     if (fsw != nil) {
-	    CREATE_AUTORELEASE_POOL (pool);
+@autoreleasepool {
       [[NSRunLoop currentRunLoop] run];
-  	  RELEASE (pool);
+  } // @autoreleasepool
     }
   }
     

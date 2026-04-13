@@ -69,7 +69,6 @@ static BOOL sizeStop = NO;
   RELEASE (offImage);
   RELEASE (multipleImage);  
   
-  [super dealloc];
 }
 
 - (id)initForInspector:(id)insp
@@ -88,7 +87,6 @@ static BOOL sizeStop = NO;
           return self;
         } 
 
-      RETAIN (mainBox);
       RELEASE (win);
 
       inspector = insp;
@@ -102,7 +100,6 @@ static BOOL sizeStop = NO;
       nc = [NSNotificationCenter defaultCenter];
     
       autocalculate = [[NSUserDefaults standardUserDefaults] boolForKey: @"auto_calculate_sizes"];
-      RETAIN (calculateButt);
     
       if (autocalculate)
         {
@@ -426,7 +423,7 @@ static BOOL sizeStop = NO;
       
           while ((fpath = [enumerator nextObject]))
             {
-              CREATE_AUTORELEASE_POOL(arp);  
+@autoreleasepool {  
       
               fpath = [currentPath stringByAppendingPathComponent: fpath];
               attrs = [[fm fileAttributesAtPath: fpath traverseLink: NO] mutableCopy];
@@ -436,7 +433,7 @@ static BOOL sizeStop = NO;
               [fm changeFileAttributes: attrs atPath: fpath];
               RELEASE (attrs);
         
-              RELEASE (arp);
+  } // @autoreleasepool
             }
                   
           ASSIGN (attributes, [fm fileAttributesAtPath: currentPath traverseLink: NO]);	
@@ -470,7 +467,7 @@ static BOOL sizeStop = NO;
         
               while ((fpath = [enumerator nextObject]))
                 {
-                  CREATE_AUTORELEASE_POOL(arp);  
+@autoreleasepool {  
 
                   fpath = [path stringByAppendingPathComponent: fpath];
                   attrs = [[fm fileAttributesAtPath: fpath traverseLink: NO] mutableCopy];
@@ -480,7 +477,7 @@ static BOOL sizeStop = NO;
                   [fm changeFileAttributes: attrs atPath: fpath];
                   RELEASE (attrs);
 
-                  RELEASE (arp);
+  } // @autoreleasepool
                 }
             }
         }
@@ -761,7 +758,6 @@ static BOOL sizeStop = NO;
     {
       [anObject setProtocolForProxy: @protocol(SizerProtocol)];
       sizer = (id <SizerProtocol>)anObject;
-      RETAIN (sizer);
       if (insppaths)
         {
           sizeStop = YES;
@@ -789,18 +785,14 @@ static BOOL sizeStop = NO;
 
 - (void)dealloc
 {
-  [super dealloc];
 }
 
 + (void)createSizerWithPorts:(NSArray *)portArray
 {
-  NSAutoreleasePool *pool;
   id attrs;
   NSConnection *conn;
   NSPort *port[2];
   Sizer *sizer;
-	
-  pool = [[NSAutoreleasePool alloc] init];
 	  
   port[0] = [portArray objectAtIndex: 0];
   port[1] = [portArray objectAtIndex: 1];
@@ -811,7 +803,6 @@ static BOOL sizeStop = NO;
   RELEASE (sizer);
 
   [[NSRunLoop currentRunLoop] run];
-  [pool release];
 }
 
 - (id)initWithAttributesConnection:(NSConnection *)conn
@@ -834,78 +825,60 @@ static BOOL sizeStop = NO;
   unsigned long long dirsize = 0;
   unsigned long long fsize = 0;
   NSUInteger i;
-	
+
   sizeStop = NO;
-  
+
   for (i = 0; i < [paths count]; i++)
     {
-      CREATE_AUTORELEASE_POOL (arp1);
-      NSString *path, *filePath;
-      NSDictionary *fileAttrs;
-      BOOL isdir;
+      @autoreleasepool {
+        NSString *path, *filePath;
+        NSDictionary *fileAttrs;
+        BOOL isdir;
 
-      if (sizeStop)
-	{
-	  RELEASE (arp1);
-	  return;
-	}
+        if (sizeStop) {
+          return;
+        }
 
-      path = [paths objectAtIndex: i];
+        path = [paths objectAtIndex: i];
 
-      fileAttrs = [fm fileAttributesAtPath: path traverseLink: NO];
-      if (fileAttrs)
-        {
+        fileAttrs = [fm fileAttributesAtPath: path traverseLink: NO];
+        if (fileAttrs) {
           fsize = [[fileAttrs objectForKey: NSFileSize] unsignedLongLongValue];
           dirsize += fsize;
         }
-     
-      [fm fileExistsAtPath: path isDirectory: &isdir];
-          
-      if (isdir)
-        {
+
+        [fm fileExistsAtPath: path isDirectory: &isdir];
+
+        if (isdir) {
           NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: path];
 
-          while (1)
-            {
-              CREATE_AUTORELEASE_POOL (arp2);
-
+          while (1) {
+            @autoreleasepool {
               filePath = [enumerator nextObject];
 
-              if (filePath)
-                {
-                  if (sizeStop)
-                    {
-                      RELEASE (arp2);
-                      RELEASE (arp1);
-                      return;
-                    }
+              if (filePath) {
+                if (sizeStop) {
+                  return;
+                }
 
-                  filePath = [path stringByAppendingPathComponent: filePath];
-                  fileAttrs = [fm fileAttributesAtPath: filePath traverseLink: NO];
-                  if (fileAttrs)
-                    {
-                      fsize = [[fileAttrs objectForKey: NSFileSize] unsignedLongLongValue];
-                      dirsize += fsize;
-                    }
-      
+                filePath = [path stringByAppendingPathComponent: filePath];
+                fileAttrs = [fm fileAttributesAtPath: filePath traverseLink: NO];
+                if (fileAttrs) {
+                  fsize = [[fileAttrs objectForKey: NSFileSize] unsignedLongLongValue];
+                  dirsize += fsize;
                 }
-              else
-                {
-                  RELEASE (arp2);
-                  break;   
-                }
-      
-              RELEASE (arp2);
+              } else {
+                break;
+              }
             }
+          }
         }
-    
-      RELEASE (arp1);
-    }	
-
-  if (sizeStop == NO)
-    {
-      [attributes sizeReady: sizeDescription(dirsize)];
+      }
     }
+
+  if (sizeStop == NO) {
+    [attributes sizeReady: sizeDescription(dirsize)];
+  }
 }
 
 @end

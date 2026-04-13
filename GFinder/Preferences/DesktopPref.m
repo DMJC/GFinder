@@ -42,7 +42,6 @@ static NSString *nibName = @"DesktopPref";
   RELEASE (imagePath);
   RELEASE (imagesDir);
 
-  [super dealloc];
 }
 
 - (id)init
@@ -60,7 +59,6 @@ static NSString *nibName = @"DesktopPref";
 	  NSString *impath;
 	  id cell;
 
-	  RETAIN (prefbox);
 	  RELEASE (win);
 
 	  manager = [GWDesktopManager desktopManager];
@@ -84,7 +82,7 @@ static NSString *nibName = @"DesktopPref";
 
 	  if (imagePath)
 	    {
-	      CREATE_AUTORELEASE_POOL (pool);
+@autoreleasepool {
 	      NSImage *image = [[NSImage alloc] initWithContentsOfFile: imagePath];
 
 	      if (image)
@@ -92,7 +90,7 @@ static NSString *nibName = @"DesktopPref";
 		  [imageView setImage: image];
 		  RELEASE (image);
 		}
-	      RELEASE (pool);
+  } // @autoreleasepool
 	    }
 
 	  [imagePosMatrix selectCellAtRow: [[manager desktopView] backImageStyle] column: 0];
@@ -106,7 +104,7 @@ static NSString *nibName = @"DesktopPref";
 	  // General
 	  [omnipresentCheck setState: ([manager usesXBundle] ? NSOnState : NSOffState)];
 	  [launchSingleClick setState: ([manager singleClickLaunch] ? NSOnState : NSOffState)];
-	  [hideTShelfCheck setState: (([[gfinder tabbedShelf] autohide]) ? NSOnState : NSOffState)];
+	  [hideTShelfCheck setState: NSOffState];
 
 	  /* Internationalization */
 	  [[tabView tabViewItemAtIndex: 0] setLabel: NSLocalizedString(@"Background", @"")];
@@ -147,7 +145,7 @@ static NSString *nibName = @"DesktopPref";
 - (IBAction)setColor:(id)sender
 {
   [[manager desktopView] setCurrentColor: [colorWell color]];
-  [gfinder tshelfBackgroundDidChange];
+  if ([gfinder respondsToSelector: @selector(tshelfBackgroundDidChange)]) [gfinder performSelector: @selector(tshelfBackgroundDidChange)];
 }
 
 
@@ -172,7 +170,7 @@ static NSString *nibName = @"DesktopPref";
                                      types: [NSImage imageFileTypes]];
                                      
   if (result == NSOKButton) {
-    CREATE_AUTORELEASE_POOL (pool);
+@autoreleasepool {
     NSString *impath = [openPanel filename];
     NSImage *image = [[NSImage alloc] initWithContentsOfFile: impath];
 
@@ -183,14 +181,14 @@ static NSString *nibName = @"DesktopPref";
       RELEASE (image);
     }
     
-    RELEASE (pool);
+  } // @autoreleasepool
   }
 
   if (imagePath) {  
     [[manager desktopView] setBackImageAtPath: imagePath];
     [imagePosMatrix selectCellAtRow: [[manager desktopView] backImageStyle] 
                              column: 0];
-    [gfinder tshelfBackgroundDidChange];
+    if ([gfinder respondsToSelector: @selector(tshelfBackgroundDidChange)]) [gfinder performSelector: @selector(tshelfBackgroundDidChange)];
   }
 }
 
@@ -206,14 +204,14 @@ static NSString *nibName = @"DesktopPref";
   
   [imagePosMatrix getRow: &row column: &col ofCell: cell];
   [[manager desktopView] setBackImageStyle: row];  
-  [gfinder tshelfBackgroundDidChange];
+  if ([gfinder respondsToSelector: @selector(tshelfBackgroundDidChange)]) [gfinder performSelector: @selector(tshelfBackgroundDidChange)];
 }
 
 - (IBAction)setUseImage:(id)sender
 {
   BOOL useImage = ([sender state] == NSOnState);
   [[manager desktopView] setUseBackImage: useImage];
-  [gfinder tshelfBackgroundDidChange];
+  if ([gfinder respondsToSelector: @selector(tshelfBackgroundDidChange)]) [gfinder performSelector: @selector(tshelfBackgroundDidChange)];
   [imageView setEnabled: useImage];
   [chooseImageButt setEnabled: useImage];
   [imagePosMatrix setEnabled: useImage];
@@ -231,13 +229,12 @@ static NSString *nibName = @"DesktopPref";
 
 - (IBAction)setTShelfAutohide:(id)sender
 {
-  [[gfinder tabbedShelf] setAutohide: ([sender state] == NSOnState)];
+  // tabbedShelf was removed
 }
 
 - (IBAction)setSingleClickLaunch:(id)sender
 {
   [manager setSingleClickLaunch: ([sender state] == NSOnState)];
-  [[gfinder tabbedShelf] setSingleClickLaunch: ([sender state] == NSOnState)];
 }
 
 @end

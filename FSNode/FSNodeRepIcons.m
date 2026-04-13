@@ -185,7 +185,6 @@ static unsigned char darkerLUT[256] = {
                       [baseIcon lockFocus];
                       [linkIcon compositeToPoint:NSMakePoint(0,0) operation:NSCompositeSourceOver];
                       [baseIcon unlockFocus];
-                      [baseIcon autorelease];
                     }
   
                   icon = [self cachedIconOfSize: size forKey: key addBaseIcon: baseIcon];
@@ -214,7 +213,6 @@ static unsigned char darkerLUT[256] = {
 		[icon lockFocus];
 		[linkIcon compositeToPoint:NSMakePoint(0,0) operation:NSCompositeSourceOver];
 		[icon unlockFocus];
-		[icon autorelease];
 	      }	    
       
 	    if ((icnsize.width > size) || (icnsize.height > size))
@@ -264,7 +262,6 @@ static unsigned char darkerLUT[256] = {
 		  [baseIcon lockFocus];
 		  [linkIcon compositeToPoint:NSMakePoint(0,0) operation:NSCompositeSourceOver];
 		  [baseIcon unlockFocus];
-		  [baseIcon autorelease];
                   icon = [self cachedIconOfSize: size forKey: linkKey addBaseIcon: baseIcon];
 		}
               else
@@ -451,34 +448,34 @@ static unsigned char darkerLUT[256] = {
   return 0.8125;
 }
 
-- (NSImage *)resizedIcon:(NSImage *)icon 
+- (NSImage *)resizedIcon:(NSImage *)icon
                   ofSize:(int)size
 {
-  CREATE_AUTORELEASE_POOL(arp);
-  NSSize icnsize = [icon size];
-  NSRect srcr = NSMakeRect(0, 0, icnsize.width, icnsize.height);
-  float fact = (icnsize.width >= icnsize.height) ? (icnsize.width / size) : (icnsize.height / size);
-  NSSize newsize = NSMakeSize(floor(icnsize.width / fact + 0.5), floor(icnsize.height / fact + 0.5));	
-  NSRect dstr = NSMakeRect(0, 0, newsize.width, newsize.height);
-  NSImage *newIcon = [[NSImage alloc] initWithSize: newsize];
-  NSBitmapImageRep *rep = nil;
-  
-  [newIcon lockFocus];
+  NSImage *newIcon;
+  @autoreleasepool {
+    NSSize icnsize = [icon size];
+    NSRect srcr = NSMakeRect(0, 0, icnsize.width, icnsize.height);
+    float fact = (icnsize.width >= icnsize.height) ? (icnsize.width / size) : (icnsize.height / size);
+    NSSize newsize = NSMakeSize(floor(icnsize.width / fact + 0.5), floor(icnsize.height / fact + 0.5));
+    NSRect dstr = NSMakeRect(0, 0, newsize.width, newsize.height);
+    newIcon = [[NSImage alloc] initWithSize: newsize];
+    NSBitmapImageRep *rep = nil;
 
-  [icon drawInRect: dstr 
-          fromRect: srcr 
-         operation: NSCompositeSourceOver 
-          fraction: 1.0];
+    [newIcon lockFocus];
 
-  rep = [[NSBitmapImageRep alloc] initWithFocusedViewRect: dstr];
-  [newIcon addRepresentation: rep];
-  RELEASE (rep);
+    [icon drawInRect: dstr
+            fromRect: srcr
+           operation: NSCompositeSourceOver
+            fraction: 1.0];
 
-  [newIcon unlockFocus];
+    rep = [[NSBitmapImageRep alloc] initWithFocusedViewRect: dstr];
+    [newIcon addRepresentation: rep];
+    RELEASE (rep);
 
-  RELEASE (arp);
+    [newIcon unlockFocus];
+  } // @autoreleasepool
 
-  return AUTORELEASE (newIcon);  
+  return newIcon;
 }
 
 /*
@@ -489,7 +486,7 @@ static unsigned char darkerLUT[256] = {
 - (NSImage *)resizedIcon:(NSImage *)icon 
                   ofSize:(int)size
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSData *tiffdata = [icon TIFFRepresentation];
   NSBitmapImageRep *rep = [NSBitmapImageRep imageRepWithData: tiffdata];
   int spp = [rep samplesPerPixel];
@@ -623,7 +620,7 @@ static unsigned char darkerLUT[256] = {
     [newIcon unlockFocus];
   }
 
-  RELEASE (arp);
+  } // @autoreleasepool
 
   return AUTORELEASE (newIcon);  
 }
@@ -631,12 +628,12 @@ static unsigned char darkerLUT[256] = {
 
 - (NSImage *)lighterIcon:(NSImage *)icon
 {
-  CREATE_AUTORELEASE_POOL(arp);
+  NSImage *newIcon;
+  @autoreleasepool {
   NSData *tiffdata = [icon TIFFRepresentation];
   NSBitmapImageRep *rep = [NSBitmapImageRep imageRepWithData: tiffdata];
   int samplesPerPixel = [rep samplesPerPixel];
   int bitsPerPixel = [rep bitsPerPixel];
-  NSImage *newIcon;
 
 	if (((samplesPerPixel == 3) && (bitsPerPixel == 24)) 
               || ((samplesPerPixel == 4) && (bitsPerPixel == 32))) {
@@ -685,19 +682,19 @@ static unsigned char darkerLUT[256] = {
     newIcon = [icon copy];
   }
 
-  RELEASE (arp);
+  } // @autoreleasepool
 
-  return [newIcon autorelease];  
+  return newIcon;  
 }
 
 - (NSImage *)darkerIcon:(NSImage *)icon
 {
-  CREATE_AUTORELEASE_POOL(arp);
+  NSImage *newIcon;
+  @autoreleasepool {
   NSData *tiffdata = [icon TIFFRepresentation];
   NSBitmapImageRep *rep = [NSBitmapImageRep imageRepWithData: tiffdata];
   int samplesPerPixel = [rep samplesPerPixel];
   int bitsPerPixel = [rep bitsPerPixel];
-  NSImage *newIcon;
 
 	if (((samplesPerPixel == 3) && (bitsPerPixel == 24)) 
               || ((samplesPerPixel == 4) && (bitsPerPixel == 32))) {
@@ -746,9 +743,9 @@ static unsigned char darkerLUT[256] = {
     newIcon = [icon copy];
   }
 
-  RELEASE (arp);
+  } // @autoreleasepool
 
-  return [newIcon autorelease];  
+  return newIcon;  
 }
 
 - (void)prepareThumbnailsCache

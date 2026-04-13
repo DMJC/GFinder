@@ -61,7 +61,6 @@ NSRecursiveLock *dbkbtree_lock = nil;
   RELEASE (freeNodesPage);
   RELEASE (unsavedNodes);
   
-  [super dealloc];
 }
 
 - (id)initWithPath:(NSString *)path
@@ -215,9 +214,9 @@ NSRecursiveLock *dbkbtree_lock = nil;
 
 - (DBKBTreeNode *)insertKey:(id)key
 {
-  CREATE_AUTORELEASE_POOL(arp);
-  BOOL autoflush = [file autoflush];
   DBKBTreeNode *insnode = nil;
+@autoreleasepool {
+  BOOL autoflush = [file autoflush];
   BOOL exists;
 
   [self checkBegin];  
@@ -251,10 +250,9 @@ NSRecursiveLock *dbkbtree_lock = nil;
   [file setAutoflush: autoflush];
   [file flushIfNeeded];
   
-  RETAIN (insnode);
-  RELEASE (arp);
-  
-  return AUTORELEASE (insnode);
+  } // @autoreleasepool
+
+  return insnode;
 }
 
 - (DBKBTreeNode *)insertKey:(id)key
@@ -316,43 +314,42 @@ NSRecursiveLock *dbkbtree_lock = nil;
 - (DBKBTreeNode *)nodeOfKey:(id)key
                    getIndex:(NSUInteger *)index
 {
-  CREATE_AUTORELEASE_POOL(arp);
   DBKBTreeNode *node = root;
-  BOOL exists;
-  
-  [self checkBegin];
-  
-  *index = [node indexForKey: key existing: &exists];
 
-  while (exists == NO) {
-    NSArray *subnodes = [node subnodes];
-    
-    if ([subnodes count]) {
-      node = [subnodes objectAtIndex: *index];
-      
-      if ([node isLoaded] == NO) {
-        [node loadNodeData];
+  @autoreleasepool {
+    BOOL exists;
+
+    [self checkBegin];
+
+    *index = [node indexForKey: key existing: &exists];
+
+    while (exists == NO) {
+      NSArray *subnodes = [node subnodes];
+
+      if ([subnodes count]) {
+        node = [subnodes objectAtIndex: *index];
+
+        if ([node isLoaded] == NO) {
+          [node loadNodeData];
+        }
+
+        *index = [node indexForKey: key existing: &exists];
+      } else {
+        return nil;
       }
-      
-      *index = [node indexForKey: key existing: &exists];
-    } else {
-      RELEASE (arp);
-      return nil;
     }
-  }
+  } // @autoreleasepool
 
-  RETAIN (node);
-  RELEASE (arp);
-  
-  return [node autorelease];
+  return node;
 }
 
 - (DBKBTreeNode *)nodeOfKey:(id)key
                    getIndex:(NSUInteger *)index
                    didExist:(BOOL *)exists
 {
-  CREATE_AUTORELEASE_POOL(arp);
   DBKBTreeNode *node = root;
+
+@autoreleasepool {
   
   [self checkBegin];
   
@@ -376,10 +373,9 @@ NSRecursiveLock *dbkbtree_lock = nil;
     }
   }
 
-  RETAIN (node);
-  RELEASE (arp);
+  } // @autoreleasepool
   
-  return [node autorelease];
+  return node;
 }
 
 - (DBKBTreeNode *)nodeOfKey:(id)key
@@ -401,57 +397,49 @@ NSRecursiveLock *dbkbtree_lock = nil;
 - (NSArray *)keysGreaterThenKey:(id)akey
                andLesserThenKey:(id)bkey
 {
-  CREATE_AUTORELEASE_POOL(pool);
   NSMutableArray *keys = [NSMutableArray array];
-  DBKBTreeNode *node;
-  id key;
-  BOOL exists;
-  NSUInteger index;
-  
-  [self checkBegin];
-    
-  key = akey;
-  node = [self nodeOfKey: key getIndex: &index didExist: &exists];
-  
-  if (exists == NO) {
-    key = [node predecessorKeyInNode: &node forKeyAtIndex: index];
-    
-    if (key == nil) {
-      key = [node minKeyInSubnode: &node];
-      [keys addObject: key]; 
-    } else {
-      node = [self nodeOfKey: key getIndex: &index didExist: &exists];
+
+  @autoreleasepool {
+    DBKBTreeNode *node;
+    id key;
+    BOOL exists;
+    NSUInteger index;
+
+    [self checkBegin];
+
+    key = akey;
+    node = [self nodeOfKey: key getIndex: &index didExist: &exists];
+
+    if (exists == NO) {
+      key = [node predecessorKeyInNode: &node forKeyAtIndex: index];
+
+      if (key == nil) {
+        key = [node minKeyInSubnode: &node];
+        [keys addObject: key];
+      } else {
+        node = [self nodeOfKey: key getIndex: &index didExist: &exists];
+      }
     }
-  }
 
-  while (node != nil)
-    { 
-      CREATE_AUTORELEASE_POOL(arp);
-    
-      key = [node successorKeyInNode: &node forKeyAtIndex: index];
-    
-      if (key == nil)
-        {
-          RELEASE(arp);
+    while (node != nil) {
+      @autoreleasepool {
+        key = [node successorKeyInNode: &node forKeyAtIndex: index];
+
+        if (key == nil) {
           break;
         }
-    
-      if (bkey && ([delegate compareNodeKey: key withKey: bkey] != NSOrderedAscending))
-        {
-          RELEASE(arp);
+
+        if (bkey && ([delegate compareNodeKey: key withKey: bkey] != NSOrderedAscending)) {
           break;
         }
-    
-      index = [node indexOfKey: key];
-      [keys addObject: key]; 
-    
-      RELEASE (arp);
-  }
 
-  RETAIN (keys);
-  RELEASE (pool);
-    
-  return [keys autorelease];
+        index = [node indexOfKey: key];
+        [keys addObject: key];
+      }
+    }
+  } // @autoreleasepool
+
+  return keys;
 }
 
 - (BOOL)replaceKey:(id)key
@@ -477,53 +465,48 @@ NSRecursiveLock *dbkbtree_lock = nil;
 
 - (BOOL)deleteKey:(id)key
 {
-  CREATE_AUTORELEASE_POOL(arp);
-  DBKBTreeNode *node;
-  NSUInteger index;
+  @autoreleasepool {
+    DBKBTreeNode *node;
+    NSUInteger index;
 
-  [self checkBegin];
+    [self checkBegin];
 
-  node = [self nodeOfKey: key getIndex: &index];
-    
-  if (node) {
-    BOOL autoflush = [file autoflush];
-    
-    [file setAutoflush: NO];
-    
-    if ([self deleteKey: key atIndex: index ofNode: node]) {
-      if ([[root keys] count] == 0) { 
-        NSArray *subnodes = [root subnodes];
-        
-        if ([subnodes count]) {
-          DBKBTreeNode *nd = [subnodes objectAtIndex: 0];
+    node = [self nodeOfKey: key getIndex: &index];
 
-          if ([nd isLoaded] == NO) {
-            [nd loadNodeData];
+    if (node) {
+      BOOL autoflush = [file autoflush];
+
+      [file setAutoflush: NO];
+
+      if ([self deleteKey: key atIndex: index ofNode: node]) {
+        if ([[root keys] count] == 0) {
+          NSArray *subnodes = [root subnodes];
+
+          if ([subnodes count]) {
+            DBKBTreeNode *nd = [subnodes objectAtIndex: 0];
+
+            if ([nd isLoaded] == NO) {
+              [nd loadNodeData];
+            }
+
+            [root removeSubnodeAtIndex: 0];
+            [self nodeWillFreeOffset: [nd offset]];
+            [self setRoot: nd];
           }
-
-          RETAIN (nd);
-          [root removeSubnodeAtIndex: 0];
-          [self nodeWillFreeOffset: [nd offset]];
-          [self setRoot: nd];
-          RELEASE (nd);
         }
+
+        [self saveNodes];
+        [file setAutoflush: autoflush];
+        [file flushIfNeeded];
+
+        return YES;
       }
 
-      [self saveNodes];
       [file setAutoflush: autoflush];
-      [file flushIfNeeded];
-      
-      RELEASE (arp);
-      
-      return YES;
     }
-    
-    [file setAutoflush: autoflush];
-  }
 
-  RELEASE (arp);
-    
-  return NO;
+    return NO;
+  }
 }
 
 - (BOOL)deleteKey:(id)key
@@ -749,14 +732,14 @@ NSRecursiveLock *dbkbtree_lock = nil;
 
 - (void)saveNode:(DBKBTreeNode *)node
 {
-  CREATE_AUTORELEASE_POOL (arp);
+@autoreleasepool {
   NSMutableData *data = [NSMutableData dataWithCapacity: 1];
   
   [data appendData: [node nodeData]];
   [data setLength: nodesize];
   [file writeData: data atOffset: [node offset]];
 
-  RELEASE (arp); 
+  } // @autoreleasepool 
 }
 
 - (unsigned)order

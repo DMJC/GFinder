@@ -39,7 +39,6 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
   RELEASE (conn);
   RELEASE (client);
   RELEASE (wpaths);
-  [super dealloc];
 }
 
 - (id)init
@@ -138,12 +137,11 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
   [dnc removeObserver: self];
   
   RELEASE (clientsInfo);
-  NSZoneFree (NSDefaultMallocZone(), (void *)watchers);
+  watchers = nil;
   freeTree(includePathsTree);
   freeTree(excludePathsTree);
   RELEASE (excludedSuffixes);
 
-  [super dealloc];
 }
 
 - (id)init
@@ -474,7 +472,7 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
       GWDebugLog(@"add watcher for: %@", path);     
       [info addWatchedPath: path];
   	  watcher = [[Watcher alloc] initWithWatchedPath: path fswatcher: self];      
-      NSMapInsert (watchers, path, watcher);
+      NSMapInsert (watchers, (__bridge const void *)path, (__bridge const void *)watcher);
   	  RELEASE (watcher);  
     }
   }
@@ -506,7 +504,7 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
 
 - (Watcher *)watcherForPath:(NSString *)path
 {
-  return (Watcher *)NSMapGet(watchers, path);
+  return (__bridge Watcher *)NSMapGet(watchers, (__bridge const void *)path);
 }
 
 - (void)watcherTimeOut:(NSTimer *)sender
@@ -531,9 +529,7 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
   
   GWDebugLog(@"removed watcher for: %@", path);
   
-  RETAIN (path);
-  NSMapRemove(watchers, path);  
-  RELEASE (path);
+  NSMapRemove(watchers, (__bridge const void *)path);
 }
 
 - (pcomp *)includePathsTree
@@ -585,7 +581,7 @@ static inline BOOL isDotFile(NSString *path)
 
 - (void)notifyClients:(NSDictionary *)info
 {
-  CREATE_AUTORELEASE_POOL(pool);
+@autoreleasepool {
   NSString *path = [info objectForKey: @"path"];
   NSString *event = [info objectForKey: @"event"];
   NSData *data = [NSArchiver archivedDataWithRootObject: info];
@@ -656,7 +652,7 @@ static inline BOOL isDotFile(NSString *path)
 	}      
     }
   
-  RELEASE (pool);  
+  } // @autoreleasepool  
 }
 
 - (void)notifyGlobalWatchingClients:(NSDictionary *)info
@@ -685,7 +681,6 @@ static inline BOOL isDotFile(NSString *path)
   RELEASE (watchedPath);  
   RELEASE (pathContents);
   RELEASE (date);  
-  [super dealloc];
 }
 
 - (id)initWithWatchedPath:(NSString *)path
@@ -727,107 +722,99 @@ static inline BOOL isDotFile(NSString *path)
 
 - (void)watchFile
 {
-  CREATE_AUTORELEASE_POOL(pool);
-  NSDictionary *attributes;
-  NSDate *moddate;
-  NSMutableDictionary *notifdict;
+  @autoreleasepool {
+    NSDictionary *attributes;
+    NSDate *moddate;
+    NSMutableDictionary *notifdict;
 
-  if (isOld)
-    {
-      RELEASE (pool);  
+    if (isOld) {
       return;
     }
-	
-  attributes = [fm fileAttributesAtPath: watchedPath traverseLink: YES];
 
-  if (attributes == nil) {
-    notifdict = [NSMutableDictionary dictionary];
-    [notifdict setObject: watchedPath forKey: @"path"];
-    [notifdict setObject: @"GWWatchedPathDeleted" forKey: @"event"];
-    [fswatcher notifyClients: notifdict];              
-		isOld = YES;
-    RELEASE (pool);  
-    return;
-  }
-  	
-  moddate = [attributes fileModificationDate];
+    attributes = [fm fileAttributesAtPath: watchedPath traverseLink: YES];
 
-  if ([date isEqualToDate: moddate] == NO) {
-    if (isdir) {
-      NSArray *oldconts = [pathContents copy];
-      NSArray *newconts = [fm directoryContentsAtPath: watchedPath];	
-      NSMutableArray *diffFiles = [NSMutableArray array];
-      BOOL contentsChanged = NO;
-      int i;
-
-      ASSIGN (date, moddate);	
-      ASSIGN (pathContents, newconts);
-
+    if (attributes == nil) {
       notifdict = [NSMutableDictionary dictionary];
       [notifdict setObject: watchedPath forKey: @"path"];
-
-		  /* if there is an error in fileAttributesAtPath */
-		  /* or watchedPath doesn't exist anymore         */
-		  if (newconts == nil) {	
-        [notifdict setObject: @"GWWatchedPathDeleted" forKey: @"event"];
-        [fswatcher notifyClients: notifdict];
-        RELEASE (oldconts);
-			  isOld = YES;
-        RELEASE (pool);  
-    	  return;
-		  }
-
-      for (i = 0; i < [oldconts count]; i++) {
-        NSString *fname = [oldconts objectAtIndex: i];
-        if ([newconts containsObject: fname] == NO) {
-          [diffFiles addObject: fname];
-        }
-      }
-
-      if ([diffFiles count] > 0) {
-        contentsChanged = YES;
-        [notifdict setObject: @"GWFileDeletedInWatchedDirectory" forKey: @"event"];
-        [notifdict setObject: diffFiles forKey: @"files"];
-        [fswatcher notifyClients: notifdict];
-      }
-
-      [diffFiles removeAllObjects];
-
-      for (i = 0; i < [newconts count]; i++) {
-        NSString *fname = [newconts objectAtIndex: i];
-        if ([oldconts containsObject: fname] == NO) {   
-          [diffFiles addObject: fname];
-        }
-      }
-
-      if ([diffFiles count] > 0) {
-        contentsChanged = YES;
-        [notifdict setObject: watchedPath forKey: @"path"];
-        [notifdict setObject: @"GWFileCreatedInWatchedDirectory" forKey: @"event"];
-        [notifdict setObject: diffFiles forKey: @"files"];
-        [fswatcher notifyClients: notifdict];
-      }
-
-      RELEASE (oldconts);	
-
-      if (contentsChanged == NO) {
-        [notifdict setObject: @"GWWatchedFileModified" forKey: @"event"];
-        [fswatcher notifyClients: notifdict];
-      }
-      	
-	  } else {  // isdir == NO
-      ASSIGN (date, moddate);	
-      
-      notifdict = [NSMutableDictionary dictionary];
-      
-      [notifdict setObject: watchedPath forKey: @"path"];
-      [notifdict setObject: @"GWWatchedFileModified" forKey: @"event"];
-                    
+      [notifdict setObject: @"GWWatchedPathDeleted" forKey: @"event"];
       [fswatcher notifyClients: notifdict];
+      isOld = YES;
+      return;
     }
-  }
 
-  RELEASE (pool);   
+    moddate = [attributes fileModificationDate];
+
+    if ([date isEqualToDate: moddate] == NO) {
+      if (isdir) {
+        NSArray *oldconts = [pathContents copy];
+        NSArray *newconts = [fm directoryContentsAtPath: watchedPath];
+        NSMutableArray *diffFiles = [NSMutableArray array];
+        BOOL contentsChanged = NO;
+        int i;
+
+        ASSIGN (date, moddate);
+        ASSIGN (pathContents, newconts);
+
+        notifdict = [NSMutableDictionary dictionary];
+        [notifdict setObject: watchedPath forKey: @"path"];
+
+        /* if there is an error in fileAttributesAtPath */
+        /* or watchedPath doesn't exist anymore         */
+        if (newconts == nil) {
+          [notifdict setObject: @"GWWatchedPathDeleted" forKey: @"event"];
+          [fswatcher notifyClients: notifdict];
+          isOld = YES;
+          return;
+        }
+
+        for (i = 0; i < [oldconts count]; i++) {
+          NSString *fname = [oldconts objectAtIndex: i];
+          if ([newconts containsObject: fname] == NO) {
+            [diffFiles addObject: fname];
+          }
+        }
+
+        if ([diffFiles count] > 0) {
+          contentsChanged = YES;
+          [notifdict setObject: @"GWFileDeletedInWatchedDirectory" forKey: @"event"];
+          [notifdict setObject: diffFiles forKey: @"files"];
+          [fswatcher notifyClients: notifdict];
+        }
+
+        [diffFiles removeAllObjects];
+
+        for (i = 0; i < [newconts count]; i++) {
+          NSString *fname = [newconts objectAtIndex: i];
+          if ([oldconts containsObject: fname] == NO) {
+            [diffFiles addObject: fname];
+          }
+        }
+
+        if ([diffFiles count] > 0) {
+          contentsChanged = YES;
+          [notifdict setObject: watchedPath forKey: @"path"];
+          [notifdict setObject: @"GWFileCreatedInWatchedDirectory" forKey: @"event"];
+          [notifdict setObject: diffFiles forKey: @"files"];
+          [fswatcher notifyClients: notifdict];
+        }
+
+        if (contentsChanged == NO) {
+          [notifdict setObject: @"GWWatchedFileModified" forKey: @"event"];
+          [fswatcher notifyClients: notifdict];
+        }
+
+      } else {  // isdir == NO
+        ASSIGN (date, moddate);
+
+        notifdict = [NSMutableDictionary dictionary];
+
+        [notifdict setObject: watchedPath forKey: @"path"];
+        [notifdict setObject: @"GWWatchedFileModified" forKey: @"event"];
+
+        [fswatcher notifyClients: notifdict];
+      }
+    }
+  } // @autoreleasepool
 }
 
 - (void)addListener
@@ -868,7 +855,7 @@ static inline BOOL isDotFile(NSString *path)
 
 int main(int argc, char** argv)
 {
-  CREATE_AUTORELEASE_POOL(pool);
+@autoreleasepool {
   NSProcessInfo *info = [NSProcessInfo processInfo];
   NSMutableArray *args = AUTORELEASE ([[info arguments] mutableCopy]);
   BOOL subtask = YES;
@@ -911,18 +898,16 @@ int main(int argc, char** argv)
     exit(EXIT_FAILURE);
   }
   
-  RELEASE(pool);
+  } // @autoreleasepool
 
   {
-    CREATE_AUTORELEASE_POOL (pool);
     FSWatcher *fsw = [[FSWatcher alloc] init];
-    RELEASE (pool);
-  
+
     if (fsw != nil)
     {
-      CREATE_AUTORELEASE_POOL (pool);
-      [[NSRunLoop currentRunLoop] run];
-      RELEASE (pool);
+      @autoreleasepool {
+        [[NSRunLoop currentRunLoop] run];
+      }
     }
   }
     

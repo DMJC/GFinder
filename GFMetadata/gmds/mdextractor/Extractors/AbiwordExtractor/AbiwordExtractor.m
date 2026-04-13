@@ -43,7 +43,6 @@ static char *style = "<xsl:stylesheet "
   RELEASE (skipSet);
   RELEASE (stylesheet);
 
-	[super dealloc];
 }
 
 - (id)initForExtractor:(id)extr
@@ -97,7 +96,7 @@ static char *style = "<xsl:stylesheet "
                        withID:(int)path_id
                    attributes:(NSDictionary *)attributes
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSMutableDictionary *mddict = [NSMutableDictionary dictionary];  
   GSXMLParser *parser = [GSXMLParser parserWithContentsOfFile: path];
   GSXMLDocument *doc = nil;
@@ -160,7 +159,7 @@ static char *style = "<xsl:stylesheet "
             
   success = [extractor setMetadata: mddict forPath: path withID: path_id];  
   
-  RELEASE (arp);
+  } // @autoreleasepool
     
   return success;
 }

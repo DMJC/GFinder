@@ -35,7 +35,6 @@ static NSString *nibName = @"StartAppWin";
 - (void)dealloc
 {
   RELEASE (win);
-  [super dealloc];
 }
 
 - (id)init

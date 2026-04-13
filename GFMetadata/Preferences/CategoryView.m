@@ -48,7 +48,6 @@
   RELEASE (backcolor);
   RELEASE (dragImage);
   
-  [super dealloc];
 }
 
 - (id)initWithCategoryInfo:(NSDictionary *)info 

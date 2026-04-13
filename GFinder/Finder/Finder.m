@@ -74,7 +74,6 @@ static Finder *finder = nil;
   RELEASE (searchResults);
   RELEASE (lsFolders);
     
-  [super dealloc];
 }
 
 - (id)init
@@ -123,7 +122,7 @@ static Finder *finder = nil;
   
     placesMatrix = [[NSMatrix alloc] initWithFrame: NSMakeRect(0, 0, 100, 100)
                                               mode: NSListModeMatrix 
-                                         prototype: [[SearchPlacesCell new] autorelease]
+                                         prototype: [SearchPlacesCell new]
                                       numberOfRows: 0 
                                    numberOfColumns: 0];
     [placesMatrix setTarget: self];
@@ -282,7 +281,7 @@ static Finder *finder = nil;
 
   for (i = 0; i < [bundlesPaths count]; i++)
     {
-      CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
       NSString *bpath = [bundlesPaths objectAtIndex: i];
       NSBundle *bundle = [NSBundle bundleWithPath: bpath];
      
@@ -298,7 +297,7 @@ static Finder *finder = nil;
           }
         }
     
-      RELEASE (arp);
+  } // @autoreleasepool
     }
 
   if ([unsortedModules count] == 0) {  
@@ -685,7 +684,6 @@ static Finder *finder = nil;
     NSMutableArray *paths = [NSMutableArray array];  
     NSUInteger i;
     
-    RETAIN (cells);
     for (i = 0; i < [cells count]; i++) {
       NSString *path = [[cells objectAtIndex: i] path];
     
@@ -869,7 +867,7 @@ static Finder *finder = nil;
 
 - (void)fileSystemDidChange:(NSNotification *)notif
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSDictionary *info = [notif object];
   NSString *operation = [info objectForKey: @"operation"];
   NSString *source = [info objectForKey: @"source"];
@@ -1004,7 +1002,7 @@ static Finder *finder = nil;
     }
   }
 
-  RELEASE (arp);
+  } // @autoreleasepool
 }
 
 - (void)watcherNotification:(NSNotification *)notif

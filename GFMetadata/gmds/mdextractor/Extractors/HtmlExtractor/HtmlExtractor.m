@@ -40,7 +40,6 @@ int escapeChar(char *buf, NSMutableString *str);
   RELEASE (extensions);
   RELEASE (skipSet);
 
-	[super dealloc];
 }
 
 - (id)initForExtractor:(id)extr
@@ -111,7 +110,7 @@ int escapeChar(char *buf, NSMutableString *str);
                        withID:(int)path_id
                    attributes:(NSDictionary *)attributes
 {
-  CREATE_AUTORELEASE_POOL(arp);
+@autoreleasepool {
   NSMutableDictionary *mddict = [NSMutableDictionary dictionary];
   NSString *contents = [NSString stringWithContentsOfFile: path];
   BOOL success = NO;
@@ -161,7 +160,7 @@ int escapeChar(char *buf, NSMutableString *str);
 
   success = [extractor setMetadata: mddict forPath: path withID: path_id];
   
-  RELEASE (arp);
+  } // @autoreleasepool
   
   return success;
 }

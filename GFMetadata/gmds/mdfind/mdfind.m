@@ -248,33 +248,30 @@
 
 int main(int argc, char **argv, char **env)
 {
-  NSAutoreleasePool	*pool;
   NSProcessInfo *proc;
   MDFind *mdfind;
-  
+
 #ifdef GS_PASS_ARGUMENTS
   [NSProcessInfo initializeWithArguments: argv count: argc environment: env];
 #endif
 
-  pool = [NSAutoreleasePool new];
-  proc = [NSProcessInfo processInfo];
-  
-  if (proc == nil) {
-    GSPrintf(stderr, @"mdfind: unable to get process information!\n");
-    RELEASE (pool);
-    exit(EXIT_FAILURE);
-  }
+  @autoreleasepool {
+    proc = [NSProcessInfo processInfo];
 
-  mdfind = [[MDFind alloc] initWithArguments: [proc arguments]];
-  
-  RELEASE (pool);
+    if (proc == nil) {
+      GSPrintf(stderr, @"mdfind: unable to get process information!\n");
+      exit(EXIT_FAILURE);
+    }
+
+    mdfind = [[MDFind alloc] initWithArguments: [proc arguments]];
+  }
 
   if (mdfind != nil) {
-	  CREATE_AUTORELEASE_POOL (pool);
+@autoreleasepool {
     [[NSRunLoop currentRunLoop] run];
-  	RELEASE (pool);
+  } // @autoreleasepool
   }
-  
+
   exit(EXIT_SUCCESS);
 }
 
