@@ -78,7 +78,18 @@
           if ([command hasSuffix:@".app"])
             [[NSWorkspace sharedWorkspace] launchApplication: command];
           else
-            [NSTask launchedTaskWithLaunchPath: command arguments: args];
+            {
+              NSTask *t = [NSTask launchedTaskWithLaunchPath: command arguments: args];
+              __block id obs = [[NSNotificationCenter defaultCenter]
+                  addObserverForName: NSTaskDidTerminateNotification
+                              object: t
+                               queue: [NSOperationQueue mainQueue]
+                          usingBlock: ^(NSNotification *n) {
+                [[NSNotificationCenter defaultCenter] removeObserver: obs];
+                obs = nil;
+                (void)[t terminationStatus];
+              }];
+            }
           [win close];
         }
       else

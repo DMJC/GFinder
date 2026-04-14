@@ -31,13 +31,23 @@
 int main(int argc, char **argv, char **env)
 {
 @autoreleasepool {
+  /* Single-instance guard: if a GFinder DO service is already registered,
+   * another instance is running — exit without launching a second one. */
+  NSString *appName = [[NSProcessInfo processInfo] processName];
+  id existing = [NSConnection rootProxyForConnectionWithRegisteredName: appName
+                                                                  host: @""];
+  if (existing != nil) {
+    NSLog(@"GFinder is already running.");
+    return 0;
+  }
+
   GFinder *gw = [GFinder gfinder];
 	NSApplication *app = [NSApplication sharedApplication];
-  
-  [app setDelegate: gw];    
+
+  [app setDelegate: gw];
 	[app run];
   } // @autoreleasepool
-  
+
   return 0;
 }
 

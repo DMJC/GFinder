@@ -273,8 +273,19 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   
   cmd = [NSTask launchPathForTool: @"lsfupdater"];
 
-  [NSTask launchedTaskWithLaunchPath: cmd 
-                           arguments: [NSArray arrayWithObject: cname]];
+  {
+    NSTask *t = [NSTask launchedTaskWithLaunchPath: cmd
+                                         arguments: [NSArray arrayWithObject: cname]];
+    __block id obs = [[NSNotificationCenter defaultCenter]
+        addObserverForName: NSTaskDidTerminateNotification
+                    object: t
+                     queue: [NSOperationQueue mainQueue]
+                usingBlock: ^(NSNotification *n) {
+      [[NSNotificationCenter defaultCenter] removeObserver: obs];
+      obs = nil;
+      (void)[t terminationStatus];
+    }];
+  }
 }
 
 - (void)checkUpdater:(id)sender

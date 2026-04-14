@@ -681,21 +681,29 @@ static NSString *nibName = @"Contents";
   NSDictionary *userInfo = [notif userInfo];
   NSData *data = [userInfo objectForKey: NSFileHandleNotificationDataItem];
   NSString *str;
-  
+
   if (data && [data length])
     {
-      str = [[NSString alloc] initWithData: data 
+      str = [[NSString alloc] initWithData: data
                                   encoding: [NSString defaultCStringEncoding]];
     }
   else
     {
       str = [[NSString alloc] initWithString: NSLocalizedString(@"No Contents Inspector", @"")];
     }
-  
+
   [self showString: str];
-  
+
   RELEASE (str);
-  } // @autoreleasepool   
+
+  /* The pipe reached EOF because the task exited; reap it now so the
+     child does not linger as a zombie. */
+  if (task)
+    {
+      (void)[task terminationStatus];
+      DESTROY (task);
+    }
+  } // @autoreleasepool
 }
 
 - (void)showString:(NSString *)str

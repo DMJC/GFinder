@@ -937,8 +937,7 @@ static GFinder *gfinder = nil;
   } else {  
 	  NSTask *task = [NSTask new];
 
-	  AUTORELEASE (task);
-	  [task setCurrentDirectoryPath: dirPath];			
+	  [task setCurrentDirectoryPath: dirPath];
 	  [task setLaunchPath: defXterm];
 
     if (defXtermArgs) {
@@ -947,6 +946,17 @@ static GFinder *gfinder = nil;
     }
 
 	  [task launch];
+
+    /* Reap the child when the terminal exits to prevent zombie processes. */
+    __block id obs = [[NSNotificationCenter defaultCenter]
+        addObserverForName: NSTaskDidTerminateNotification
+                    object: task
+                     queue: [NSOperationQueue mainQueue]
+                usingBlock: ^(NSNotification *n) {
+      [[NSNotificationCenter defaultCenter] removeObserver: obs];
+      obs = nil;
+      (void)[task terminationStatus];
+    }];
   }
 }
 
@@ -1595,8 +1605,19 @@ static GFinder *gfinder = nil;
       arguments = [NSMutableArray arrayWithCapacity:2];
       [arguments addObject:@"--daemon"];
       [arguments addObject:@"--auto"];  
-      [NSTask launchedTaskWithLaunchPath: cmd arguments: arguments];
-   
+      {
+        NSTask *fswTask = [NSTask launchedTaskWithLaunchPath: cmd arguments: arguments];
+        __block id obs = [[NSNotificationCenter defaultCenter]
+            addObserverForName: NSTaskDidTerminateNotification
+                        object: fswTask
+                         queue: [NSOperationQueue mainQueue]
+                    usingBlock: ^(NSNotification *n) {
+          [[NSNotificationCenter defaultCenter] removeObserver: obs];
+          obs = nil;
+          (void)[fswTask terminationStatus];
+        }];
+      }
+
       for (i = 1; i <= 40; i++) {
         [startAppWin updateProgressBy: 1.0];
 	      [[NSRunLoop currentRunLoop] runUntilDate:
@@ -1819,10 +1840,20 @@ static GFinder *gfinder = nil;
  
 	  arguments = [NSMutableArray arrayWithCapacity:2];
 	  [arguments addObject:@"--daemon"];
-	  [arguments addObject:@"--auto"];  
-	  [NSTask launchedTaskWithLaunchPath: cmd arguments: arguments];
+	  [arguments addObject:@"--auto"];
+	  {
+	    NSTask *ddbdTask = [NSTask launchedTaskWithLaunchPath: cmd arguments: arguments];
+	    __block id obs = [[NSNotificationCenter defaultCenter]
+	        addObserverForName: NSTaskDidTerminateNotification
+	                    object: ddbdTask
+	                     queue: [NSOperationQueue mainQueue]
+	                usingBlock: ^(NSNotification *n) {
+	      [[NSNotificationCenter defaultCenter] removeObserver: obs];
+	      obs = nil;
+	      (void)[ddbdTask terminationStatus];
+	    }];
+	  }
 
-   
 	  for (i = 1; i <= 40; i++)
 	    {
 	      [startAppWin updateProgressBy: 1.0];
@@ -1934,8 +1965,19 @@ static GFinder *gfinder = nil;
                              operation: NSLocalizedString(@"starting:", @"")
                           maxProgValue: 80.0];
     
-      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
-   
+      {
+        NSTask *mdTask = [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
+        __block id obs = [[NSNotificationCenter defaultCenter]
+            addObserverForName: NSTaskDidTerminateNotification
+                        object: mdTask
+                         queue: [NSOperationQueue mainQueue]
+                    usingBlock: ^(NSNotification *n) {
+          [[NSNotificationCenter defaultCenter] removeObserver: obs];
+          obs = nil;
+          (void)[mdTask terminationStatus];
+        }];
+      }
+
       for (i = 1; i <= 80; i++) {
         [startAppWin updateProgressBy: 1.0];
 	      [[NSRunLoop currentRunLoop] runUntilDate:

@@ -131,7 +131,16 @@
           else
             {
               [args addObjectsFromArray:selpaths];
-              [NSTask launchedTaskWithLaunchPath: command arguments: args];
+              NSTask *t = [NSTask launchedTaskWithLaunchPath: command arguments: args];
+              __block id obs = [[NSNotificationCenter defaultCenter]
+                  addObserverForName: NSTaskDidTerminateNotification
+                              object: t
+                               queue: [NSOperationQueue mainQueue]
+                          usingBlock: ^(NSNotification *n) {
+                [[NSNotificationCenter defaultCenter] removeObserver: obs];
+                obs = nil;
+                (void)[t terminationStatus];
+              }];
             }
         }
       else

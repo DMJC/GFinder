@@ -271,9 +271,20 @@ static NSString *lsfname = @"LiveSearch.lsf";
                                   repeats: NO];
 
   cmd = [NSTask launchPathForTool: @"searchtool"];
-                                          
-  [NSTask launchedTaskWithLaunchPath: cmd 
-                           arguments: [NSArray arrayWithObject: cname]];
+
+  {
+    NSTask *t = [NSTask launchedTaskWithLaunchPath: cmd
+                                         arguments: [NSArray arrayWithObject: cname]];
+    __block id obs = [[NSNotificationCenter defaultCenter]
+        addObserverForName: NSTaskDidTerminateNotification
+                    object: t
+                     queue: [NSOperationQueue mainQueue]
+                usingBlock: ^(NSNotification *n) {
+      [[NSNotificationCenter defaultCenter] removeObserver: obs];
+      obs = nil;
+      (void)[t terminationStatus];
+    }];
+  }
 }
 
 - (BOOL)connection:(NSConnection *)ancestor 
