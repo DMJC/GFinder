@@ -321,7 +321,9 @@ static GFinder *gfinder = nil;
   [mainMenu addItemWithTitle:_(@"Print...") action:@selector(print:) keyEquivalent:@"p"];
 	
   // Quit
+#if !AMBROSIA_BUILD
   [mainMenu addItemWithTitle:_(@"Quit") action:@selector(terminate:) keyEquivalent:@"Q"];
+#endif
 
   [mainMenu update];
 

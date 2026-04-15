@@ -32,7 +32,6 @@
 #import "FSNFunctions.h"
 #import "GFinder.h"
 #import "GWViewersManager.h"
-#import "TShelf/TShelfWin.h"
 #import "Thumbnailer/GWThumbnailer.h"
 
 #define RESV_MARGIN 10

@@ -30,7 +30,6 @@
 #import "GFinder.h"
 #import "GWDesktopView.h"
 #import "Dock.h"
-#import "TShelf/TShelfWin.h"
 
 static NSString *nibName = @"DesktopPref";
 

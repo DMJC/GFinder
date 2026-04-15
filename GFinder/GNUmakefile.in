@@ -92,13 +92,6 @@ Finder/SearchResults/SearchResults.m \
 Finder/SearchResults/ResultsTableView.m \
 Finder/LiveSearch/LSFolder.m \
 Finder/LiveSearch/LSFEditor.m \
-TShelf/TShelfWin.m \
-TShelf/TShelfView.m \
-TShelf/TShelfViewItem.m \
-TShelf/TShelfIcon.m \
-TShelf/TShelfFileIcon.m \
-TShelf/TShelfPBIcon.m \
-TShelf/TShelfIconsView.m \
 Preferences/PrefController.m \
 Preferences/DefEditorPref.m \
 Preferences/XTermPref.m \

@@ -1,6 +1,9 @@
 /* GFinder/config.h.  Generated from config.h.in by configure.  */
 /* GFinder/config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* Build for Ambrosia desktop integration */
+/* #undef AMBROSIA_BUILD */
+
 /* debug logging */
 #define GW_DEBUG_LOG 0
 

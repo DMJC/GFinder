@@ -82,8 +82,23 @@ AC_DEFINE_UNQUOTED([GW_DEBUG_LOG], [$GW_DEBUG_LOG], [debug logging])
 AC_ARG_WITH(inotify,
   [  --with-inotify  Build fswatcher-inotify],
   with_inotify=yes, with_inotify=no)
-  
+
 AC_SUBST(with_inotify)
+
+#--------------------------------------------------------------------
+# Ambrosia desktop integration (disables Quit menu item)
+#--------------------------------------------------------------------
+AC_ARG_WITH(ambrosia,
+  [  --with-ambrosia         Build for Ambrosia desktop (disables Quit menu item)],
+  with_ambrosia=yes, with_ambrosia=no)
+
+if test "$with_ambrosia" = "yes"; then
+  AMBROSIA_BUILD=1
+else
+  AMBROSIA_BUILD=0
+fi
+
+AC_DEFINE_UNQUOTED([AMBROSIA_BUILD], [$AMBROSIA_BUILD], [Build for Ambrosia desktop integration])
 
 AC_CONFIG_FILES([
   GNUmakefile
