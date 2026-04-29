@@ -29,7 +29,6 @@
 #import "History.h"
 #import "FSNFunctions.h"
 #import "GFinder.h"
-#import "GWDesktopManager.h"
 
 
 static GWViewersManager *vwrsmanager = nil;
@@ -434,7 +433,7 @@ static GWViewersManager *vwrsmanager = nil;
                       if ([node isApplication] == NO)
                         [gfinder openFile: [node path]];
                       else
-                        [[NSWorkspace sharedWorkspace] launchApplication: [node path]];
+                        [gfinder launchApplication: [node path] showIcon: YES autolaunch: NO];
                     }
                   else
                     {
@@ -545,15 +544,8 @@ static GWViewersManager *vwrsmanager = nil;
       }
     }
     
-    if ([viewer invalidated] == NO) {
-      id shelf = [viewer shelf];
-      
-      if (shelf) {
-        [shelf nodeContentsWillChange: opinfo];
-      }
-    }
   }
-  
+
   [self closeInvalidViewers: viewersToClose];
 }
 
@@ -577,16 +569,9 @@ static GWViewersManager *vwrsmanager = nil;
       }
     }
     
-    if ([viewer invalidated] == NO) {
-      id shelf = [viewer shelf];
-      
-      if (shelf) {
-        [shelf nodeContentsDidChange: opinfo];
-      }
-    }
   }
 
-  [self closeInvalidViewers: viewersToClose]; 
+  [self closeInvalidViewers: viewersToClose];
 }
 
 - (void)watcherNotification:(NSNotification *)notif
@@ -618,16 +603,9 @@ static GWViewersManager *vwrsmanager = nil;
       }
     }
     
-    if ([viewer invalidated] == NO) {
-      id shelf = [viewer shelf];
-      
-      if (shelf) {
-        [shelf watchedPathChanged: info];
-      }
-    }
   }
 
-  [self closeInvalidViewers: viewersToClose]; 
+  [self closeInvalidViewers: viewersToClose];
 }
 
 - (void)thumbnailsDidChangeInPaths:(NSArray *)paths
@@ -766,11 +744,6 @@ static GWViewersManager *vwrsmanager = nil;
 
 - (void)updateDesktop
 {
-  id desktopManager = [gfinder desktopManager];  
-
-  if ([desktopManager isActive]) {
-    [desktopManager deselectAllIcons];
-  }
 }
 
 - (void)updateDefaults

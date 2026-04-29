@@ -120,11 +120,9 @@ static NSString *nibName = @"Contents";
 
                       if ([principalClass conformsToProtocol: @protocol(ContentViewersProtocol)])
                         {
-@autoreleasepool {
                           id vwr = [[principalClass alloc] initWithFrame: r inspector: self];
-
-                          [viewers addObject: vwr];
-  } // @autoreleasepool
+                          if (vwr)
+                            [viewers addObject: vwr];
                         }
                     }
                 }

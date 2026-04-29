@@ -35,7 +35,7 @@
 #import "GWViewerWindow.h"
 #import "GWViewerScrollView.h"
 #import "GWViewerSplit.h"
-#import "GWViewerShelf.h"
+#import "GWSidebarView.h"
 #import "GFinder.h"
 #import "GWFunctions.h"
 #import "FSNBrowser.h"
@@ -49,10 +49,11 @@
 #define MIN_WIN_H 300
 
 #define MIN_SHELF_HEIGHT 2.0
-#define MID_SHELF_HEIGHT 77.0
-#define MAX_SHELF_HEIGHT 150.0
-#define COLLAPSE_LIMIT 35
-#define MID_LIMIT 110
+#define MID_SHELF_HEIGHT 180.0
+#define MAX_SHELF_HEIGHT 280.0
+#define COLLAPSE_LIMIT 50
+
+#define STATUS_BAR_H 24
 
 static NSInteger GWViewerSegmentIndexForViewType(GWViewType type)
 {
@@ -214,6 +215,8 @@ static GWViewType GWViewerViewTypeForSegmentIndex(NSInteger segment)
     defEntry = [viewerPrefs objectForKey: @"shelfheight"];
     if (defEntry) {
       shelfHeight = [defEntry floatValue];
+      if (shelfHeight < COLLAPSE_LIMIT)
+        shelfHeight = MID_SHELF_HEIGHT;
     } else {
       shelfHeight = MID_SHELF_HEIGHT;
     }
@@ -257,39 +260,6 @@ static GWViewType GWViewerViewTypeForSegmentIndex(NSInteger segment)
     }
 
     [self createSubviews];
-
-    defEntry = [viewerPrefs objectForKey: @"shelfdicts"];
-
-    if (defEntry && [defEntry count]) {
-      [shelf setContents: defEntry];
-    } else if (rootViewer) {
-      NSMutableArray *sfdicts = [NSMutableArray array];
-      NSArray *localappdirs = NSSearchPathForDirectoriesInDomains(NSApplicationDirectory, NSLocalDomainMask, YES);
-      NSMutableArray *paths = [NSMutableArray array];
-      if ([localappdirs count]) {
-        [paths addObject: [localappdirs objectAtIndex: 0]];
-      }
-      [paths addObjectsFromArray: @[
-                        NSHomeDirectory(),
-                        [NSHomeDirectory() stringByAppendingPathComponent: @"Desktop"],
-                        [NSHomeDirectory() stringByAppendingPathComponent: @"Documents"],
-                        [NSHomeDirectory() stringByAppendingPathComponent: @"Downloads"],
-                        [NSHomeDirectory() stringByAppendingPathComponent: @"Pictures"],
-                        [NSHomeDirectory() stringByAppendingPathComponent: @"Music"],
-                        [NSHomeDirectory() stringByAppendingPathComponent: @"Videos"],
-                        @"/",
-                        @"/media"
-                        ]];
-      NSInteger i;
-      for (i = 0; i < [paths count]; i++) {
-        NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
-                        [NSNumber numberWithInteger: i], @"index",
-                        [NSArray arrayWithObject: [paths objectAtIndex: i]], @"paths",
-                        nil];
-        [sfdicts addObject: dict];
-      }
-      [shelf setContents: sfdicts];
-    }
 
     if (viewType == GWViewTypeIcon) {
 	      nodeView = [[GWViewerIconsView alloc] initForViewer: self];
@@ -383,9 +353,9 @@ static GWViewType GWViewerViewTypeForSegmentIndex(NSInteger segment)
   d = [split dividerThickness];
 
   r = NSMakeRect(0, 0, shelfHeight, h);
-  shelf = [[GWViewerShelf alloc] initWithFrame: r forViewer: self];
-  [split addSubview: shelf];
-  RELEASE (shelf);
+  sidebar = [[GWSidebarView alloc] initWithFrame: r forViewer: self];
+  [split addSubview: sidebar];
+  RELEASE (sidebar);
   
   r = NSMakeRect(shelfHeight + d, 0, w - shelfHeight - d, h);
   lowBox = [[NSView alloc] initWithFrame: r];
@@ -404,6 +374,69 @@ static GWViewType GWViewerViewTypeForSegmentIndex(NSInteger segment)
     NSTextField *folderLabel;
     CGFloat labelWidth = w - (xmargin * 2);
 
+    /* ---- Status bar at the bottom ---- */
+    {
+      NSView *sb = [[NSView alloc] initWithFrame: NSMakeRect(0, 0, w, STATUS_BAR_H)];
+      [sb setAutoresizingMask: NSViewWidthSizable | NSViewMaxYMargin];
+
+      /* Thin top-border separator */
+      NSBox *sep = [[NSBox alloc] initWithFrame: NSMakeRect(0, STATUS_BAR_H - 1, w, 1)];
+      [sep setBoxType: NSBoxSeparator];
+      [sep setAutoresizingMask: NSViewWidthSizable | NSViewMinYMargin];
+      [sb addSubview: sep];
+      RELEASE(sep);
+
+      /* Item count – left */
+      NSTextField *icf = [[NSTextField alloc]
+        initWithFrame: NSMakeRect(8, (STATUS_BAR_H - 14) / 2, 180, 14)];
+      [icf setBezeled: NO];
+      [icf setDrawsBackground: NO];
+      [icf setEditable: NO];
+      [icf setSelectable: NO];
+      [icf setFont: [NSFont systemFontOfSize: 11]];
+      [icf setStringValue: @""];
+      [icf setAutoresizingMask: NSViewMaxXMargin | NSViewMaxYMargin | NSViewMinYMargin];
+      [sb addSubview: icf];
+      ASSIGN(itemCountField, icf);
+      RELEASE(icf);
+
+      /* Disk free – right */
+      NSTextField *dsf = [[NSTextField alloc]
+        initWithFrame: NSMakeRect(w - 188, (STATUS_BAR_H - 14) / 2, 180, 14)];
+      [dsf setBezeled: NO];
+      [dsf setDrawsBackground: NO];
+      [dsf setEditable: NO];
+      [dsf setSelectable: NO];
+      [dsf setFont: [NSFont systemFontOfSize: 11]];
+      [dsf setAlignment: NSRightTextAlignment];
+      [dsf setStringValue: @""];
+      [dsf setAutoresizingMask: NSViewMinXMargin | NSViewMaxYMargin | NSViewMinYMargin];
+      [sb addSubview: dsf];
+      ASSIGN(diskSpaceField, dsf);
+      RELEASE(dsf);
+
+      /* Icon size slider – centered, icon view only */
+      CGFloat sliderW = 120;
+      NSSlider *sl = [[NSSlider alloc]
+        initWithFrame: NSMakeRect((w - sliderW) / 2, (STATUS_BAR_H - 16) / 2,
+                                  sliderW, 16)];
+      [sl setMinValue: 32];
+      [sl setMaxValue: 128];
+      [sl setIntValue: 48];
+      [sl setContinuous: YES];
+      [sl setTarget: self];
+      [sl setAction: @selector(iconSizeSliderChanged:)];
+      [sl setAutoresizingMask: NSViewMinXMargin | NSViewMaxXMargin];
+      [sl setHidden: (viewType != GWViewTypeIcon)];
+      [sb addSubview: sl];
+      ASSIGN(iconSizeSlider, sl);
+      RELEASE(sl);
+
+      [lowBox addSubview: sb];
+      RELEASE(sb);
+    }
+
+    /* ---- Folder name label at top ---- */
     folderLabel = [[NSTextField alloc] initWithFrame:
       NSMakeRect(xmargin, h - buttonHeight - ymargin,
                  labelWidth, buttonHeight)];
@@ -417,13 +450,15 @@ static GWViewType GWViewerViewTypeForSegmentIndex(NSInteger segment)
     ASSIGN (folderNameField, folderLabel);
     RELEASE (folderLabel);
 
-    r = NSMakeRect(xmargin, ymargin-5,
-                   w-5,
-                   h);
+    /* ---- Main scroll view (above status bar) ---- */
+    r = NSMakeRect(xmargin, STATUS_BAR_H,
+                   w - xmargin - 5,
+                   h - STATUS_BAR_H);
     nviewScroll = [[GWViewerScrollView alloc] initWithFrame: r inViewer: self];
     [nviewScroll setBorderType: NSBezelBorder];
     [nviewScroll setHasHorizontalScroller: YES];
     [nviewScroll setHasVerticalScroller: (viewType != GWViewTypeBrowser)];
+    [nviewScroll setAutohidesScrollers: NO];
     resizeMask = NSViewNotSizable | NSViewWidthSizable | NSViewHeightSizable;
     [nviewScroll setAutoresizingMask: resizeMask];
     [lowBox addSubview: nviewScroll];
@@ -585,6 +620,30 @@ static GWViewType GWViewerViewTypeForSegmentIndex(NSInteger segment)
     }
 }
 
+- (void)updateStatusBarForViewType
+{
+  BOOL isIconView = (viewType == GWViewTypeIcon);
+  [iconSizeSlider setHidden: !isIconView];
+  if (isIconView && nodeView
+      && [nodeView respondsToSelector: @selector(iconSize)])
+    {
+      [iconSizeSlider setIntValue: [(FSNIconsView *)nodeView iconSize]];
+    }
+}
+
+- (void)iconSizeSliderChanged:(id)sender
+{
+  int size = (int)lround([sender doubleValue]);
+  size = MAX(32, MIN(128, size));  /* hard clamp against float drift */
+
+  if ([nodeView respondsToSelector: @selector(setIconSize:)])
+    {
+      [(id <FSNodeRepContainer>)nodeView setIconSize: size];
+      NSLog(@"Size = %u", size);
+      [nodeView updateNodeInfo: YES];
+    }
+}
+
 - (NSToolbarItem *)toolbar:(NSToolbar *)tb
     itemForItemIdentifier:(NSString *)itemIdentifier
  willBeInsertedIntoToolbar:(BOOL)flag
@@ -673,9 +732,9 @@ static GWViewType GWViewerViewTypeForSegmentIndex(NSInteger segment)
   return nodeView;
 }
 
-- (id)shelf
+- (id)sidebar
 {
-  return shelf;
+  return sidebar;
 }
 
 - (GWViewType)viewType
@@ -712,7 +771,7 @@ static GWViewType GWViewerViewTypeForSegmentIndex(NSInteger segment)
   CGFloat h = r.size.height;
   CGFloat d = [split dividerThickness];
 
-  [shelf setFrame: NSMakeRect(0, 0, shelfHeight, h)];
+  [sidebar setFrame: NSMakeRect(0, 0, shelfHeight, h)];
   [lowBox setFrame: NSMakeRect(shelfHeight + d, 0, w - shelfHeight - d, h)];
 }
 
@@ -831,41 +890,6 @@ static GWViewType GWViewerViewTypeForSegmentIndex(NSInteger segment)
 {
 }
 
-- (void)shelfDidSelectIcon:(id)icon
-{
-  FSNode *node = [icon node];
-  NSArray *selection = [icon selection];
-  FSNode *nodetoshow;
-  
-  if (selection && ([selection count] > 1)) {
-    nodetoshow = [FSNode nodeWithPath: [node parentPath]];
-  } else {
-    if ([node isDirectory] && ([node isPackage] == NO)) {
-      nodetoshow = node;
-      
-      if (viewType != GWViewTypeBrowser) {
-        selection = nil;
-      } else {
-        selection = [NSArray arrayWithObject: node];
-      }
-    
-    } else {
-      nodetoshow = [FSNode nodeWithPath: [node parentPath]];
-      selection = [NSArray arrayWithObject: node];
-    }
-  }
-
-  [nodeView showContentsOfNode: nodetoshow];
-  
-  if (selection) {
-    [nodeView selectRepsOfSubnodes: selection];
-  }
-
-  if ([nodeView respondsToSelector: @selector(scrollSelectionToVisible)]) {
-    [nodeView scrollSelectionToVisible];
-  }
-}
-
 - (void)setSelectableNodesRange:(NSRange)range
 {
   visibleCols = range.length;
@@ -908,10 +932,11 @@ static GWViewType GWViewerViewTypeForSegmentIndex(NSInteger segment)
       count++;
     }
   }
-  countstr = [NSString stringWithFormat: @"%lu %@", (unsigned long)count, NSLocalizedString(@"files", @"")];
+  countstr = [NSString stringWithFormat: @"%lu %@", (unsigned long)count,
+              NSLocalizedString(@"items", @"")];
 
-  [split updateDiskSpaceInfo: labelstr];
-  [split updateFileCountInfo: countstr];
+  if (itemCountField)  [itemCountField  setStringValue: countstr];
+  if (diskSpaceField)  [diskSpaceField  setStringValue: labelstr];
 }
 
 - (BOOL)involvedByFileOperation:(NSDictionary *)opinfo
@@ -1018,13 +1043,11 @@ static GWViewType GWViewerViewTypeForSegmentIndex(NSInteger segment)
 - (void)hideDotsFileChanged:(BOOL)hide
 {
   [self reloadFromNode: baseNode];
-  [shelf checkIconsAfterDotsFilesChange];
 }
 
 - (void)hiddenFilesChanged:(NSArray *)paths
 {
   [self reloadFromNode: baseNode];
-  [shelf checkIconsAfterHidingOfPaths: paths];
 }
 
 - (void)columnsWidthChanged:(NSNotification *)notification
@@ -1074,9 +1097,6 @@ static GWViewType GWViewerViewTypeForSegmentIndex(NSInteger segment)
     [updatedprefs setObject: [NSNumber numberWithFloat: shelfHeight]
                      forKey: @"shelfheight"];
 
-    [updatedprefs setObject: [shelf contentsInfo]
-                     forKey: @"shelfdicts"];
-
     defEntry = [nodeView selectedPaths];
     if (defEntry) {
       if ([defEntry count] == 0) {
@@ -1120,17 +1140,14 @@ static GWViewType GWViewerViewTypeForSegmentIndex(NSInteger segment)
 }
 
 - (CGFloat)splitView:(NSSplitView *)sender
-constrainSplitPosition:(CGFloat)proposedPosition 
+constrainSplitPosition:(CGFloat)proposedPosition
          ofSubviewAt:(NSInteger)offset
 {
   if (proposedPosition < COLLAPSE_LIMIT) {
     shelfHeight = MIN_SHELF_HEIGHT;
-  } else if (proposedPosition <= MID_LIMIT) {  
-    shelfHeight = MID_SHELF_HEIGHT;
   } else {
-    shelfHeight = MAX_SHELF_HEIGHT;
+    shelfHeight = proposedPosition;
   }
-  
   return shelfHeight;
 }
 
@@ -1173,13 +1190,12 @@ constrainMinCoordinate:(CGFloat)proposedMin
 {
   NSArray *selection = [nodeView selectedNodes];
 
-  [manager updateDesktop];
   if ([selection count] == 0)
     {
       selection = [NSArray arrayWithObject: [nodeView shownNode]];
     }
   [self selectionChanged: selection];
-  
+
   [manager changeHistoryOwner: self];
 }
 
@@ -1201,8 +1217,7 @@ constrainMinCoordinate:(CGFloat)proposedMin
 
 - (BOOL)windowShouldClose:(id)sender
 {
-  [manager updateDesktop];
-	return YES;
+  return YES;
 }
 
 - (void)windowWillClose:(NSNotification *)aNotification
@@ -1256,7 +1271,7 @@ constrainMinCoordinate:(CGFloat)proposedMin
             if ([node isApplication] == NO) {
               [gfinder openFile: [node path]];
             } else {
-              [[NSWorkspace sharedWorkspace] launchApplication: [node path]];
+              [gfinder launchApplication: [node path] showIcon: YES autolaunch: NO];
             }
           } else {
             [dirs addObject: node];
@@ -1419,6 +1434,83 @@ constrainMinCoordinate:(CGFloat)proposedMin
   [manager goForwardInHistoryOfViewer: self];
 }
 
+- (void)goToDirectory:(NSString *)path
+{
+  FSNode *node = [FSNode nodeWithPath: path];
+
+  if (node == nil || [node isValid] == NO || [node isDirectory] == NO)
+    return;
+
+  [nodeView showContentsOfNode: node];
+
+  if (viewType == GWViewTypeBrowser)
+    {
+      [nodeView selectRepsOfSubnodes: [NSArray arrayWithObject: node]];
+      if ([nodeView respondsToSelector: @selector(scrollSelectionToVisible)])
+        [nodeView scrollSelectionToVisible];
+    }
+}
+
+- (void)goEnclosingFolder
+{
+  NSString *currentPath = [[nodeView shownNode] path];
+  NSString *parent = [currentPath stringByDeletingLastPathComponent];
+
+  if (parent && [parent length] > 0 && [parent isEqualToString: currentPath] == NO)
+    [self goToDirectory: parent];
+}
+
+- (void)goAllMyFiles
+{
+  [self goToDirectory: NSHomeDirectory()];
+}
+
+- (void)goDesktop
+{
+  [self goToDirectory: [NSHomeDirectory() stringByAppendingPathComponent: @"Desktop"]];
+}
+
+- (void)goDocuments
+{
+  [self goToDirectory: [NSHomeDirectory() stringByAppendingPathComponent: @"Documents"]];
+}
+
+- (void)goDownloads
+{
+  [self goToDirectory: [NSHomeDirectory() stringByAppendingPathComponent: @"Downloads"]];
+}
+
+- (void)goHome
+{
+  [self goToDirectory: NSHomeDirectory()];
+}
+
+- (void)goComputer
+{
+  [self goToDirectory: path_separator()];
+}
+
+- (void)goNetwork
+{
+  [self goToDirectory: @"/net"];
+}
+
+- (void)goApplications
+{
+  NSArray *dirs = NSSearchPathForDirectoriesInDomains(NSApplicationDirectory, NSLocalDomainMask, YES);
+
+  if ([dirs count] > 0)
+    [self goToDirectory: [dirs objectAtIndex: 0]];
+}
+
+- (void)goUtilities
+{
+  NSArray *dirs = NSSearchPathForDirectoriesInDomains(NSApplicationDirectory, NSLocalDomainMask, YES);
+
+  if ([dirs count] > 0)
+    [self goToDirectory: [[dirs objectAtIndex: 0] stringByAppendingPathComponent: @"Utilities"]];
+}
+
 - (void)setViewerType:(id)sender
 {
   NSInteger tag;
@@ -1559,6 +1651,7 @@ constrainMinCoordinate:(CGFloat)proposedMin
       
       [self updateDefaults];
       [self updateViewButtonsState];
+      [self updateStatusBarForViewType];
     }
 }
 

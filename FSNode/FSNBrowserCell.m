@@ -26,6 +26,7 @@
 
 #import <Foundation/Foundation.h>
 #import <AppKit/AppKit.h>
+#import <objc/runtime.h>
 
 #import "FSNBrowserCell.h"
 #import "FSNode.h"
@@ -45,10 +46,33 @@ static NSString *dots = @"...";
   RELEASE (selectionTitle);
   RELEASE (uncutTitle);
   RELEASE (extInfoType);
-  RELEASE (infoCell); 
-  RELEASE (icon); 
-  RELEASE (selectedicon); 
-  
+  RELEASE (infoCell);
+  RELEASE (icon);
+  RELEASE (selectedicon);
+
+}
+
+- (id)copyWithZone:(NSZone *)zone
+{
+  FSNBrowserCell *c = [super copyWithZone: zone];
+
+  // NSCell's copyWithZone uses NSCopyObject (bitwise copy), leaving our object
+  // ivars as unretained shared pointers. Zero them at raw memory level before
+  // ARC-managed assignment to prevent over-releasing the original's objects.
+  {
+    char *cBase = (char *)(__bridge void *)c;
+    const char *names[] = {"node", "selection", "selectionTitle", "uncutTitle",
+                           "extInfoType", "infoCell", "icon", "selectedicon",
+                           "fsnodeRep", NULL};
+    for (int i = 0; names[i]; i++) {
+      Ivar iv = class_getInstanceVariable([FSNBrowserCell class], names[i]);
+      if (iv) memset(cBase + ivar_getOffset(iv), 0, sizeof(id));
+    }
+  }
+
+  c->fsnodeRep = fsnodeRep;
+
+  return c;
 }
 
 + (void)initialize

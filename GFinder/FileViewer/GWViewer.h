@@ -38,7 +38,7 @@ typedef enum
 @class FSNodeRep;
 @class GWViewerWindow;
 @class GWViewerSplit;
-@class GWViewerShelf;
+@class GWSidebarView;
 @class GWViewerScrollView;
 @class GWViewerIconsPath;
 @class GWViewerPathsScroll;
@@ -53,8 +53,8 @@ typedef enum
 @interface GWViewer : NSObject <NSToolbarDelegate>
 {
   GWViewerWindow *vwrwin;
-  GWViewerSplit *split;
-  GWViewerShelf *shelf;
+  GWViewerSplit  *split;
+  GWSidebarView  *sidebar;
   float shelfHeight;
   NSView *lowBox;
   GWViewerPathsScroll *pathsScroll;
@@ -62,6 +62,12 @@ typedef enum
   GWViewerScrollView *nviewScroll;
   id nodeView;
   NSTextField *folderNameField;
+
+  /* Status bar */
+  NSTextField *itemCountField;
+  NSTextField *diskSpaceField;
+  NSSlider    *iconSizeSlider;
+
   NSToolbar *toolbar;
   NSToolbarItem *navigationItem;
   NSToolbarItem *viewTypeItem;
@@ -115,7 +121,7 @@ typedef enum
 
 - (GWViewerWindow *)win;
 - (id)nodeView;
-- (id)shelf;
+- (id)sidebar;
 - (GWViewType)viewType;
 
 /* the first among root viewers, the default Viewer */
@@ -138,8 +144,12 @@ typedef enum
 - (void)selectionChanged:(NSArray *)newsel;
 - (void)multipleNodeViewDidSelectSubNode:(FSNode *)node;
 - (void)pathsViewDidSelectIcon:(id)icon;
-- (void)shelfDidSelectIcon:(id)icon;
 - (void)setSelectableNodesRange:(NSRange)range;
+
+- (void)goToDirectory:(NSString *)path;
+
+- (void)iconSizeSliderChanged:(id)sender;
+- (void)updateStatusBarForViewType;
 - (void)updeateInfoLabels;
 
 - (BOOL)involvedByFileOperation:(NSDictionary *)opinfo;
@@ -179,6 +189,16 @@ typedef enum
 - (void)deleteFiles;
 - (void)goBackwardInHistory;
 - (void)goForwardInHistory;
+- (void)goEnclosingFolder;
+- (void)goAllMyFiles;
+- (void)goDesktop;
+- (void)goDocuments;
+- (void)goDownloads;
+- (void)goHome;
+- (void)goComputer;
+- (void)goNetwork;
+- (void)goApplications;
+- (void)goUtilities;
 - (void)setViewerType:(id)sender;
 - (void)setShownType:(id)sender;
 - (void)setExtendedShownType:(id)sender;

@@ -33,8 +33,6 @@
 #import "FSNodeRep.h"
 #import "FSNFunctions.h"
 #import "GFinder.h"
-#import "GWDesktopManager.h"
-#import "Dock.h"
 #import "GWViewersManager.h"
 #import "Operation.h"
 #import "StartAppWin.h"
@@ -261,12 +259,35 @@
   app = [self launchedAppWithPath: appPath andName: appName];
  
   if (app == nil) {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSString *host = [defaults stringForKey: @"NSHost"];
+    id proxy;
+
+    if (host == nil) {
+      host = @"";
+    } else {
+      NSHost *h = [NSHost hostWithName: host];
+      if ([h isEqual: [NSHost currentHost]]) {
+        host = @"";
+      }
+    }
+
+    proxy = [NSConnection rootProxyForConnectionWithRegisteredName: appName
+                                                             host: host];
+    if (proxy) {
+      NS_DURING
+        [proxy activateIgnoringOtherApps: YES];
+      NS_HANDLER
+      NS_ENDHANDLER
+      return YES;
+    }
+
     if (autolaunch) {
 	    args = [NSArray arrayWithObjects: @"-autolaunch", @"YES", nil];
 	  }
-    
+
     return [self launchApplication: appname arguments: args];
-  
+
   } else {
     application = [app application];
  
@@ -510,7 +531,6 @@
   NSString *name = [info objectForKey: @"NSApplicationName"];
   
   if (path && name) {
-    [[dtopManager dock] appWillLaunch: path appName: name];
     GWDebugLog(@"appWillLaunch: \"%@\" %@", name, path);
   } else {
     GWDebugLog(@"appWillLaunch: unknown application!");
@@ -543,7 +563,6 @@
   }
 
   if (app && [app application]) {
-    [[dtopManager dock] appDidLaunch: path appName: name];
     GWDebugLog(@"\"%@\" appDidLaunch (%@)", name, path);
   }
 }
@@ -621,7 +640,6 @@
    
   if (app) {
     [app setHidden: YES];
-    [[dtopManager dock] appDidHide: name];
   } else {
     GWDebugLog(@"appDidHide: \"%@\" unknown running application.", name);
   }
@@ -636,7 +654,6 @@
     
   if (app) {
     [app setHidden: NO];
-    [[dtopManager dock] appDidUnhide: name];
     GWDebugLog(@"\"%@\" appDidUnhide", name);
   } else {
     GWDebugLog(@"appDidUnhide: \"%@\" unknown running application.", name);
@@ -660,8 +677,7 @@
     activeApplication = nil;
   }
   
-  [[dtopManager dock] appTerminated: [app name]];
-  GWDebugLog(@"\"%@\" applicationTerminated", [app name]);  
+  GWDebugLog(@"\"%@\" applicationTerminated", [app name]);
   [launchedApps removeObject: app];  
   
   if (loggingout && ([launchedApps count] == 1)) {
@@ -873,13 +889,7 @@
           
                   [launchedApps addObject: app];
                   [app setHidden: hidden];
-                  [[dtopManager dock] appDidLaunch: path appName: name];
-          
-                  if (hidden)
-                    {
-                      [[dtopManager dock] appDidHide: name];
-                    }
-          
+
                 }
               else if (app != nil)
                 {

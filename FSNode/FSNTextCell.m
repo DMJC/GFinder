@@ -25,6 +25,7 @@
 
 #import <Foundation/Foundation.h>
 #import <AppKit/AppKit.h>
+#import <objc/runtime.h>
 #import "FSNTextCell.h"
 
 
@@ -32,10 +33,9 @@
 
 - (void)dealloc
 {
-  RELEASE (uncutTitle);
   RELEASE (fontAttr);
   RELEASE (dots);
-  RELEASE (icon);  
+  RELEASE (icon);
 }
 
 - (id)init
@@ -59,17 +59,22 @@
 {
   FSNTextCell *c = [super copyWithZone: zone];
 
-  c->fontAttr = [fontAttr copyWithZone: zone];
-  c->dots = [dots copyWithZone: zone];
-
-  c->dateCell = dateCell;
-  
-  if (uncutTitle) {
-    c->uncutTitle = [uncutTitle copyWithZone: zone];
-  } else {
-    c->uncutTitle = nil;
+  // NSCell's copyWithZone uses NSCopyObject (bitwise copy), leaving our object
+  // ivars as unretained shared pointers. Zero them at raw memory level before
+  // ARC-managed assignment to prevent over-releasing the prototype's objects.
+  {
+    char *cBase = (char *)(__bridge void *)c;
+    const char *names[] = {"fontAttr", "dots", "icon", NULL};
+    for (int i = 0; names[i]; i++) {
+      Ivar iv = class_getInstanceVariable([FSNTextCell class], names[i]);
+      if (iv) memset(cBase + ivar_getOffset(iv), 0, sizeof(id));
+    }
   }
 
+  c->fontAttr = [fontAttr copyWithZone: zone];
+  c->dots = @"...";
+  c->dateCell = dateCell;
+  c->icon = icon;
 
   return c;
 }
@@ -209,10 +214,10 @@
   if (icon)
     textlength -= ([icon size].width + (MARGIN * 2));
 
-  ASSIGN (uncutTitle, [self stringValue]);
+  NSString *uncutTitle = [self stringValue];
   /* we calculate the reduced title only if necessary */
   cutTitle = nil;
-  if ([uncutTitle sizeWithAttributes: fontAttr].width > textlength)
+  if (titlesize.width > textlength)
     {
       if (dateCell)
         cutTitle = [self cutDateTitle:uncutTitle toFitWidth:textlength];

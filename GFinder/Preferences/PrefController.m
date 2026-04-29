@@ -34,7 +34,6 @@
 #import "HiddenFilesPref.h"
 #import "HistoryPref.h"
 #import "BrowserViewerPref.h"
-#import "DesktopPref.h"
 #import "OperationPrefs.h"
 #import "GFinder.h"
 
@@ -87,7 +86,6 @@ RELEASE (currentPref)
   ADD_PREF_VIEW ([DefSortOrderPref class]);		
   ADD_PREF_VIEW ([IconsPref class]);
   ADD_PREF_VIEW ([HiddenFilesPref class]);
-  ADD_PREF_VIEW ([DesktopPref class]);
   ADD_PREF_VIEW ([OperationPrefs class]);
   ADD_PREF_VIEW ([HistoryPref class]);
 

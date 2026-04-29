@@ -47,8 +47,6 @@
 #import "StartAppWin.h"
 #import "Preferences/PrefController.h"
 #import "Fiend/Fiend.h"
-#import "GWDesktopManager.h"
-#import "Dock.h"
 #import "GWViewersManager.h"
 #import "GWViewer.h"
 #import "Finder.h"
@@ -135,7 +133,6 @@ static GFinder *gfinder = nil;
   RELEASE (runExtController);
   RELEASE (startAppWin);
   RELEASE (vwrsManager);
-  RELEASE (dtopManager);
   DESTROY (inspector);
   DESTROY (fileOpsManager);
   RELEASE (finder);
@@ -173,7 +170,7 @@ static GFinder *gfinder = nil;
   [menu addItemWithTitle:_(@"New File")  action:@selector(newFile:) keyEquivalent:@"N"];
   [menu addItemWithTitle:_(@"Duplicate")  action:@selector(duplicateFiles:) keyEquivalent:@"u"];
   [menu addItemWithTitle:_(@"Destroy")  action:@selector(deleteFiles:) keyEquivalent:@"r"];  
-  [menu addItemWithTitle:_(@"Move to Recycler")  action:@selector(recycleFiles:) keyEquivalent:@"d"];
+  [menu addItemWithTitle:_(@"Move to Recycler")  action:@selector(recycleFiles:) keyEquivalent:@"del"];
   [menu addItemWithTitle:_(@"Empty Recycler") action:@selector(emptyRecycler:) keyEquivalent:@""];
   
   // Edit
@@ -250,17 +247,16 @@ static GFinder *gfinder = nil;
   [mainMenu setSubmenu: menu forItem: menuItem];
   [menu addItemWithTitle:_(@"Back") action:@selector(goBackwardInHistory:) keyEquivalent:@""];
   [menu addItemWithTitle:_(@"Forward") action:@selector(goForwardInHistory:) keyEquivalent:@""];
-  [menu addItemWithTitle:_(@"Enclosing Folder") action:NULL keyEquivalent:@""];
-  //Insert Separator Here [menu addSeparatorItem];
-  [menu addItemWithTitle:_(@"All My Files") action:NULL keyEquivalent:@""];
-  [menu addItemWithTitle:_(@"Documents") action:NULL keyEquivalent:@""];
-  [menu addItemWithTitle:_(@"Desktop") action:NULL keyEquivalent:@""];
-  [menu addItemWithTitle:_(@"Downloads") action:NULL keyEquivalent:@""];
-  [menu addItemWithTitle:_(@"Home") action:NULL keyEquivalent:@""];
-  [menu addItemWithTitle:_(@"Computer") action:NULL keyEquivalent:@""];
-  [menu addItemWithTitle:_(@"Network") action:NULL keyEquivalent:@""];
-  [menu addItemWithTitle:_(@"Applications") action:NULL keyEquivalent:@""];
-  [menu addItemWithTitle:_(@"Utilities") action:NULL keyEquivalent:@""];
+  [menu addItemWithTitle:_(@"Enclosing Folder") action:@selector(goEnclosingFolder:) keyEquivalent:@""];
+  [menu addItemWithTitle:_(@"All My Files") action:@selector(goAllMyFiles:) keyEquivalent:@""];
+  [menu addItemWithTitle:_(@"Desktop") action:@selector(goDesktop:) keyEquivalent:@""];
+  [menu addItemWithTitle:_(@"Documents") action:@selector(goDocuments:) keyEquivalent:@""];
+  [menu addItemWithTitle:_(@"Downloads") action:@selector(goDownloads:) keyEquivalent:@""];
+  [menu addItemWithTitle:_(@"Home") action:@selector(goHome:) keyEquivalent:@""];
+  [menu addItemWithTitle:_(@"Computer") action:@selector(goComputer:) keyEquivalent:@""];
+  [menu addItemWithTitle:_(@"Network") action:@selector(goNetwork:) keyEquivalent:@""];
+  [menu addItemWithTitle:_(@"Applications") action:@selector(goApplications:) keyEquivalent:@""];
+  [menu addItemWithTitle:_(@"Utilities") action:@selector(goUtilities:) keyEquivalent:@""];
 
   // Tools
   menuItem = [mainMenu addItemWithTitle:_(@"Tools") action:NULL keyEquivalent:@""];
@@ -285,7 +281,7 @@ static GFinder *gfinder = nil;
   subMenu = AUTORELEASE ([NSMenu new]);
   [menu setSubmenu: subMenu forItem: menuItem];    
   [menu addItemWithTitle:_(@"Terminal") action:@selector(showTerminal:) keyEquivalent:@"t"];
-  [menu addItemWithTitle:_(@"Run...") action:@selector(runCommand:) keyEquivalent:@""];  
+  [menu addItemWithTitle:_(@"Run...") action:@selector(runCommand:) keyEquivalent:@"R"];  
 
   menuItem = [menu addItemWithTitle:_(@"History") action:NULL keyEquivalent:@""];
   subMenu = AUTORELEASE ([NSMenu new]);
@@ -294,7 +290,6 @@ static GFinder *gfinder = nil;
   [subMenu addItemWithTitle:_(@"Go backward") action:@selector(goBackwardInHistory:) keyEquivalent:@""];
   [subMenu addItemWithTitle:_(@"Go forward") action:@selector(goForwardInHistory:) keyEquivalent:@""];
   
-  [menu addItemWithTitle:_(@"Show Desktop") action:@selector(showDesktop:) keyEquivalent:@""];
   [menu addItemWithTitle:_(@"Show Recycler") action:@selector(showRecycler:) keyEquivalent:@""];
 
   [menu addItemWithTitle:_(@"Check for disks") action:@selector(checkRemovableMedia:) keyEquivalent:@"E"];
@@ -367,8 +362,6 @@ static GFinder *gfinder = nil;
     }
 	    
   defaults = [NSUserDefaults standardUserDefaults];
-  [defaults registerDefaults: [NSDictionary dictionaryWithObject: [NSNumber numberWithBool: YES]
-                                                          forKey: @"no_desktop"]];
   [defaults setObject: gwProcessName forKey: @"GSWorkspaceApplication"];
         
   entry = [defaults objectForKey: @"reserved_names"];
@@ -450,21 +443,10 @@ static GFinder *gfinder = nil;
     
   recyclerApp = nil;
 
-  dtopManager = [GWDesktopManager desktopManager];
-    
-  if ([defaults boolForKey: @"no_desktop"] == NO)
-  { 
-    id item;
-   
-    [dtopManager activateDesktop];
-    menu = [[[NSApp mainMenu] itemWithTitle: NSLocalizedString(@"Tools", @"")] submenu];
-    item = [menu itemWithTitle: NSLocalizedString(@"Show Desktop", @"")];
-    [item setTitle: NSLocalizedString(@"Hide Desktop", @"")];
-
-  } else if ([defaults boolForKey: @"uses_recycler"])
-  { 
-    [self connectRecycler];
-  }  
+  if ([defaults boolForKey: @"uses_recycler"])
+    {
+      [self connectRecycler];
+    }
 
   prefController = [PrefController new];  
   
@@ -708,11 +690,6 @@ static GFinder *gfinder = nil;
   return vwrsManager;
 }
 
-- (GWDesktopManager *)desktopManager
-{
-  return dtopManager;
-}
-
 - (History *)historyWindow
 {
   return history;
@@ -835,9 +812,6 @@ static GFinder *gfinder = nil;
   [defaults setObject: entry forKey: @"default_sortorder"];
 
   [vwrsManager updateDefaults];
-
-  [dtopManager updateDefaults];
-  [defaults setBool: ![dtopManager isActive] forKey: @"no_desktop"];
 
   [finder updateDefaults];
 
@@ -977,8 +951,8 @@ static GFinder *gfinder = nil;
   SEL action = [anItem action];
 
   if (sel_isEqual(action, @selector(showRecycler:))) {
-    return (([dtopManager isActive] == NO) || ([dtopManager dockActive] == NO));
-  
+    return YES;
+
   } else if (sel_isEqual(action, @selector(emptyRecycler:))) {
     return ([trashContents count] != 0);
 
@@ -1438,8 +1412,6 @@ static GFinder *gfinder = nil;
   [fsnodeRep setUseThumbnails: value];
   
   [vwrsManager thumbnailsDidChangeInPaths: nil];
-  [dtopManager thumbnailsDidChangeInPaths: nil];
-  
 }
 
 - (void)thumbnailsDidChange:(NSNotification *)notif
@@ -1471,7 +1443,6 @@ static GFinder *gfinder = nil;
       }
 
       [vwrsManager thumbnailsDidChangeInPaths: tmbdirs];
-      [dtopManager thumbnailsDidChangeInPaths: tmbdirs];
       [tmbdirs removeAllObjects];
     }
 
@@ -1497,8 +1468,6 @@ static GFinder *gfinder = nil;
       }
       
       [vwrsManager thumbnailsDidChangeInPaths: tmbdirs];
-      [dtopManager thumbnailsDidChangeInPaths: tmbdirs];
-      
     }
 }
 
@@ -1509,7 +1478,6 @@ static GFinder *gfinder = nil;
   removables = [[[NSUserDefaults standardUserDefaults] persistentDomainForName: NSGlobalDomain] objectForKey: @"GSRemovableMediaPaths"];
 
   [fsnodeRep setVolumes: removables];
-  [dtopManager removableMediaPathsDidChange];
 }
 
 - (void)reservedMountNamesDidChange:(NSNotification *)notif
@@ -1524,7 +1492,6 @@ static GFinder *gfinder = nil;
   
   [fsnodeRep setHideSysFiles: hide];
   [vwrsManager hideDotsFileDidChange: hide];
-  [dtopManager hideDotsFileDidChange: hide];
 
   if (fiend != nil) {
     [fiend checkIconsAfterDotsFilesChange];
@@ -1534,7 +1501,6 @@ static GFinder *gfinder = nil;
 - (void)hiddenFilesDidChange:(NSArray *)paths
 {
   [vwrsManager hiddenFilesDidChange: paths];
-  [dtopManager hiddenFilesDidChange: paths];
   if (fiend != nil) {
     [fiend checkIconsAfterHidingOfPaths: paths];
   }
@@ -1556,8 +1522,6 @@ static GFinder *gfinder = nil;
   paths = [NSArray arrayWithObject: dirpath];
   
   [vwrsManager thumbnailsDidChangeInPaths: paths];
-  [dtopManager thumbnailsDidChangeInPaths: paths];
-
 }
 
 - (void)applicationForExtensionsDidChange:(NSNotification *)notif
@@ -1622,11 +1586,10 @@ static GFinder *gfinder = nil;
 
       for (i = 1; i <= 40; i++) {
         [startAppWin updateProgressBy: 1.0];
-	      [[NSRunLoop currentRunLoop] runUntilDate:
-		                     [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+        [NSThread sleepForTimeInterval: 0.1];
 
-        fswatcher = [NSConnection rootProxyForConnectionWithRegisteredName: @"fswatcher" 
-                                                                      host: @""];                  
+        fswatcher = [NSConnection rootProxyForConnectionWithRegisteredName: @"fswatcher"
+                                                                      host: @""];
         if (fswatcher)
 	{
           [startAppWin updateProgressBy: 40.0 - (double)i];
@@ -1749,10 +1712,9 @@ static GFinder *gfinder = nil;
           for (i = 1; i <= 80; i++)
             {
               [startAppWin updateProgressBy: 1.0];
-              [[NSRunLoop currentRunLoop] runUntilDate:
-                                            [NSDate dateWithTimeIntervalSinceNow: 0.1]];
-              recyclerApp = [NSConnection rootProxyForConnectionWithRegisteredName: @"Recycler" 
-                                                                              host: @""];                  
+              [NSThread sleepForTimeInterval: 0.1];
+              recyclerApp = [NSConnection rootProxyForConnectionWithRegisteredName: @"Recycler"
+                                                                              host: @""];
               if (recyclerApp)
                 {
                   [startAppWin updateProgressBy: 80.0 - (double)i];
@@ -1859,10 +1821,9 @@ static GFinder *gfinder = nil;
 	  for (i = 1; i <= 40; i++)
 	    {
 	      [startAppWin updateProgressBy: 1.0];
-	      [[NSRunLoop currentRunLoop] runUntilDate:
-					    [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+	      [NSThread sleepForTimeInterval: 0.1];
 
-	      ddbd = [NSConnection rootProxyForConnectionWithRegisteredName: @"ddbd" 
+	      ddbd = [NSConnection rootProxyForConnectionWithRegisteredName: @"ddbd"
 								       host: @""];                  
 	      if (ddbd)
 		{
@@ -1982,10 +1943,9 @@ static GFinder *gfinder = nil;
 
       for (i = 1; i <= 80; i++) {
         [startAppWin updateProgressBy: 1.0];
-	      [[NSRunLoop currentRunLoop] runUntilDate:
-		                     [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+        [NSThread sleepForTimeInterval: 0.1];
 
-        mdextractor = [NSConnection rootProxyForConnectionWithRegisteredName: @"mdextractor" 
+        mdextractor = [NSConnection rootProxyForConnectionWithRegisteredName: @"mdextractor"
                                                                         host: @""];                  
         if (mdextractor) {
           [startAppWin updateProgressBy: 80.0 - (double)i];
@@ -2126,6 +2086,66 @@ static GFinder *gfinder = nil;
   [vwrsManager showRootViewer];
 }
 
+- (id)currentViewer
+{
+  NSWindow *kwin = [NSApp keyWindow];
+
+  if (kwin && [vwrsManager hasViewerWithWindow: kwin])
+    return [vwrsManager viewerWithWindow: kwin];
+
+  return [vwrsManager rootViewer];
+}
+
+- (void)goEnclosingFolder:(id)sender
+{
+  [[self currentViewer] goEnclosingFolder];
+}
+
+- (void)goAllMyFiles:(id)sender
+{
+  [[self currentViewer] goAllMyFiles];
+}
+
+- (void)goDesktop:(id)sender
+{
+  [[self currentViewer] goDesktop];
+}
+
+- (void)goDocuments:(id)sender
+{
+  [[self currentViewer] goDocuments];
+}
+
+- (void)goDownloads:(id)sender
+{
+  [[self currentViewer] goDownloads];
+}
+
+- (void)goHome:(id)sender
+{
+  [[self currentViewer] goHome];
+}
+
+- (void)goComputer:(id)sender
+{
+  [[self currentViewer] goComputer];
+}
+
+- (void)goNetwork:(id)sender
+{
+  [[self currentViewer] goNetwork];
+}
+
+- (void)goApplications:(id)sender
+{
+  [[self currentViewer] goApplications];
+}
+
+- (void)goUtilities:(id)sender
+{
+  [[self currentViewer] goUtilities];
+}
+
 - (void)showHistory:(id)sender
 {
   [history activate];
@@ -2159,31 +2179,6 @@ static GFinder *gfinder = nil;
 {
   [self showInspector: nil]; 
   [inspector showAnnotations];
-}
-
-- (void)showDesktop:(id)sender
-{
-  NSMenu *menu = [[[NSApp mainMenu] itemWithTitle: NSLocalizedString(@"Tools", @"")] submenu];
-  id item;
-
-  if ([dtopManager isActive] == NO)
-    {
-      [dtopManager activateDesktop];
-      item = [menu itemWithTitle: NSLocalizedString(@"Show Desktop", @"")];
-      [item setTitle: NSLocalizedString(@"Hide Desktop", @"")];
-      if (recyclerApp)
-	{
-	  recyclerCanQuit = YES;
-	  [recyclerApp terminateApplication];
-	  item = [menu itemWithTitle: NSLocalizedString(@"Hide Recycler", @"")];
-	  [item setTitle: NSLocalizedString(@"Show Recycler", @"")];
-	}
-    }
-  else {
-    [dtopManager deactivateDesktop];
-    item = [menu itemWithTitle: NSLocalizedString(@"Hide Desktop", @"")];
-    [item setTitle: NSLocalizedString(@"Show Desktop", @"")];
-  }
 }
 
 - (void)showRecycler:(id)sender
@@ -2279,40 +2274,21 @@ static GFinder *gfinder = nil;
 {
   NSWindow *kwin = [NSApp keyWindow];
 
-  if (kwin)
+  if (kwin && [vwrsManager hasViewerWithWindow: kwin])
     {
-      if ([vwrsManager hasViewerWithWindow: kwin]
-                                  || [dtopManager hasWindow: kwin])
-	{
-	  id nodeView;
-	  NSArray *selection;
-	  NSArray *basesel;
+      id nodeView = [[vwrsManager viewerWithWindow: kwin] nodeView];
+      NSArray *selection = [nodeView selectedPaths];
+      NSArray *basesel = [NSArray arrayWithObject: [[nodeView baseNode] path]];
 
-	  if ([vwrsManager hasViewerWithWindow: kwin])
-	    {
-	      nodeView = [[vwrsManager viewerWithWindow: kwin] nodeView];
-	    }
-	  else
-	    {
-	      nodeView = [dtopManager desktopView];
-	    }
-
-	  selection = [nodeView selectedPaths];
-	  basesel = [NSArray arrayWithObject: [[nodeView baseNode] path]];
-
-	  if ([selection count] && ([selection isEqual: basesel] == NO))
-	    {
-	      NSPasteboard *pb = [NSPasteboard generalPasteboard];
-
-	      [pb declareTypes: [NSArray arrayWithObject: NSFilenamesPboardType]
-			 owner: nil];
-
-	      if ([pb setPropertyList: selection forType: NSFilenamesPboardType])
-		{
-		  [fileOpsManager setFilenamesCut: YES];
-		}
-	    }
-	}
+      if ([selection count] && ([selection isEqual: basesel] == NO))
+        {
+          NSPasteboard *pb = [NSPasteboard generalPasteboard];
+          [pb declareTypes: [NSArray arrayWithObject: NSFilenamesPboardType] owner: nil];
+          if ([pb setPropertyList: selection forType: NSFilenamesPboardType])
+            {
+              [fileOpsManager setFilenamesCut: YES];
+            }
+        }
     }
 }
 
@@ -2320,93 +2296,76 @@ static GFinder *gfinder = nil;
 {
   NSWindow *kwin = [NSApp keyWindow];
 
-  if (kwin) {
-      if ([vwrsManager hasViewerWithWindow: kwin]
-                                  || [dtopManager hasWindow: kwin]) {
-      id nodeView;
-      NSArray *selection;
-      NSArray *basesel;
-      
-      if ([vwrsManager hasViewerWithWindow: kwin]) {
-        nodeView = [[vwrsManager viewerWithWindow: kwin] nodeView];
-      } else {
-        nodeView = [dtopManager desktopView];
-      }
-    
-      selection = [nodeView selectedPaths];  
-      basesel = [NSArray arrayWithObject: [[nodeView baseNode] path]];
-      
-      if ([selection count] && ([selection isEqual: basesel] == NO)) {
-        NSPasteboard *pb = [NSPasteboard generalPasteboard];
+  if (kwin && [vwrsManager hasViewerWithWindow: kwin])
+    {
+      id nodeView = [[vwrsManager viewerWithWindow: kwin] nodeView];
+      NSArray *selection = [nodeView selectedPaths];
+      NSArray *basesel = [NSArray arrayWithObject: [[nodeView baseNode] path]];
 
-        [pb declareTypes: [NSArray arrayWithObject: NSFilenamesPboardType]
-                   owner: nil];
-
-        if ([pb setPropertyList: selection forType: NSFilenamesPboardType]) {
-          [fileOpsManager setFilenamesCut: NO];
+      if ([selection count] && ([selection isEqual: basesel] == NO))
+        {
+          NSPasteboard *pb = [NSPasteboard generalPasteboard];
+          [pb declareTypes: [NSArray arrayWithObject: NSFilenamesPboardType] owner: nil];
+          if ([pb setPropertyList: selection forType: NSFilenamesPboardType])
+            {
+              [fileOpsManager setFilenamesCut: NO];
+            }
         }
-      }
     }
-  }
 }
 
 - (void)paste:(id)sender
 {
   NSWindow *kwin = [NSApp keyWindow];
 
-  if (kwin) {
-      if ([vwrsManager hasViewerWithWindow: kwin]
-                                  || [dtopManager hasWindow: kwin]) {
+  if (kwin && [vwrsManager hasViewerWithWindow: kwin])
+    {
       NSPasteboard *pb = [NSPasteboard generalPasteboard];
 
-      if ([[pb types] containsObject: NSFilenamesPboardType]) {
-        NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType];   
+      if ([[pb types] containsObject: NSFilenamesPboardType])
+        {
+          NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
 
-        if (sourcePaths) {
-          BOOL cut = [fileOpsManager filenamesWasCut];
-          id nodeView;
+          if (sourcePaths)
+            {
+              BOOL cut = [fileOpsManager filenamesWasCut];
+              id nodeView = [[vwrsManager viewerWithWindow: kwin] nodeView];
 
-          if ([vwrsManager hasViewerWithWindow: kwin]) {
-            nodeView = [[vwrsManager viewerWithWindow: kwin] nodeView];
-          } else {
-            nodeView = [dtopManager desktopView];
-          }
+              if ([nodeView validatePasteOfFilenames: sourcePaths wasCut: cut])
+                {
+                  NSMutableDictionary *opDict = [NSMutableDictionary dictionary];
+                  NSString *source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
+                  NSString *destination = [[nodeView shownNode] path];
+                  NSMutableArray *files = [NSMutableArray array];
+                  NSString *operation;
+                  int i;
 
-          if ([nodeView validatePasteOfFilenames: sourcePaths
-                                       wasCut: cut]) {
-            NSMutableDictionary *opDict = [NSMutableDictionary dictionary];
-            NSString *source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
-            NSString *destination = [[nodeView shownNode] path];
-            NSMutableArray *files = [NSMutableArray array];
-            NSString *operation;
-            int i;
+                  for (i = 0; i < [sourcePaths count]; i++)
+                    {
+                      [files addObject: [[sourcePaths objectAtIndex: i] lastPathComponent]];
+                    }
 
-            for (i = 0; i < [sourcePaths count]; i++) {  
-              NSString *spath = [sourcePaths objectAtIndex: i];
-              [files addObject: [spath lastPathComponent]];
-            }  
+                  if (cut)
+                    {
+                      operation = [source isEqual: trashPath]
+                        ? @"GFinderRecycleOutOperation"
+                        : NSWorkspaceMoveOperation;
+                    }
+                  else
+                    {
+                      operation = NSWorkspaceCopyOperation;
+                    }
 
-            if (cut) {
-              if ([source isEqual: trashPath]) {
-                operation = @"GFinderRecycleOutOperation";
-              } else {
-		            operation = NSWorkspaceMoveOperation;
-              }
-            } else {
-		          operation = NSWorkspaceCopyOperation;
+                  [opDict setObject: operation forKey: @"operation"];
+                  [opDict setObject: source forKey: @"source"];
+                  [opDict setObject: destination forKey: @"destination"];
+                  [opDict setObject: files forKey: @"files"];
+
+                  [self performFileOperation: opDict];
+                }
             }
-
-	          [opDict setObject: operation forKey: @"operation"];
-	          [opDict setObject: source forKey: @"source"];
-	          [opDict setObject: destination forKey: @"destination"];
-	          [opDict setObject: files forKey: @"files"];
-
-	          [self performFileOperation: opDict];	
-          }
         }
-      }
-    }    
-  }
+    }
 }
 
 - (void)runCommand:(id)sender
@@ -2416,7 +2375,6 @@ static GFinder *gfinder = nil;
 
 - (void)checkRemovableMedia:(id)sender
 {
-  [dtopManager checkNewRemovableMedia];	
 }
 
 - (void)emptyRecycler:(id)sender

@@ -40,7 +40,6 @@
 @class FSNode;
 @class FSNodeRep;
 @class GWViewersManager;
-@class GWDesktopManager;
 @class Finder;
 @class Inspector;
 @class Operation;
@@ -136,7 +135,6 @@
   int maxHistoryCache;
     
   GWViewersManager *vwrsManager;
-  GWDesktopManager *dtopManager;  
   Inspector *inspector;
   Finder *finder;
   Operation *fileOpsManager;
@@ -190,8 +188,6 @@
 - (NSString *)defXtermArgs;
 
 - (GWViewersManager *)viewersManager;
-
-- (GWDesktopManager *)desktopManager;
 
 - (History *)historyWindow;
 
@@ -345,6 +341,18 @@
 
 - (void)showViewer:(id)sender;
 
+- (id)currentViewer;
+- (void)goEnclosingFolder:(id)sender;
+- (void)goAllMyFiles:(id)sender;
+- (void)goDesktop:(id)sender;
+- (void)goDocuments:(id)sender;
+- (void)goDownloads:(id)sender;
+- (void)goHome:(id)sender;
+- (void)goComputer:(id)sender;
+- (void)goNetwork:(id)sender;
+- (void)goApplications:(id)sender;
+- (void)goUtilities:(id)sender;
+
 - (void)showHistory:(id)sender;
 
 - (void)showInspector:(id)sender;
@@ -356,8 +364,6 @@
 - (void)showToolsInspector:(id)sender;
 
 - (void)showAnnotationsInspector:(id)sender;
-
-- (void)showDesktop:(id)sender;
 
 - (void)showRecycler:(id)sender;
 

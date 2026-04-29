@@ -2,8 +2,6 @@
 # Things to do before compiling
 before-all::
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/GFinder
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Desktop
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Desktop/Dock
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Finder
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Finder/SearchResults
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Finder/LiveSearch
@@ -21,8 +19,6 @@ before-install::
 before-all::
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/GFinder
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/FileViewer
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Desktop  
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Desktop/Dock
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Finder  
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Finder/SearchResults
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Finder/LiveSearch

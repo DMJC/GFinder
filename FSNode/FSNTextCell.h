@@ -31,13 +31,12 @@
 
 @class NSImage;
 
-@interface FSNTextCell : NSTextFieldCell 
+@interface FSNTextCell : NSTextFieldCell
 {
   NSDictionary *fontAttr;
   NSString *dots;
   NSSize titlesize;
   BOOL dateCell;
-  NSString *uncutTitle; 
   NSImage *icon;
 }
 
