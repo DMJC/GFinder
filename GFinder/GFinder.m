@@ -266,7 +266,7 @@ static GFinder *gfinder = nil;
   menuItem = [menu addItemWithTitle:_(@"Inspectors") action:NULL keyEquivalent:@""];
   subMenu = AUTORELEASE ([NSMenu new]);
   [menu setSubmenu: subMenu forItem: menuItem];	
-  [subMenu addItemWithTitle:_(@"Show Inspectors") action:NULL keyEquivalent:@""];
+  [subMenu addItemWithTitle:_(@"Show Inspectors") action:@selector(showInspector:) keyEquivalent:@""];
   [subMenu addItemWithTitle:_(@"Attributes") action:@selector(showAttributesInspector:) keyEquivalent:@"1"];
   [subMenu addItemWithTitle:_(@"Contents") action:@selector(showContentsInspector:) keyEquivalent:@"2"];
   [subMenu addItemWithTitle:_(@"Tools") action:@selector(showToolsInspector:) keyEquivalent:@"3"];

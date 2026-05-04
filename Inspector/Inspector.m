@@ -56,24 +56,24 @@ static NSString *nibName = @"InspectorWin";
 - (id)init
 {
   self = [super init];
-  
+
   if (self) {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSString *appName = [defaults stringForKey: @"DesktopApplicationName"];
     NSString *selName = [defaults stringForKey: @"DesktopApplicationSelName"];
-  
+
     if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
       NSLog(@"failed to load %@!", nibName);
       DESTROY (self);
       return self;
-    } 
-    
+    }
+
     if (appName && selName) {
 		  Class desktopAppClass = [[NSBundle mainBundle] classNamed: appName];
       SEL sel = NSSelectorFromString(selName);
       desktopApp = [desktopAppClass performSelector: sel];
     }
-   
+
     [win setFrameUsingName: @"inspector"];
     [win setDelegate: self];
   
