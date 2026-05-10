@@ -47,6 +47,14 @@
   
   if (self)
     {
+      fm = [NSFileManager defaultManager];
+
+      NSString *pathEnv = [[[NSProcessInfo processInfo] environment] objectForKey: @"PATH"];
+      if (pathEnv)
+        pathsArr = RETAIN([pathEnv componentsSeparatedByString: @":"]);
+      else
+        pathsArr = RETAIN([NSArray array]);
+
       if ([NSBundle loadNibNamed: nibName owner: self] == NO)
         {
           NSLog(@"failed to load %@!", nibName);
