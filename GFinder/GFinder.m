@@ -1130,12 +1130,122 @@ static GFinder *gfinder = nil;
   }
 }
 
+- (BOOL)launchDesktopFile:(NSString *)fullPath
+{
+  NSString *contents = [NSString stringWithContentsOfFile: fullPath
+                                                 encoding: NSUTF8StringEncoding
+                                                    error: NULL];
+  if (contents == nil)
+    return NO;
+
+  NSMutableDictionary *entry = [NSMutableDictionary dictionary];
+  BOOL inDesktopEntry = NO;
+
+  for (NSString *line in [contents componentsSeparatedByString: @"\n"])
+    {
+      NSString *trimmed = [line stringByTrimmingCharactersInSet:
+                           [NSCharacterSet whitespaceCharacterSet]];
+
+      if ([trimmed hasPrefix: @"["])
+        {
+          inDesktopEntry = [trimmed isEqualToString: @"[Desktop Entry]"];
+          continue;
+        }
+
+      if (!inDesktopEntry || [trimmed hasPrefix: @"#"] || [trimmed length] == 0)
+        continue;
+
+      NSRange eqRange = [trimmed rangeOfString: @"="];
+      if (eqRange.location == NSNotFound)
+        continue;
+
+      NSString *key = [trimmed substringToIndex: eqRange.location];
+      NSString *value = [trimmed substringFromIndex: NSMaxRange(eqRange)];
+      if ([entry objectForKey: key] == nil)
+        [entry setObject: value forKey: key];
+    }
+
+  NSString *type = [entry objectForKey: @"Type"];
+
+  if ([type isEqualToString: @"Link"])
+    {
+      NSString *urlString = [entry objectForKey: @"URL"];
+      if (urlString)
+        {
+          NSURL *url = [NSURL URLWithString: urlString];
+          if (url)
+            return [ws openURL: url];
+        }
+      return NO;
+    }
+
+  if ([type isEqualToString: @"Directory"])
+    {
+      NSString *dirPath = [entry objectForKey: @"Path"];
+      if (dirPath)
+        {
+          [self newViewerAtPath: dirPath];
+          return YES;
+        }
+      return NO;
+    }
+
+  if ([type isEqualToString: @"Application"] == NO)
+    return NO;
+
+  NSString *exec = [entry objectForKey: @"Exec"];
+  if (exec == nil || [exec length] == 0)
+    return NO;
+
+  // Strip freedesktop field codes — we open with no file argument
+  NSMutableString *cmd = [NSMutableString stringWithString: exec];
+  for (NSString *code in @[@"%f", @"%F", @"%u", @"%U", @"%d", @"%D",
+                            @"%n", @"%N", @"%i", @"%c", @"%k", @"%v", @"%m"])
+    {
+      [cmd replaceOccurrencesOfString: code
+                           withString: @""
+                              options: 0
+                                range: NSMakeRange(0, [cmd length])];
+    }
+  [cmd replaceOccurrencesOfString: @"%%"
+                       withString: @"%"
+                          options: 0
+                            range: NSMakeRange(0, [cmd length])];
+
+  NSString *cmdStr = [cmd stringByTrimmingCharactersInSet:
+                      [NSCharacterSet whitespaceCharacterSet]];
+  if ([cmdStr length] == 0)
+    return NO;
+
+  NSString *useTerminal = [entry objectForKey: @"Terminal"];
+  if ([useTerminal isEqualToString: @"true"])
+    {
+      NSString *term = (defXterm && [defXterm length] > 0) ? defXterm : @"xterm";
+      NSMutableArray *termArgs = [NSMutableArray array];
+      if (defXtermArgs && [defXtermArgs length] > 0)
+        [termArgs addObjectsFromArray: [defXtermArgs componentsSeparatedByString: @" "]];
+      [termArgs addObject: @"-e"];
+      [termArgs addObject: cmdStr];
+      [NSTask launchedTaskWithLaunchPath: term arguments: termArgs];
+    }
+  else
+    {
+      [NSTask launchedTaskWithLaunchPath: @"/bin/sh"
+                               arguments: @[@"-c", cmdStr]];
+    }
+
+  return YES;
+}
+
 - (BOOL)openFile:(NSString *)fullPath
 {
   NSString *appName = nil;
   NSString *type = nil;
   BOOL success;
   NSURL *aURL;
+
+  if ([[fullPath pathExtension] isEqualToString: @"desktop"])
+    return [self launchDesktopFile: fullPath];
 
   aURL = nil;
   [ws getInfoForFile: fullPath application: &appName type: &type];
