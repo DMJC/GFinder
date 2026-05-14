@@ -469,6 +469,7 @@ iconForPath(NSString *path)
   [outlineView setAutoresizesOutlineColumn: YES];
   [outlineView setIndentationPerLevel: 8];
   [outlineView setRowHeight: 22];
+  [outlineView setDrawsGrid: NO];
   [outlineView setHeaderView: nil];
   [outlineView setDataSource: self];
   [outlineView setDelegate: self];
